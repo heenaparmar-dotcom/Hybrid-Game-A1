@@ -57,6 +57,9 @@ Each time a level is entered, the game picks one puzzle at random (never the one
 
 **Final-version update.** Warm Up and Find the Beat now draw ONLY from the Hindi film-song puzzles (10 and 5). Warm Up has a small Hint button (the timer keeps running); Find the Beat shows its hint all the time. Each Warm Up song names which of the game's own original dance tracks it uses. The 20 original lines per level remain in the data file but are not played in these two levels. The Rule Book was updated for the timers, the timeout reveal and the listening level.
 
+**YouTube playback of a solved song (added).** For Kala Chashma the dance now plays the official video through YouTube's embedded player (IFrame API, no key, privacy-enhanced domain), chosen because the video owner allows embedding (checked with YouTube's public oEmbed lookup). The video is shown on screen, is never downloaded or copied, and credits its channel. The dance follows the video's playback clock; if the video cannot start within about 9 seconds or errors, the game falls back to its own music and says so. Remaining limits: it needs internet, YouTube may show ads, the 30-second window starts at second 0 of the video (set `start` to change it), and the dancer's steps are tuned to the game's own tempos, so they are approximate for a real song. Other songs still use the game's own music until their official video links are supplied.
+
+
 Puzzle details **[Implemented]**: drag with mouse or finger (pointer events), tap-to-swap as a single-pointer alternative, keyboard control; the tiles reflow with a short slide; gentle feedback ("2 of 4 words are in the right place") that never reveals the answer; a *Nudge* after about 14 seconds that locks one correct word; *Shuffle again*.
 
 ## 5. Music, audio and licensing (investigation)
@@ -68,7 +71,7 @@ Options considered:
 | Option | Verdict |
 | --- | --- |
 | Popular Hindi or English songs | **Rejected.** Copyrighted, and being playable on YouTube or Spotify does not grant reuse rights. Audio recordings, lyrics and dance videos all carry rights |
-| YouTube / Spotify embeds | **Rejected for the core game.** Terms and technical limits generally prevent synchronising an embedded player to the game's own beat clock, and playback needs accounts or keys. Nothing was scraped or called |
+| YouTube / Spotify embeds | **YouTube embed now used as an option for songs whose official video is supplied (Kala Chashma so far); not for the core game.** Spotify not used. Terms and technical limits generally prevent synchronising an embedded player to the game's own beat clock, and playback needs accounts or keys. Nothing was scraped or called |
 | A music API | **Not used.** No key is available, none was invented, and the core game must work without one |
 | Royalty-free or Creative Commons tracks | **Possible later.** Needs the licence checked per track (attribution, no-derivatives, commercial terms). The README explains how to add one and what the dancer clock needs |
 | Original generated music | **Chosen.** Zero licensing risk, works offline, and gives the dancer an exact audio clock |

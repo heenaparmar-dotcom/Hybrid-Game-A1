@@ -183,6 +183,11 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 .burst-shape { position: absolute; left: -12px; top: -12px; opacity: 0; animation: burst 1.2s cubic-bezier(0.15, 0.7, 0.3, 1) forwards; }
 @keyframes burst { 0% { transform: translate(0, 0) scale(0.2) rotate(0); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; } }
 
+/* YouTube video for a song's dance */
+.video-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.video-box { max-width: 100%; border-radius: 14px; overflow: hidden; min-width: 200px; min-height: 200px; background: #000; }
+.video-box iframe { display: block; max-width: 100%; }
+
 /* Puzzle countdown, hint button and dance countdown */
 .puzzle-timer { display: inline-flex; align-items: baseline; gap: 0.45rem; position: relative; padding: 0.3rem 1.2rem 0.7rem; border-radius: 999px; border: 2px solid var(--line); background: rgba(255, 242, 224, 0.06); min-width: 150px; justify-content: center; }
 .puzzle-timer-num { font: 800 2.2rem/1 var(--display); font-variant-numeric: tabular-nums; }

@@ -23,6 +23,12 @@ export interface Puzzle {
   song?: { title: string; hint: string };
   /** Which of the game's own original dance tracks to use for this puzzle (default: the level's track). */
   trackId?: TrackId;
+  /**
+   * An official, embeddable YouTube video of the song. When set, the dance plays that video through YouTube's own player
+   * (nothing is copied or downloaded) and falls back to the game's own music if it cannot play.
+   * `start` is the second of the video where the 30-second dance begins; `credit` is shown to the player.
+   */
+  video?: { id: string; start?: number; credit: string };
 }
 
 export const PUZZLES: readonly Puzzle[] = [
@@ -50,7 +56,7 @@ export const PUZZLES: readonly Puzzle[] = [
 
   // Level 1: Hindi film songs. The words to arrange are the song title.
   { id: 'l1-s01', level: 1, trackId: 'hookstep', phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
-  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' } },
+  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' } },
   { id: 'l1-s03', level: 1, trackId: 'sunrise', phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
   { id: 'l1-s04', level: 1, trackId: 'hookstep', phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
   { id: 'l1-s05', level: 1, trackId: 'nacho', phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },

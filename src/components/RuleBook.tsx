@@ -117,7 +117,7 @@ export function RuleBook() {
         <ul>
           <li>Your progress and sound settings are saved only in this browser.</li>
           <li>A challenge link contains only the line, the chosen song, the word order and an optional nickname. Do not put personal details in them.</li>
-          <li>The film-song puzzles use only the song title and a short fact about it. No film-song lyrics or recordings are in the game. All music is original and made live in your browser, and the listening clips are demo clips with a computer voice.</li>
+          <li>The film-song puzzles use only the song title and a short fact about it. No film-song lyrics are in the game. The game's own music is original and made live in your browser. When a song has an official video set up (Kala Chashma so far), its dance plays that video through YouTube instead, which needs internet and shows a small video player; if it cannot play, the game's own music is used. The listening clips are demo clips with a computer voice.</li>
           <li>There are {EMOJI.length} emoji in the game, each with a text label: {EMOJI.map((e) => `${e.emoji} ${e.label}`).join(', ')}.</li>
         </ul>
       </section>
