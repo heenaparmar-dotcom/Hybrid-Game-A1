@@ -45,13 +45,13 @@ The first prototype was a scored, timed, two-player game on one device. After re
 
 ## 4. Gameplay, levels and difficulty
 
-| Level | Name | Line | Song | Words | Dance |
+| Level | Name | Lines (20 per level, picked at random) | Song | Words | Dance |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Warm Up | "Sway with the sunrise" | Sunrise Sway (English, warm pop, 112 BPM) | 4 | sway, reach, step, clap, repeated twice |
-| 2 | Find the Beat | "Aaj dil khol ke nacho" (Hindi in Roman script: "Today, dance with an open heart") | Nacho Aaj (dhol-inspired groove, 108 BPM) | 5 | step, arm lifts, hands on hips, clap, repeated twice |
-| 3 | Feel the Rhythm | "Let the rhythm carry us forward" | Hook-Step Party (Latin-pop, Zumba-inspired, 126 BPM) | 6 | march, turn, wave, arm lifts, reach, repeated twice |
+| 1 | Warm Up | 20 original English lines, e.g. "Sway with the sunrise" | Sunrise Sway (English, warm pop, 112 BPM) | 4 | sway, reach, step, clap, repeated twice |
+| 2 | Find the Beat | 20 original Hindi lines in Roman script, each with an English meaning, e.g. "Aaj dil khol ke nacho" ("Today, dance with an open heart") | Nacho Aaj (dhol-inspired groove, 108 BPM) | 5 | step, arm lifts, hands on hips, clap, repeated twice |
+| 3 | Feel the Rhythm | 20 original English lines, e.g. "Let the rhythm carry us forward" | Hook-Step Party (Latin-pop, Zumba-inspired, 126 BPM) | 6 | march, turn, wave, arm lifts, reach, repeated twice |
 
-Difficulty rises through more words, a line in another language, and longer, livelier routines. **[Implemented]** Each routine is 34 to 38 seconds of moves plus an 8-beat count-in, 39 to 42 seconds in total (limit 45) **[Verified by automated test]**.
+Each time a level is entered, the game picks one of that level's 20 lines at random (never the one just played) and shuffles its tiles freshly. The three pools are separate: 60 distinct lines in total. Difficulty rises through more words, a line in another language, and longer, livelier routines. **[Implemented]** Each routine is 34 to 38 seconds of moves plus an 8-beat count-in, 39 to 42 seconds in total (limit 45) **[Verified by automated test]**.
 
 Puzzle details **[Implemented]**: drag with mouse or finger (pointer events), tap-to-swap as a single-pointer alternative, keyboard control; the tiles reflow with a short slide; gentle feedback ("2 of 4 words are in the right place") that never reveals the answer; a *Nudge* after about 14 seconds that locks one correct word; *Shuffle again*.
 
@@ -161,9 +161,10 @@ Run by the developer on Windows with desktop Google Chrome. **These are not user
 | Check | Method | Result |
 | --- | --- | --- |
 | Type-check, lint, production build | `npm run check` | `npm run check` exited with code 0: type-check clean, lint clean, build succeeded |
-| Puzzle logic, scramble and hints, Devanagari, dancer poses are finite and continuous at all beats, each move visibly changes, cue timing and count-in, every routine 20 to 45 s, challenge-link encode/decode and hostile inputs, share URLs, storage sanitising, emoji budget, Rule Book numbers match the code | Vitest | 49 tests in 4 files, all passed |
+| Puzzle pools (60 lines, 20 per level, no overlap, rising word counts, all pass the custom-puzzle validation), random selection that never repeats the previous puzzle, puzzle logic, scramble and hints, Devanagari, dancer poses are finite and continuous at all beats, each move visibly changes, cue timing and count-in, every routine 20 to 45 s, challenge-link encode/decode and hostile inputs, share URLs, storage sanitising, emoji budget, Rule Book numbers match the code | Vitest | 61 tests in 5 files, all passed |
 | Title tap and keyboard start; shuffled tiles; no submit, check or verify button; wrong arrangement is gentle and never shows the answer; automatic detection; invitation shown; music engine not created until the dance button; "not now" never starts music | Playwright | Passed |
 | Mouse drag, keyboard move, tap-swap, nudge, shuffle again | Playwright | Passed |
+| **All 60 level puzzles solved through the game** (each forced once by controlling the random number), with the success state and meaning shown; entering a level again varies the puzzle and the shuffle; the title art is three vector silhouettes on a transparent background | Playwright | Passed |
 | Full Level 1 in real time: count-in, cues change on the beat, dancer pose changes, pause freezes dancer and cues, resume, automatic end, celebration, Next level, Level 2 Hindi line, progress saved | Playwright | Passed |
 | Restart dance, dance again, end dance, seated version (chair shown, upper-body cues), audio-unavailable fallback, Rule Book opens during dance and pauses it, level replay and locking, refresh | Playwright | Passed |
 | Puzzle maker validation, reviewed scramble matches the friend's puzzle, copy link (clipboard read back), friend opens real puzzle and song, share URLs for WhatsApp, Telegram and Email, native share present and absent, malformed and legacy links, Devanagari puzzle, paste-a-link | Playwright | Passed |
@@ -171,7 +172,7 @@ Run by the developer on Windows with desktop Google Chrome. **These are not user
 | Smoke test of the **deployed** site (`BASE_URL=... npm run test:e2e`): title start, no submit button, automatic detection, music waits for the button, create and share link opened in a second tab, malformed and legacy links, audio fallback, Rule Book, phone layout and touch drag | Playwright against the live GitHub Pages address | 8 selected tests passed (the full suite was run locally, not against the live site) |
 | Visual inspection: title, puzzle states, invitation, dance (standing and seated), celebration, create screen, Rule Book, phone views; a contact sheet of every move at several beats | Screenshots reviewed by the developer | Done; defects found and fixed (section 14) |
 
-Browser tests: 31 passed in the final full run.
+Browser tests: 36 passed in the final full run.
 
 ### 13.3 What has NOT been tested
 - **Any human playtest.** Understanding without coaching, enjoyment, comfort, whether the cues are easy to follow, and the real hybrid balance are all unknown.
@@ -192,7 +193,7 @@ Browser tests: 31 passed in the final full run.
 
 ## 14. Design thinking: Refine (iteration log)
 
-Entries 1 to 6 come from **developer testing**. Rows 7 onward are **placeholders for playtest-driven changes**; none has happened yet.
+Entries 1 to 7 come from **developer testing**. Rows 8 onward are **placeholders for playtest-driven changes**; none has happened yet.
 
 | # | Issue | Evidence | Change | Retest result |
 | --- | --- | --- | --- | --- |
@@ -202,10 +203,11 @@ Entries 1 to 6 come from **developer testing**. Rows 7 onward are **placeholders
 | 4 | Arms in front of the body (clap) vanished into the torso, and the arm-lift move passed through a T-pose on every beat | Pose contact sheet | Pale edge on arms; torso reshaped; arm lifts now peak on the beat; hips sway period matches its cue | Re-rendered contact sheet; unit tests check poses are finite, continuous and moving |
 | 5 | The count-in cue wrapped off the screen and the beat dots fell below the fold on a 1280 x 720 screen | Screenshots at laptop and phone sizes | Shorter count-in cue ("Find your spot"), capped stage height, cropped stage on phones | Re-captured screenshots: fixed |
 | 6 | Mobile title wordmark was clipped at the right edge | Phone screenshot | Smaller responsive size | Re-captured: fixed |
-| 7 | *[placeholder]* | *[playtest evidence]* | *[change]* | *[retest with whom, how, and result, including if it failed]* |
-| 8 | *[placeholder]* | | | |
+| 7 | Two of the new Hindi puzzle lines were wrong for the level: one had 4 words, one repeated a word so two tiles looked identical | New puzzle-pool unit tests failed on both lines | Rewrote both lines (5 distinct words each) | Pool tests pass; the 60-puzzle browser test passes |
+| 8 | *[placeholder]* | *[playtest evidence]* | *[change]* | *[retest with whom, how, and result, including if it failed]* |
+| 9 | *[placeholder]* | | | |
 
-**Requirement note.** The assignment asks for at least one evidence-based improvement after testing. Entries 1 to 6 are genuine but come from the developer's testing. Add at least one change driven by a human playtest and re-test it before submission.
+**Requirement note.** The assignment asks for at least one evidence-based improvement after testing. Entries 1 to 7 are genuine but come from the developer's testing. Add at least one change driven by a human playtest and re-test it before submission.
 
 ## 15. Accessibility, safety, ethics and privacy
 

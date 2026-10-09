@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../../src/data/levels';
+import { PUZZLES } from '../../src/data/puzzles';
 import { MOVES } from '../../src/data/moves';
 import { BEATS_PER_MOVE, COUNT_IN_BEATS, MAX_ROUTINE_SECONDS, TRACKS, routineBeats, routineSeconds, totalSeconds } from '../../src/data/tracks';
 import { MOVE_IDS, REST, poseAt } from '../../src/lib/dancer';
@@ -15,9 +16,8 @@ const seeded = (seed: number) => () => {
 describe('levels and songs', () => {
   it('has three levels that get longer, each tied to an existing song', () => {
     expect(LEVELS).toHaveLength(3);
-    const words = LEVELS.map((l) => tokenise(l.phrase).length);
-    expect(words).toEqual([...words].sort((a, b) => a - b));
-    expect(new Set(words).size).toBe(3);
+    const words = LEVELS.map((l) => new Set(PUZZLES.filter((p) => p.level === l.n).map((p) => tokenise(p.phrase).length)));
+    expect(words.map((w) => [...w])).toEqual([[4], [5], [6]]); // every puzzle in a level has the same, rising, word count
     for (const l of LEVELS) expect(TRACKS.some((t) => t.id === l.trackId)).toBe(true);
   });
   it('includes both Hindi and English songs', () => {
@@ -40,17 +40,19 @@ describe('levels and songs', () => {
       }
     }
   });
-  it('level 1 phrase has unique words (no ambiguous tiles)', () => {
-    const t = tokenise(LEVELS[0].phrase);
-    expect(new Set(t.map((x) => x.norm)).size).toBe(t.length);
+  it('every puzzle has unique words (no ambiguous tiles)', () => {
+    for (const p of PUZZLES) {
+      const t = tokenise(p.phrase);
+      expect(new Set(t.map((x) => x.norm)).size, p.id).toBe(t.length);
+    }
   });
 });
 
 describe('puzzle mechanics', () => {
   it('scramble never returns the solved order', () => {
-    for (const l of LEVELS) {
-      const sol = tokenise(l.phrase);
-      for (let i = 1; i <= 30; i++) expect(sameOrder(scramble(sol, seeded(i)), sol)).toBe(false);
+    for (const p of PUZZLES) {
+      const sol = tokenise(p.phrase);
+      for (let i = 1; i <= 30; i++) expect(sameOrder(scramble(sol, seeded(i)), sol), p.id).toBe(false);
     }
   });
   it('duplicate words are interchangeable', () => {

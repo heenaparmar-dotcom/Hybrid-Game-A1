@@ -1,5 +1,5 @@
 import { expect, type Page } from '@playwright/test';
-import { LEVELS } from '../../src/data/levels';
+import { PUZZLES, type Puzzle } from '../../src/data/puzzles';
 
 export const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{M}\p{N}]/gu, '');
 export const tileTexts = (page: Page) => page.locator('[data-testid^="tile-"]').allTextContents();
@@ -50,13 +50,26 @@ export async function solveByTaps(page: Page, phrase: string) {
   }
 }
 
-export const LEVEL1 = LEVELS[0];
-export const LEVEL2 = LEVELS[1];
-export const LEVEL3 = LEVELS[2];
+/** Which level puzzle is on screen? Matches the shown words against the puzzle pools. */
+export async function currentPuzzle(page: Page): Promise<Puzzle> {
+  const key = (words: string[]) => words.map(norm).sort().join('|');
+  const texts = (await tileTexts(page)).map((t) => t.trim());
+  const found = PUZZLES.filter((p) => key(p.phrase.split(' ')) === key(texts));
+  expect(found, `puzzle matching tiles ${texts.join(' / ')}`).toHaveLength(1);
+  return found[0];
+}
 
-/** Solve the puzzle and wait for the dance invitation. */
-export async function solveToInvite(page: Page, phrase: string) {
-  await solveByTaps(page, phrase);
+/** Solve whichever level puzzle is on screen and return it. */
+export async function solveCurrent(page: Page): Promise<Puzzle> {
+  const puzzle = await currentPuzzle(page);
+  await solveByTaps(page, puzzle.phrase);
+  return puzzle;
+}
+
+/** Solve the puzzle (the given phrase, or whichever level puzzle is showing) and wait for the dance invitation. */
+export async function solveToInvite(page: Page, phrase?: string) {
+  if (phrase) await solveByTaps(page, phrase);
+  else await solveCurrent(page);
   await expect(page.getByTestId('song-unlocked')).toBeVisible();
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
 }

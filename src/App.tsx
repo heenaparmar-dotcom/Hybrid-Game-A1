@@ -4,6 +4,7 @@ import { LevelBar } from './components/LevelBar';
 import { Modal } from './components/Modal';
 import { RuleBook } from './components/RuleBook';
 import { LEVEL_COUNT, levelByNumber } from './data/levels';
+import { pickPuzzle, type Puzzle } from './data/puzzles';
 import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
 import { CHALLENGE_PARAM, parseChallengeInput, type ChallengeData } from './lib/challenge';
@@ -17,7 +18,7 @@ import { InviteScreen } from './screens/InviteScreen';
 import { PuzzleScreen } from './screens/PuzzleScreen';
 import { TitleScreen } from './screens/TitleScreen';
 
-type Run = { kind: 'level'; level: number } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
+type Run = { kind: 'level'; level: number; puzzle: Puzzle } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
 type Stage = 'puzzle' | 'invite' | 'dance' | 'celebrate';
 type View =
   | { name: 'title' }
@@ -37,11 +38,11 @@ function describe(run: Run) {
   if (run.kind === 'level') {
     const level = levelByNumber(run.level);
     return {
-      phrase: level.phrase,
+      phrase: run.puzzle.phrase,
       track: trackById(level.trackId),
       kicker: `Level ${level.n} · ${level.name}`,
       prompt: level.prompt,
-      meaning: level.meaning,
+      meaning: run.puzzle.meaning,
       initialOrder: undefined as number[] | undefined,
       from: undefined as string | undefined,
     };
@@ -65,6 +66,8 @@ export default function App() {
   const [rulesOpen, setRulesOpen] = useState(false);
   const [splash, setSplash] = useState<string | null>(null);
   const keyCounter = useRef(0);
+  /** The puzzle last shown for each level, so entering a level again gives a different one. */
+  const lastPuzzle = useRef<Record<number, string>>({});
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => saveStore(store), [store]);
@@ -115,8 +118,10 @@ export default function App() {
   const startLevel = (n: number) => {
     music.stop();
     const level = levelByNumber(n);
+    const puzzle = pickPuzzle(level.n, lastPuzzle.current[level.n]);
+    lastPuzzle.current[level.n] = puzzle.id;
     setSplash(`Level ${level.n}|${level.name}`);
-    setView({ name: 'play', run: { kind: 'level', level: level.n }, stage: 'puzzle', key: newKey(), skipped: false });
+    setView({ name: 'play', run: { kind: 'level', level: level.n, puzzle }, stage: 'puzzle', key: newKey(), skipped: false });
   };
   const resumeLevel = () => startLevel(store.completed >= LEVEL_COUNT ? 1 : store.completed + 1);
 

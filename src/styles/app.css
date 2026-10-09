@@ -107,13 +107,14 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 
 /* Title screen */
 .title-stage { position: relative; min-height: calc(100svh - 62px); overflow: hidden; cursor: pointer; display: grid; align-items: center; outline-offset: -6px; }
-.title-art { position: absolute; right: -4%; top: 50%; transform: translateY(-50%); height: min(104%, 980px); width: auto; aspect-ratio: 600 / 520; pointer-events: none; }
-.wave { fill: none; stroke: var(--coral); stroke-width: 3; transform-origin: center; transform-box: fill-box; animation: wave 2.7s ease-out infinite; opacity: 0; }
-@keyframes wave { 0% { transform: scale(0.5); opacity: 0.55; } 100% { transform: scale(2.1); opacity: 0; } }
+.title-art { position: absolute; right: -3%; bottom: 0; height: min(74%, 640px); width: auto; aspect-ratio: 600 / 520; pointer-events: none; }
 .title-floor { fill: rgba(255, 93, 77, 0.22); }
-.hero-dancer .dancer { --c: #0d0316; }
-.hero-dancer { filter: drop-shadow(0 0 2px var(--cream)) drop-shadow(0 0 16px rgba(255, 93, 77, 0.65)); }
-.trail .dancer { --c: inherit; }
+/* Three black silhouettes on the plum background: no image, no white box. A thin cream rim keeps the black shapes readable. */
+.title-dancers .dancer { --c: #08010f; }
+.title-dancers .dancer .edge { display: none; }
+.title-dancers { filter: drop-shadow(0 0 1.5px rgba(255, 242, 224, 0.85)) drop-shadow(0 0 14px rgba(255, 93, 77, 0.45)); }
+.title-dancer { animation: dancer-in 0.8s var(--ease-out) both; }
+@keyframes dancer-in { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }
 .title-copy { position: relative; z-index: 2; padding: clamp(1rem, 5vw, 4.5rem); padding-bottom: clamp(5rem, 14vh, 9rem); max-width: 100%; pointer-events: none; }
 .wordmark-big { font: 800 clamp(4rem, 17.5vw, 13rem)/0.8 var(--display); font-stretch: 75%; font-variation-settings: 'wdth' 75; letter-spacing: -0.02em; text-transform: uppercase; display: flex; flex-direction: column; }
 .wm-line { display: block; white-space: nowrap; }
@@ -215,7 +216,7 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 .dancer path { fill: var(--c); stroke: var(--c); }
 .dancer .edge line { stroke: rgba(255, 242, 224, 0.5); }
 .dancer .edge circle { fill: rgba(255, 242, 224, 0.5); }
-.you-wrap .dancer .edge, .trail .dancer .edge { display: none; }
+.you-wrap .dancer .edge { display: none; }
 .chair rect { fill: #8a52b3; stroke: rgba(255, 242, 224, 0.7); stroke-width: 2; }
 .dancer-wrap { filter: drop-shadow(0 0 2px var(--cream)) drop-shadow(0 0 14px rgba(255, 93, 77, 0.7)); }
 .dancer-wrap .dancer { --c: #0d0316; }
@@ -268,7 +269,7 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 
 @media (max-width: 760px) {
   body { font-size: 17px; }
-  .title-art { right: 50%; transform: translate(50%, -42%); height: 78%; opacity: 0.95; }
+  .title-art { right: 50%; transform: translateX(50%); bottom: 3.6rem; height: auto; width: 116vw; }
   .title-copy { align-self: start; padding-top: 1.4rem; }
   .wordmark-big { font-size: clamp(3.4rem, 19vw, 8rem); }
   .nav-btn span { display: none; }
@@ -283,7 +284,7 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 
 /* Reduced motion: stop decorative movement. The dancer keeps moving, because the routine IS the content. */
 @media (prefers-reduced-motion: reduce) {
-  .wave, .wm-line span, .start-text, .burst, .splash-kicker, .splash-title, .count-big, .unlocked, .invite-title, .cue, .staff.is-solved .tile, .curtain { animation: none !important; }
+  .title-dancer, .wm-line span, .start-text, .burst, .splash-kicker, .splash-title, .count-big, .unlocked, .invite-title, .cue, .staff.is-solved .tile, .curtain { animation: none !important; }
   .splash { animation-duration: 0.01s; animation-delay: 0.5s; }
   .burst { display: none; }
   .btn, .tile, .btn-hero { transition: none !important; }

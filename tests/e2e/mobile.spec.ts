@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { LEVEL1, norm, solveToInvite, tileTexts } from './helpers';
+import { currentPuzzle, norm, solveToInvite, tileTexts } from './helpers';
 
 test.use({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
 
@@ -55,7 +55,7 @@ test('mobile: every screen fits, touch targets are large, and tiles drag with a 
   const solvedByDrag = (await page.getByTestId('song-unlocked').count()) > 0;
   if (!solvedByDrag) {
     await expect(page.locator('.tile.is-dragging')).toHaveCount(0);
-    const target = LEVEL1.phrase.split(' ');
+    const target = (await currentPuzzle(page)).phrase.split(' ');
     for (let i = 0; i < target.length; i++) {
       const cur = await tileTexts(page);
       if (norm(cur[i]) === norm(target[i])) continue;
@@ -103,7 +103,7 @@ test('mobile: seated dance fits and the stage is cropped for small screens', asy
   await page.getByTestId('title-stage').tap();
   await page.getByTestId('tile-0').waitFor();
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
-  await solveToInvite(page, LEVEL1.phrase);
+  await solveToInvite(page);
   await page.getByTestId('accept-dance').tap();
   await expect(page.locator('.chair').first()).toBeVisible();
   const vb = await page.locator('.stage-svg').getAttribute('viewBox');
