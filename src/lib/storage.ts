@@ -1,90 +1,30 @@
-import { SETTING_LIMITS, TIMING } from './constants';
+import { LEVEL_COUNT } from '../data/levels';
 
-export const STORAGE_KEY = 'rhythmrush.v1';
+export const STORAGE_KEY = 'rhythmrush.v2';
 
-export interface TurnTiming {
-  at: string;
-  puzzleMs: number;
-  listenMs: number;
-  moveMs: number;
-  outcome: string;
-  moveCompleted: boolean;
+export interface Store {
+  /** Levels finished (dance completed or skipped). 0 to LEVEL_COUNT. */
+  completed: number;
+  volume: number;
+  muted: boolean;
+  /** Remembers the seated / low-impact choice. */
   seated: boolean;
 }
 
-export interface Store {
-  settings: {
-    puzzleSeconds: number;
-    moveSeconds: number;
-    volume: number;
-    muted: boolean;
-    animatedGuide: boolean;
-    names: [string, string];
-  };
-  progress: { successfulRounds: number };
-  scores: { bestSoloRound: number; bestTurn: number };
-  timingLog: TurnTiming[];
-}
-
-const prefersReducedMotion = (): boolean => {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-};
-
-export function defaultStore(): Store {
-  return {
-    settings: {
-      puzzleSeconds: TIMING.puzzleSeconds,
-      moveSeconds: TIMING.moveSeconds,
-      volume: 0.7,
-      muted: false,
-      animatedGuide: !prefersReducedMotion(),
-      names: ['Player 1', 'Player 2'],
-    },
-    progress: { successfulRounds: 0 },
-    scores: { bestSoloRound: 0, bestTurn: 0 },
-    timingLog: [],
-  };
-}
-
-const num = (v: unknown, min: number, max: number, fallback: number): number =>
-  typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : fallback;
-
-const cleanName = (v: unknown, fallback: string): string => {
-  if (typeof v !== 'string') return fallback;
-  const t = v.replace(/\s+/g, ' ').trim().slice(0, 16);
-  return t || fallback;
-};
+export const defaultStore = (): Store => ({ completed: 0, volume: 0.7, muted: false, seated: false });
 
 /** Defensive parse: anything unexpected falls back to defaults. */
 export function sanitiseStore(raw: unknown): Store {
   const d = defaultStore();
   if (typeof raw !== 'object' || raw === null) return d;
-  const r = raw as Record<string, Record<string, unknown> | undefined>;
-  const s = r.settings ?? {};
-  const names = Array.isArray(s.names) ? s.names : [];
-  const rawLog = (raw as { timingLog?: unknown }).timingLog;
-  const log = Array.isArray(rawLog) ? rawLog : [];
+  const r = raw as Record<string, unknown>;
+  const completed = typeof r.completed === 'number' && Number.isFinite(r.completed) ? Math.min(LEVEL_COUNT, Math.max(0, Math.floor(r.completed))) : d.completed;
+  const volume = typeof r.volume === 'number' && Number.isFinite(r.volume) ? Math.min(1, Math.max(0, r.volume)) : d.volume;
   return {
-    settings: {
-      puzzleSeconds: num(s.puzzleSeconds, SETTING_LIMITS.puzzleSeconds.min, SETTING_LIMITS.puzzleSeconds.max, d.settings.puzzleSeconds),
-      moveSeconds: num(s.moveSeconds, SETTING_LIMITS.moveSeconds.min, SETTING_LIMITS.moveSeconds.max, d.settings.moveSeconds),
-      volume: typeof s.volume === 'number' && Number.isFinite(s.volume) ? Math.min(1, Math.max(0, s.volume)) : d.settings.volume,
-      muted: typeof s.muted === 'boolean' ? s.muted : d.settings.muted,
-      animatedGuide: typeof s.animatedGuide === 'boolean' ? s.animatedGuide : d.settings.animatedGuide,
-      names: [cleanName(names[0], d.settings.names[0]), cleanName(names[1], d.settings.names[1])],
-    },
-    progress: { successfulRounds: num(r.progress?.successfulRounds, 0, 10_000, 0) },
-    scores: { bestSoloRound: num(r.scores?.bestSoloRound, 0, 100_000, 0), bestTurn: num(r.scores?.bestTurn, 0, 100_000, 0) },
-    timingLog: log
-      .filter(
-        (e): e is TurnTiming =>
-          typeof e === 'object' && e !== null && typeof (e as TurnTiming).moveMs === 'number' && typeof (e as TurnTiming).puzzleMs === 'number' && typeof (e as TurnTiming).listenMs === 'number',
-      )
-      .slice(-30),
+    completed,
+    volume,
+    muted: typeof r.muted === 'boolean' ? r.muted : d.muted,
+    seated: typeof r.seated === 'boolean' ? r.seated : d.seated,
   };
 }
 
@@ -101,6 +41,6 @@ export function saveStore(store: Store): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   } catch {
-    /* storage unavailable (private mode / blocked): the game keeps working without persistence */
+    /* storage unavailable (private mode / blocked): the game keeps working without saving */
   }
 }

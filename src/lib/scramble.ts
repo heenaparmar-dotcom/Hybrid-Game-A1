@@ -6,7 +6,7 @@ export interface Token {
 }
 
 export function normaliseWord(word: string): string {
-  return word.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  return word.toLowerCase().replace(/[^\p{L}\p{M}\p{N}]/gu, '');
 }
 
 export function tokenise(phrase: string): Token[] {
@@ -73,4 +73,14 @@ export function swapTiles<T>(list: T[], a: number, b: number, locked: number): T
   const next = [...list];
   [next[a], next[b]] = [next[b], next[a]];
   return next;
+}
+
+/** Arrange tokens by a creator-chosen permutation (`order[i]` = index of the token shown at position i). */
+export function applyOrder(tokens: Token[], order: number[]): Token[] {
+  return order.map((i) => tokens[i]);
+}
+
+/** The permutation that turns `solution` into `shuffled` (by token id). */
+export function orderOf(solution: Token[], shuffled: Token[]): number[] {
+  return shuffled.map((t) => solution.findIndex((s) => s.id === t.id));
 }

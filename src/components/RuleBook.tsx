@@ -1,183 +1,124 @@
-import { MOVES_PER_SEQUENCE, PHRASE_LIMITS, SCORING, TIMING, UNLOCK_STEP } from '../lib/constants';
+import { LEVELS } from '../data/levels';
 import { EMOJI } from '../data/emoji';
-import { THEMES } from '../data/themes';
+import { TRACKS, routineSeconds, totalSeconds, trackById } from '../data/tracks';
+import { PHRASE_LIMITS } from '../lib/challenge';
 
-const digitalSeconds = TIMING.puzzleSeconds + TIMING.listenGuideSeconds + TIMING.transitionAllowanceSeconds;
-const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+const secs = (n: number) => Math.round(n);
+const longest = Math.max(...TRACKS.map(totalSeconds));
+const shortest = Math.min(...TRACKS.map(totalSeconds));
 
-/** The full Rule Book. Numbers come from lib/constants.ts so the screen, scoring and timers always agree. */
+/** The in-game Rule Book. Kept short on purpose: a new player should get it in one or two minutes. */
 export function RuleBook() {
   return (
     <div className="rulebook">
-      <nav className="toc" aria-label="Rule Book contents">
-        {['quick', 'players', 'goals', 'rules', 'space', 'time', 'resources', 'conflict', 'example', 'safety', 'privacy', 'original'].map((id) => (
-          <a key={id} href={`#rb-${id}`} onClick={(e) => { e.preventDefault(); document.getElementById(`rb-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-            {id === 'quick' ? 'Quick start' : id === 'example' ? 'Example round' : id === 'safety' ? 'Safety & access' : id === 'privacy' ? 'Privacy' : id === 'original' ? 'Original content' : id.charAt(0).toUpperCase() + id.slice(1)}
-          </a>
-        ))}
-      </nav>
-
-      <section id="rb-quick">
-        <h3>Quick start</h3>
-        <ol>
-          <li>Choose <strong>Start game</strong> (two players) or <strong>Solo practice</strong>, then pick a theme.</li>
-          <li><strong>Solve</strong> the scrambled song line before the timer ends (digital).</li>
-          <li><strong>Listen</strong> to the generated track and preview the moves (digital).</li>
-          <li><strong>Move</strong> through the {MOVES_PER_SEQUENCE}-move sequence in a clear space, standing or seated (physical).</li>
-          <li>Confirm you finished, collect your points, then <strong>challenge a friend</strong> with your own puzzle link.</li>
+      <section>
+        <h3>The game in 30 seconds</h3>
+        <ol className="steps-list">
+          <li><strong>Solve the song.</strong> A lyric line is scrambled into word tiles. Drag them into order. The game notices when you are right, so there is no button to press.</li>
+          <li><strong>Unlock the dance.</strong> When the line is right, you can choose to dance to its song.</li>
+          <li><strong>Move.</strong> A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.</li>
+          <li><strong>Challenge a friend.</strong> Write your own puzzle and send a link so a friend can take a movement break too.</li>
         </ol>
-        <p>Clear a safe space, keep water nearby, and move only as far as feels comfortable.</p>
       </section>
 
-      <section id="rb-players">
+      <section>
         <h3>1. Players</h3>
-        <ul>
-          <li><strong>Target audience:</strong> college students and young adults, about 18 to 24 years old.</li>
-          <li><strong>Two-player mode:</strong> exactly two players share one device and take turns. No accounts and no second device needed.</li>
-          <li><strong>Solo practice:</strong> one player practises and tries to beat a personal best.</li>
-          <li><strong>Turns:</strong> in each round Player 1 plays a full turn (solve, listen, move), then Player 2 plays a full turn with a different line. The screen always shows whose turn it is.</li>
-          <li><strong>Winner:</strong> the player with the higher round total wins the round. Match totals add up across rounds. Equal totals are a tie and both players win.</li>
-        </ul>
+        <p><strong>Who it is for:</strong> college students and young adults, about 18 to 24.</p>
+        <p><strong>How many:</strong> one player on one device. Friends join by opening a challenge link on their own device, so the best way to play is 2 or more friends sending each other puzzles. The game does not have accounts or live multiplayer.</p>
       </section>
 
-      <section id="rb-goals">
+      <section>
         <h3>2. Goals</h3>
         <ul>
-          <li>Solve the scrambled word puzzle.</li>
-          <li>Complete the physical movement phase.</li>
-          <li>Earn points and unlock new themes.</li>
-          <li>Challenge a friend with a puzzle you created and share it as a link.</li>
+          <li>Put each scrambled lyric back in order.</li>
+          <li>Follow the dance for the song you unlocked.</li>
+          <li>Finish all {LEVELS.length} levels.</li>
+          <li>Make a puzzle and invite a friend to take a movement break.</li>
         </ul>
       </section>
 
-      <section id="rb-rules">
+      <section>
         <h3>3. Rules</h3>
-        <h4>Setup</h4>
-        <p>Pick the number of players, edit names (up to 16 characters), choose an unlocked theme, and make sure you have room to move. Timer lengths can be changed in Settings.</p>
-        <h4>Puzzle and timer</h4>
         <ul>
-          <li>Each turn has one scrambled line. Put the words in the correct order. The default countdown is {TIMING.puzzleSeconds} seconds and starts when you press <em>Start puzzle</em>.</li>
-          <li>Move tiles by dragging, by tapping one tile and then another to swap them, or with the keyboard (Enter to pick up a tile, arrow keys to move it).</li>
-          <li><strong>Submit</strong> checks your answer. A wrong answer costs no points: you are told how many tiles are in the right place and can keep trying until time runs out.</li>
-          <li>A solved puzzle can only score once. Submitting again does nothing.</li>
-          <li><strong>Hint:</strong> locks the next correct word in place. Each hint costs {SCORING.hintPenalty} points from the puzzle score (up to {SCORING.maxHints} hints). Puzzle points never go below 0.</li>
-          <li><strong>Timeout or skip:</strong> the answer is shown, you earn no puzzle points, and you still go on to the music and movement.</li>
-          <li><strong>Reshuffle</strong> re-mixes unlocked tiles. <strong>Restart puzzle</strong> resets the timer and hints; use it fairly (for example after an interruption). Restarts are counted in the timing log.</li>
+          <li><strong>Rearranging:</strong> drag a tile to a new place, or tap one tile and then another to swap them. With a keyboard, press Enter on a tile to pick it up, use the arrow keys to move it, and press Enter to put it down.</li>
+          <li><strong>Checking:</strong> the game checks the order every time it changes. When it matches, the words light up and the song unlocks. A wrong order never costs anything, and the game only tells you how many words are in the right place.</li>
+          <li><strong>Nudge:</strong> if you are stuck, a Nudge button appears and locks one correct word in place.</li>
+          <li><strong>The dance:</strong> it starts only when you press the dance button, and the music starts at the same moment. You can pause or mute at any time.</li>
+          <li><strong>Moving on:</strong> when the routine ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.</li>
+          <li><strong>Your own puzzles:</strong> a line of {PHRASE_LIMITS.minWords} to {PHRASE_LIMITS.maxWords} words, up to {PHRASE_LIMITS.maxChars} characters. Use your own words or words you have permission to use.</li>
         </ul>
-        <h4>Music and movement</h4>
-        <ul>
-          <li>Press <em>Play track</em> to hear the original generated music (browsers need a tap first). If sound fails, the game continues without it.</li>
-          <li>The movement phase shows {MOVES_PER_SEQUENCE} moves, one at a time, across a countdown of {TIMING.moveSeconds} seconds by default. Use Start, Pause and Resume as needed.</li>
-          <li>The game cannot see you. When the countdown ends, <strong>you</strong> confirm with <em>I completed it</em>. Play honestly.</li>
-          <li>Choose <strong>Standing</strong> or <strong>Seated / low-impact</strong> at any time. Both earn identical points.</li>
-        </ul>
-        <h4>Scoring</h4>
-        <table className="rb-table">
-          <thead><tr><th>Action</th><th>Points</th></tr></thead>
-          <tbody>
-            <tr><td>Correct puzzle answer</td><td>{SCORING.puzzleBase}</td></tr>
-            <tr><td>Speed bonus (scales with time left on the puzzle timer)</td><td>0 to {SCORING.speedBonusMax}</td></tr>
-            <tr><td>Each hint used</td><td>-{SCORING.hintPenalty} from puzzle points (never below 0)</td></tr>
-            <tr><td>Completing the movement phase (standing or seated)</td><td>{SCORING.movePoints}</td></tr>
-            <tr><td>Skipping the movement phase</td><td>0 (you may continue)</td></tr>
-          </tbody>
-        </table>
-        <p>Turn total = puzzle points + speed bonus + movement points. Best possible turn: {SCORING.puzzleBase + SCORING.speedBonusMax + SCORING.movePoints}.</p>
-        <h4>Theme unlocks</h4>
-        <p>A <strong>song-and-dance turn</strong> is a turn where you solved the puzzle and completed the movement. Every {UNLOCK_STEP} song-and-dance turns unlock the next theme. Each player's turn counts on its own, so in a two-player game one round where both players solve and move unlocks a theme:</p>
-        <ul>
-          {THEMES.map((t) => (
-            <li key={t.id}><strong>{t.name}</strong>: {t.unlockAt === 0 ? 'available from the start' : `unlocks after ${t.unlockAt} song-and-dance turns`}.</li>
-          ))}
-        </ul>
-        <h4>Skipping and accessibility</h4>
-        <p>You may skip a puzzle or a movement at any time. Choosing the seated option never reduces your score. You can turn the animated guide off in Settings and follow the written cues instead.</p>
-        <h4>Winning and replaying</h4>
-        <p>After each round the results screen shows every score. Choose <em>Next round</em>, <em>Replay</em> (new match, same players) or <em>Return home</em>. Each action is scored once, even if you revisit the screen.</p>
       </section>
 
-      <section id="rb-space">
+      <section>
         <h3>4. Space</h3>
+        <p><strong>Digital space:</strong> the browser, where the puzzle, the music and the dance guide appear.</p>
+        <p><strong>Physical space:</strong> a clear patch of floor, roughly two big steps in every direction, or a stable chair for the seated version.</p>
+        <p>The dancer is on the left of the stage and <em>your spot</em> is on the right. Copy the dancer like a mirror: when they go right on the screen, you go right.</p>
+      </section>
+
+      <section>
+        <h3>5. Time</h3>
+        <p>These are planned times, not measured results.</p>
         <ul>
-          <li><strong>Digital space:</strong> the browser interface holds the puzzle, timer, music controls, movement guide and scores.</li>
-          <li><strong>Physical space:</strong> a clear, safe area, about two metres across if standing, or a stable chair if seated.</li>
-          <li><strong>How they connect:</strong> the screen tells you what to do and when; your body does it in the room. The digital solve unlocks the physical dance, and the physical confirmation unlocks the score.</li>
+          <li><strong>Puzzle:</strong> there is no timer. Most people should need around a minute or less.</li>
+          <li><strong>Dance:</strong> {secs(shortest)} to {secs(longest)} seconds, including a short count-in. Each dance has {secs(routineSeconds(trackById('sunrise')))} to {secs(Math.max(...TRACKS.map(routineSeconds)))} seconds of moves.</li>
+          <li><strong>One level:</strong> about 2 to 3 minutes. <strong>All {LEVELS.length} levels:</strong> about 8 to 10 minutes.</li>
         </ul>
       </section>
 
-      <section id="rb-time">
-        <h3>5. Time</h3>
-        <p>A standard turn lasts about four minutes. The design target is roughly <strong>50% digital and 50% physical</strong>. This is an intended target that still needs to be checked in playtesting; the game logs your actual phase times to help.</p>
-        <table className="rb-table">
-          <thead><tr><th>Phase</th><th>Planned time</th></tr></thead>
-          <tbody>
-            <tr><td>Digital: puzzle countdown</td><td>{TIMING.puzzleSeconds} s (hard limit)</td></tr>
-            <tr><td>Digital: listen and preview (soft guide)</td><td>about {TIMING.listenGuideSeconds} s</td></tr>
-            <tr><td>Digital: feedback and hand-over</td><td>about {TIMING.transitionAllowanceSeconds} s</td></tr>
-            <tr><td><strong>Digital total</strong></td><td><strong>about {clock(digitalSeconds)}</strong></td></tr>
-            <tr><td><strong>Physical: movement countdown</strong></td><td><strong>{clock(TIMING.moveSeconds)}</strong></td></tr>
-          </tbody>
-        </table>
-        <p>When the puzzle timer runs out the answer is revealed and play continues to the music. When the movement timer ends you confirm completion or continue without movement points. Timers stop while the Rule Book is open or when you press Pause.</p>
-      </section>
-
-      <section id="rb-resources">
+      <section>
         <h3>6. Resources</h3>
         <ul>
-          <li><strong>Word tiles:</strong> the puzzle pieces you reorder.</li>
-          <li><strong>Timer:</strong> creates the pacing and friendly pressure.</li>
-          <li><strong>Generated audio:</strong> an original track made in your browser; it sets the tempo for the movement.</li>
-          <li><strong>Movement animation:</strong> the silhouette that demonstrates each move.</li>
-          <li><strong>Points:</strong> the shared score you compare.</li>
-          <li><strong>Hints:</strong> limited help, up to {SCORING.maxHints} per puzzle, at a cost of {SCORING.hintPenalty} points each.</li>
-          <li><strong>Themes:</strong> unlockable sounds, colours and move sets.</li>
-          <li><strong>Challenge links:</strong> a self-contained link to a puzzle you made, shared by you.</li>
+          <li><strong>You need:</strong> a phone, tablet or computer with a browser, and room to move.</li>
+          <li><strong>Internet:</strong> the game itself works offline once loaded. You need internet to open or send challenge links.</li>
+          <li><strong>In the game:</strong> draggable word tiles, original music made in your browser, the dancer animation, and challenge links.</li>
         </ul>
       </section>
 
-      <section id="rb-conflict">
+      <section>
         <h3>7. Conflict</h3>
-        <p>The challenge is friendly and non-violent. It comes from time pressure, puzzle difficulty, comparing scores with a friend, and finishing the movement phase. Nobody is eliminated and nobody is judged on their body or ability.</p>
+        <p>The challenge is friendly and there is no violence. It comes from three things: working out a scrambled lyric, remembering and following the dance, and keeping up with the beat. Sharing a puzzle is an invitation, not a competition. There are no scores or rankings.</p>
       </section>
 
-      <section id="rb-example">
-        <h3>Example round</h3>
-        <ol>
-          <li>Sam and Priya choose Fresh Beats. It is Sam's turn.</li>
-          <li>Sam sees the tiles <em>skies / neon / under / Dancing</em>, uses one hint, solves it with 30 s left of {TIMING.puzzleSeconds}: {SCORING.puzzleBase - SCORING.hintPenalty} puzzle points + {Math.round((SCORING.speedBonusMax * 30) / TIMING.puzzleSeconds)} speed bonus.</li>
-          <li>Sam plays the track, completes the movement and earns {SCORING.movePoints}. Turn total: {SCORING.puzzleBase - SCORING.hintPenalty + Math.round((SCORING.speedBonusMax * 30) / TIMING.puzzleSeconds) + SCORING.movePoints}.</li>
-          <li>Priya takes her turn, then the results screen names the round winner and shows progress toward the next theme.</li>
+      <section>
+        <h3>Make and share a puzzle</h3>
+        <ol className="steps-list">
+          <li>Open <em>Make a puzzle</em> from the title screen or the end of a level.</li>
+          <li>Type your line and choose a song. We scramble it and show you the result. Press <em>Shuffle again</em> if you want a different one.</li>
+          <li>Press <em>Create challenge</em>, then copy the link or open WhatsApp, Telegram or Email with a ready message.</li>
         </ol>
+        <p>The game never sends anything for you. You choose who gets it and press send. A link made on <code>localhost</code> only works on the same computer, so create links from the hosted game. A friend who opens your link goes straight to your puzzle.</p>
       </section>
 
-      <section id="rb-safety">
-        <h3>Safety and accessibility</h3>
+      <section>
+        <h3>Replay and restart</h3>
         <ul>
-          <li>Clear the floor, wear comfortable footwear, and keep water nearby.</li>
-          <li>Move gently. Stop at once if you feel pain, dizziness or discomfort. Skipping is always allowed.</li>
-          <li>Seated and low-impact options are first-class and score the same.</li>
-          <li>The game works with keyboard, touch and mouse, has visible focus, large touch targets, and respects reduced-motion settings.</li>
-          <li>The game needs no camera, microphone, location or body tracking.</li>
-          <li>Be kind. Do not use phrases that mock, shame or exclude anyone.</li>
-        </ul>
-        <p><strong>Wellness note:</strong> RHYTHM RUSH encourages enjoyable activity, music and friendship. It is not a medical treatment or therapy and makes no health claims.</p>
-      </section>
-
-      <section id="rb-privacy">
-        <h3>Privacy and sharing</h3>
-        <ul>
-          <li>Settings, names, best scores and unlocks are stored only in your own browser (localStorage). Nothing is sent to a server.</li>
-          <li>A challenge link contains only the puzzle phrase and an optional nickname, encoded in the link. Do not put personal details in a phrase.</li>
-          <li>Phrases: {PHRASE_LIMITS.minWords} to {PHRASE_LIMITS.maxWords} words, up to {PHRASE_LIMITS.maxChars} characters. Use only your own original words or words you have permission to use.</li>
-          <li>The game never posts anywhere. You copy the link and choose where to send it.</li>
-          <li>A link from <code>localhost</code> only works on the same computer. Friends need the game hosted at a public web address.</li>
-          <li>Optional emoji check-ins use exactly {EMOJI.length} emoji, each with a text label: {EMOJI.map((e) => `${e.emoji} ${e.label}`).join(', ')}.</li>
+          <li>Use <em>Shuffle again</em> on the puzzle screen to start the puzzle over.</li>
+          <li>Use <em>Dance again</em> after a dance, or <em>Restart dance</em> from the pause screen.</li>
+          <li>Tap a finished level in the level dots to play it again.</li>
         </ul>
       </section>
 
-      <section id="rb-original">
-        <h3>Original content and licensing</h3>
-        <p>All song lines are original demo content written for this project, not lyrics from any commercial song. Music is generated live in your browser with the Web Audio API. Logo, tiles, backgrounds and the dancing silhouette are original CSS and SVG. No stock images, fonts or recordings are used. If you create your own puzzle, use your own words.</p>
+      <section>
+        <h3>Safety and access</h3>
+        <ul>
+          <li>Clear the floor, wear comfortable shoes and keep water nearby.</li>
+          <li>Move gently. Stop if you feel pain or dizziness. You can always pause or skip.</li>
+          <li><strong>Seated version:</strong> choose it before the dance. The dancer sits on a stool and the cues use the upper body.</li>
+          <li>Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation.</li>
+          <li>The game needs no camera, microphone or location, and it does not watch you move. You decide how it went.</li>
+        </ul>
+        <p><strong>Wellness note:</strong> this is a game that encourages enjoyable movement, music and time with friends. It is not a medical treatment.</p>
+      </section>
+
+      <section>
+        <h3>Privacy, music and emoji</h3>
+        <ul>
+          <li>Your progress and sound settings are saved only in this browser.</li>
+          <li>A challenge link contains only the line, the chosen song, the word order and an optional nickname. Do not put personal details in them.</li>
+          <li>All songs are original and made live in your browser. All lyric lines were written for this game.</li>
+          <li>There are {EMOJI.length} emoji in the game, each with a text label: {EMOJI.map((e) => `${e.emoji} ${e.label}`).join(', ')}.</li>
+        </ul>
       </section>
     </div>
   );

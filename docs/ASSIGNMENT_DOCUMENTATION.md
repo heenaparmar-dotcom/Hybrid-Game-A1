@@ -1,320 +1,275 @@
 # RHYTHM RUSH: Assignment Documentation
 
-*A hybrid (digital + physical) wellness game. Solve the song. Catch the beat. Own the move.*
+*Game Design Assignment 1, Hybrid Game. Theme: wellness.*
+*Solve the song. Catch the beat. Own the move.*
 
-**How to read this document.** Statements are labelled so that nothing is mistaken for evidence:
+**How to read this document.** Every claim is labelled so nothing is mistaken for evidence:
 
-- **[Implemented]**: exists in the prototype.
-- **[Verified by automated test]**: checked by the project's own test suite (see section 16).
-- **[Design hypothesis]**: a reasoned assumption that has **not** been confirmed by research.
-- **[NOT YET COLLECTED]**: needs real people (playtests, faculty feedback). Left blank on purpose.
+- **[Implemented]**: exists in the playable game.
+- **[Verified by automated test]**: checked by the project's own test suite (section 13).
+- **[Design hypothesis]**: a reasoned assumption not yet confirmed by research.
+- **[NOT YET COLLECTED]**: needs real people (interviews, playtests, faculty). Left blank on purpose.
 
-No participant, interview, statistic or faculty comment appears in this document unless a real one has been written into a template by the team.
+No participant, interview, statistic or faculty comment appears here unless a real one has been written into a template by the team.
 
 ---
 
-## 1. Title and game overview
+## 1. Game overview and concept
 
-**RHYTHM RUSH** is a two-player (or solo) browser game for friends. Each turn has a digital half and a physical half:
+RHYTHM RUSH is a small music-and-movement game for friends. **[Implemented]**
 
-1. **Solve:** unscramble an original song line on the screen (digital).
-2. **Listen:** play an original, browser-generated track and preview the moves (digital).
-3. **Move:** follow an animated silhouette through 8 simple moves, standing or seated (physical).
-4. **Score and share:** collect points, unlock themes, then create a puzzle and send a challenge link to a friend.
+**Core loop:** Solve the song > Unlock the dance > Complete the movement > Celebrate > Continue > Challenge a friend.
 
-**Core loop:** SCRAMBLE > SOLVE > LISTEN > DANCE > SCORE > UNLOCK > CHALLENGE A FRIEND.
+1. A short original lyric is scrambled into word tiles. The player drags them into order. There is **no submit button**: the game checks after every change and recognises the right order by itself.
+2. Solving it unlocks a dance invitation: "You cracked the song! Ready to dance to it?" Music starts only when the player presses the button.
+3. A **shadow dancer** demonstrates a routine of about 35 seconds on a stage, with the player's own spot beside it. Large cues change on the beat.
+4. After a short celebration the player continues through three levels, or writes their own puzzle and sends a link to a friend, so the friend takes a movement break too.
 
-## 2. Theme and wellness rationale
+**Wellness purpose.** Enjoyable movement, a playful mental warm-up, music and connection with friends. The game makes **no medical claims**.
 
-**Theme: wellness.** RHYTHM RUSH treats wellness as a mix of enjoyable physical movement, playful thinking, music and social connection. It deliberately avoids medical claims: the game does not claim to treat or reduce anxiety, depression or any condition, and it says so in the Rule Book.
+## 2. What changed from the first version
 
-**Why a puzzle plus dance?** [Design hypothesis] Many people spend long periods seated at screens. A short, playful reason to stand and move, anchored to something fun (music) and shared with a friend, may feel more approachable than "exercise". The puzzle gives a low-pressure warm-up for the mind and also makes the screen part a real, necessary half of the game instead of decoration.
+The first prototype was a scored, timed, two-player game on one device. After reviewing it against the new brief, this version was rebuilt around the level flow. Decisions:
 
-## 3. Problem framing and design opportunity
-
-**Design question (How might we...):** *How might we give college students a short, friendly reason to get up and move together, without making it feel like a workout or a test?*
-
-**Design hypothesis, not research.** The following are assumptions to test, not findings:
-- H1: Students in study-heavy routines often sit for long stretches, and a 4-minute break built around music could be welcome.
-- H2: People are more willing to move when the activity feels like a game and when there is a seated option with no penalty.
-- H3: Sending a self-made puzzle to a friend is more personal and more fun than sending a generic invite.
-- H4: A puzzle phase before the dance reduces self-consciousness by giving everyone a shared, structured start.
-
-No survey, interview or statistic supports these yet. See section 13 for how they will be checked.
-
-## 4. Target audience and player count
-
-- **Target audience:** college students and young adults, about 18 to 24.
-- **Players:** exactly **2** in the core mode (friendly turn-based competition on one device), plus an optional **solo practice** mode.
-- **Not designed for:** medical or rehabilitation use, or for children under the target age without adaptation.
-
-## 5. Game concept and core loop
-
-See section 1 for the loop. Key design choices **[Implemented]**:
-
-- One device, no accounts: players hand over the screen between turns.
-- Original song lines grouped by three themes; each theme has its own generated music (tempo and instruments) and its own ordering of moves.
-- Both the puzzle and the movement can be skipped without ending the game, so there are no dead ends.
-- A self-contained challenge link carries a friend's custom puzzle.
-
-## 6. Alternative game ideas
-
-### 6.1 RHYTHM RUSH: song puzzle plus dance (selected)
-Unscramble a song line, listen, then dance a short sequence. Digital-to-physical hand-off is clear: the screen leads, the body follows. Social layer: custom puzzle links.
-
-### 6.2 MOVE & MATCH: digital prompts linked to physical movement
-The screen flashes a symbol or colour pair; players must match it with a movement (for example blue = arms up, orange = step side). Matching speeds up over time. Simple to learn and quick to build. Weaker points: the digital part is thin (mostly reading prompts), and the social/sharing element is less obvious.
-
-### 6.3 MOOD IN MOTION: emotion cards linked to expressive movement
-Players draw a digital emotion card (for example "calm", "bouncy", "proud") and express it with movement while a friend guesses. Strong expressive and social potential. Weaker points: it can feel personal or awkward for some players, the scoring is subjective, and it needs careful wording to avoid appearing to give emotional or therapeutic advice.
-
-## 7. Concept comparison matrix
-
-Scores are the team's **initial self-assessment** from 1 (weak) to 5 (strong), **not** measured data. They are unweighted and should be revisited with faculty feedback and playtests.
-
-| Criterion | RHYTHM RUSH | MOVE & MATCH | MOOD IN MOTION |
-| --- | --- | --- | --- |
-| Simplicity to learn | 4 | 5 | 3 |
-| Wellness value | 4 | 4 | 5 |
-| Social interaction | 5 | 3 | 4 |
-| Originality | 4 | 3 | 4 |
-| Physical / digital balance (target) | 4 | 4 | 3 |
-| Feasibility (build time, risk) | 4 | 5 | 4 |
-| **Total (out of 30)** | **25** | **24** | **23** |
-
-The totals are close. The decision below rests on the qualitative reasons as much as on the sums.
-
-## 8. Why RHYTHM RUSH was selected
-
-- It gives the clearest, most separable digital and physical halves, which makes the 50/50 requirement something we can plan and measure.
-- Its social hook (create and share a puzzle) fits the social-media-inspired requirement without needing any social network.
-- It is easy to demonstrate live in a classroom in about two minutes.
-- Music is original and generated, so copyright risk is low.
-- It is less personal than MOOD IN MOTION and richer than MOVE & MATCH.
-
-**Trade-offs accepted:** movement is self-reported, and the dance guide is a simple silhouette.
-
-## 9. Faculty discussion and feedback
-
-**Status: [NOT YET COLLECTED].** No faculty feedback has been received or is claimed. Use this template during the discussion.
-
-| Field | Entry |
-| --- | --- |
-| Date | |
-| Faculty member(s) (as permitted to be named) | |
-| Concepts presented | |
-| Questions asked by faculty | |
-| Feedback on RHYTHM RUSH (in their words) | |
-| Feedback on the other two concepts | |
-| Suggested changes | |
-| Which suggestions we accepted, and why | |
-| Which suggestions we did not accept, and why | |
-| Follow-up actions and owners | |
-
-## 10. The seven game-design elements
-
-| Element | Role in RHYTHM RUSH |
-| --- | --- |
-| **Players** | Two friends (18 to 24) taking turns on one device, or one solo player. Turn order is always shown; the highest round total wins; ties are shared. |
-| **Goals** | Solve the song puzzle, complete the movement, earn points, unlock themes, and challenge a friend with a custom puzzle. |
-| **Rules** | 45 s puzzle timer, hints cost 20, one score per action, self-confirmed movement, seated option scores the same, themes unlock every 2 song-and-dance turns. Full rules in the Rule Book. |
-| **Space** | Digital space: the browser interface. Physical space: about 2 m of clear floor or a chair. The screen directs; the body performs. |
-| **Time** | Planned 2:00 digital (45 s puzzle, about 30 s listen, about 45 s feedback and hand-over) and 2:00 physical (120 s movement). Timers are configurable. |
-| **Resources** | Word tiles, timer, generated audio, movement animation, points, hints, themes and challenge links. |
-| **Conflict** | Friendly: time pressure, puzzle difficulty, score comparison, and finishing the movement. No elimination, no violence, no body judgement. |
-
-## 11. Rule Book summary
-
-The full standalone manual is [`RULE_BOOK.md`](RULE_BOOK.md) and is also built into the game (Rule Book button, available on every screen and during play). In short:
-
-- Solve the line in 45 s, then listen, then move for 2 minutes (standing or seated).
-- Score: 100 correct + up to 50 speed bonus - 20 per hint (min 0 for puzzle points) + 100 for completed movement. Best turn: 250.
-- Skipping or timing out is allowed and earns 0 for that part.
-- Every 2 song-and-dance turns (puzzle solved **and** movement completed) unlock the next theme.
-- Challenge links contain only a phrase and an optional nickname.
-
-## 12. How the game aims for a 50/50 hybrid experience
-
-**50/50 is the design target. It has not been validated with players.**
-
-Planned time per standard turn:
-
-| Phase | Type | Planned time | Nature of the limit |
-| --- | --- | --- | --- |
-| Puzzle countdown | Digital | 45 s | Hard limit |
-| Listening and move preview | Digital | about 30 s | Soft guide |
-| Feedback and hand-over | Digital | about 45 s | Allowance (estimate) |
-| **Digital total** | | **about 120 s** | |
-| Movement countdown | Physical | 120 s | Hard limit |
-
-How the design keeps the halves balanced **[Implemented]**:
-- A visible step track (Solve / Listen are marked Digital, Move is marked Physical) and a split bar on the home screen make the intent clear to players.
-- The timers are configurable, and a Quick demo preset exists for classroom demos (not for playtests).
-- The movement score (100) is as large as the base puzzle score, so neither half is a side activity.
-- The game logs puzzle, listening and movement **screen time** per turn (Settings > Playtest timing log) and shows the movement share on the results screen.
-
-Limits of that measurement: the log excludes feedback and hand-over pauses, the listening step is not enforced, and it records screen time rather than how players feel about the balance. The stopwatch method in [`PLAYTEST_PLAN.md`](PLAYTEST_PLAN.md) section 6 is needed to judge the real split. The planned numbers add up to 2:00 / 2:00 by design; real sessions may differ, and if they do, the timers should be adjusted.
-
-## 13. Design-thinking process
-
-| Stage | Purpose | Status |
+| Kept and improved | Replaced | Removed (and why) |
 | --- | --- | --- |
-| **Empathise** | Understand the target audience's routines and attitudes to movement and games | **[NOT YET COLLECTED]** See plan below |
-| **Define** | Turn what we learn into a problem statement | Draft problem statement and hypotheses H1 to H4 in section 3 (unconfirmed) |
-| **Ideate** | Generate and compare concepts | Done: three concepts compared in sections 6 and 7 (team judgement) |
-| **Prototype** | Build something playable | Done: working browser prototype **[Implemented]** |
-| **Test** | Check with real users | Automated developer testing done (section 16). **Human playtests [NOT YET COLLECTED].** |
-| **Refine** | Improve from evidence | Two developer-testing refinements logged (section 17). Playtest-driven refinements pending. |
+| Rule Book (rewritten to match the new game), custom puzzle creator, challenge-link codec (links already shared still open), Web Audio music approach, seated option, accessibility groundwork | Home screen and menus became one tap-anywhere title screen; submit-based puzzle became automatic checking; the dance guide became a rigged, beat-synced shadow dancer; the plain visual style became a new art direction | Scores, timers, hints-with-penalties, two-player turns and theme unlocks. They put metrics and menus around the puzzle, which the brief asks to avoid, and did not make the game more fun to the team |
 
-**Empathise plan (to do).** Talk to 3 to 5 people aged 18 to 24 using short, open questions: How do you take breaks while studying? What makes you want, or not want, to move around others? What would make a shared game with a friend appealing? Record answers in the table below, in the participant's words, using codes instead of names.
+## 3. Art direction
 
-| Participant code | Date | Break habits | Feelings about movement games | What would make this appealing | Concerns |
+- **Palette:** deep plum stage, warm coral and tangerine energy, cream type, a little lime and mint for success and "your spot". **[Implemented]**
+- **Type:** Bricolage Grotesque (expressive display, condensed at large sizes) with Figtree for reading text; both are open-licensed and bundled locally.
+- **Identity:** a condensed, bouncing wordmark (RHYTHM in cream, RUSH in a skewed coral with a tangerine shadow); a live title composition of the dancer with colour-trail "echoes" and radiating sound-wave rings; the puzzle shown as a lyric line with start and end bars, like a bar of music; a curtain wipe from the tap point and a bold level splash as transitions.
+- **Avoided on purpose:** gradient-everything, glass panels, dashboard cards, random floating decorations, fake statistics or leaderboards. Emoji are limited to 8 (limit 10), each with a text label, and appear only in the optional mood check-in and friend reactions.
+- **Responsive:** laptop, tablet and phone layouts; the stage is cropped on phones to make the dancers larger.
+
+## 4. Gameplay, levels and difficulty
+
+| Level | Name | Line | Song | Words | Dance |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Warm Up | "Sway with the sunrise" | Sunrise Sway (English, warm pop, 112 BPM) | 4 | sway, reach, step, clap, repeated twice |
+| 2 | Find the Beat | "Aaj dil khol ke nacho" (Hindi in Roman script: "Today, dance with an open heart") | Nacho Aaj (dhol-inspired groove, 108 BPM) | 5 | step, arm lifts, hands on hips, clap, repeated twice |
+| 3 | Feel the Rhythm | "Let the rhythm carry us forward" | Hook-Step Party (Latin-pop, Zumba-inspired, 126 BPM) | 6 | march, turn, wave, arm lifts, reach, repeated twice |
+
+Difficulty rises through more words, a line in another language, and longer, livelier routines. **[Implemented]** Each routine is 34 to 38 seconds of moves plus an 8-beat count-in, 39 to 42 seconds in total (limit 45) **[Verified by automated test]**.
+
+Puzzle details **[Implemented]**: drag with mouse or finger (pointer events), tap-to-swap as a single-pointer alternative, keyboard control; the tiles reflow with a short slide; gentle feedback ("2 of 4 words are in the right place") that never reveals the answer; a *Nudge* after about 14 seconds that locks one correct word; *Shuffle again*.
+
+## 5. Music, audio and licensing (investigation)
+
+**Decision: original synthesised music only.** All three songs are generated in the browser (`src/lib/audio.ts`) from a small step sequencer with kick, snare, hats, bass, a melody, and (for Nacho Aaj) dhol-style hits and a Hijaz-style scale. There are no recordings, downloads or third-party services. **[Implemented]**
+
+Options considered:
+
+| Option | Verdict |
+| --- | --- |
+| Popular Hindi or English songs | **Rejected.** Copyrighted, and being playable on YouTube or Spotify does not grant reuse rights. Audio recordings, lyrics and dance videos all carry rights |
+| YouTube / Spotify embeds | **Rejected for the core game.** Terms and technical limits generally prevent synchronising an embedded player to the game's own beat clock, and playback needs accounts or keys. Nothing was scraped or called |
+| A music API | **Not used.** No key is available, none was invented, and the core game must work without one |
+| Royalty-free or Creative Commons tracks | **Possible later.** Needs the licence checked per track (attribution, no-derivatives, commercial terms). The README explains how to add one and what the dancer clock needs |
+| Original generated music | **Chosen.** Zero licensing risk, works offline, and gives the dancer an exact audio clock |
+
+**Hindi and English.** Level 2 and the Nacho Aaj track provide Hindi content. The lyric line is original; the music is "dhol-inspired", a simple synthesiser approximation that does not copy any real song. **[NOT YET COLLECTED]:** review of the Hindi phrase and cues by a native speaker, and listener feedback on the sound.
+
+Playback behaviour **[Implemented]**: music starts only on the dance button; pause, mute and volume controls; pausing the Rule Book pauses the music; if the browser blocks sound or has no Web Audio, a clear message appears and the dance continues silently on a beat clock **[Verified by automated test]** (Web Audio removed in the test).
+
+## 6. Social sharing: Challenge a Friend
+
+Social interaction is a core requirement, so sharing is designed in rather than added. **[Implemented]**
+
+- **Puzzle creator:** type a line (3 to 8 words, validated), see the scramble, shuffle again, choose one of the three songs (with a play-to-preview button), optional nickname.
+- **Challenge link:** the puzzle is encoded in the URL after `#challenge=`: the line, the shuffle the creator reviewed, the song and an optional nickname, and nothing else. No server, keys or personal data. Links made before songs and shuffles existed still open.
+- **Friend experience:** opening the link shows "Maya challenged you!", then the exact puzzle (same shuffle) and, after solving, the dance to the creator's chosen song. A finished challenge offers reactions to copy and "Make your own puzzle".
+- **Sharing options:** Copy link, Copy message, the phone's native share sheet when available, and WhatsApp, Telegram and Email buttons built as proper share URLs (`wa.me/?text=`, `t.me/share/url`, `mailto:`).
+- **Honesty:** those buttons only open the app with a ready message. The text says "Nothing is sent until you do", and the game never claims a challenge was delivered. On `localhost` it warns that friends cannot open the link.
+- **Purpose:** an invitation to take a movement break together. There are no scores, rankings or comparisons of bodies.
+- **Safeguards:** all link data is validated (length, characters, a small unkind-word list, permutation check for the shuffle, song code); malformed links show a clear error instead of crashing. The word list is basic and is not moderation. **[Verified by automated test]**
+
+## 7. The seven game design elements
+
+| Element | In RHYTHM RUSH |
+| --- | --- |
+| **Players** | College students and young adults (about 18 to 24). One player per device; friends take part by exchanging challenge links. No accounts or live multiplayer. |
+| **Goals** | Reconstruct each lyric, complete the dance, finish three levels, and invite a friend with a puzzle of your own. |
+| **Rules** | Tiles are rearranged by drag, tap-swap or keyboard; the game detects the right order automatically; the dance starts only when the player presses the button; the routine can be paused or skipped; puzzles must pass validation; links are shared only by the player. |
+| **Space** | Digital: the browser (puzzle, stage, cues). Physical: a clear patch of floor about two big steps each way, or a chair. The stage shows the dancer and "your spot" side by side to connect the two. |
+| **Time** | No puzzle timer. Dance 39 to 42 seconds including the count-in. A level is planned at about 2 to 3 minutes, all three at about 8 to 10 (estimates). |
+| **Resources** | A device with a browser, word tiles, generated music, the dancer animation, challenge links, and floor space. Internet only for opening or sending links. |
+| **Conflict** | Friendly and non-violent: deciphering a scrambled line, remembering and following moves, keeping to the beat. Sharing is an invitation, not a contest. |
+
+## 8. The hybrid balance (physical and digital / social)
+
+The brief frames the game as about half physical activity and half digital and social interaction. **This is a design intent and it has not been measured.**
+
+- **Physical:** the dance, about 35 to 40 seconds per level, with a seated version.
+- **Digital and social:** the puzzle (no fixed length), reading the invitation, creating a puzzle, and sending and opening links.
+- Because the puzzle has no timer, the split depends on how long players take. Puzzles are short on purpose (4 to 6 words). **[NOT YET COLLECTED]:** real timings. The stopwatch method is in `docs/PLAYTEST_PLAN.md` section 4. If puzzles take far longer than the dances, the plan is to shorten lines or lengthen routines, then re-test.
+
+## 9. Design thinking: Empathise
+
+**Status: [NOT YET COLLECTED].** No interviews have been done, and none are claimed. The needs below are **hypotheses from the team's own experience**, to be checked:
+
+- H1: students who study or work at screens for long periods may welcome a short, fun reason to stand and move.
+- H2: people are more willing to move when it feels like a game with friends, not exercise, and when a seated option carries no penalty.
+- H3: a personalised puzzle from a friend feels more inviting than a generic invitation.
+- H4: solving something first can lower the self-consciousness of dancing.
+
+**Plan:** talk to 3 to 5 people aged 18 to 24 with open questions (How do you take breaks while studying? What makes you want, or not want, to move around others? What would make a shared game with a friend appealing?). Record in their words, using codes.
+
+| Participant | Date | Break habits | Feelings about moving in games | What would make this appealing | Concerns |
 | --- | --- | --- | --- | --- | --- |
 | P1 | | | | | |
 | P2 | | | | | |
 | P3 | | | | | |
 
-**Insights from empathy work:** *(to be written only after real interviews)*
+## 10. Design thinking: Define
 
-## 14. Original media and copyright statement
+**Problem statement (draft, unconfirmed):** *Students who sit for long periods need a low-pressure, enjoyable reason to move that they can share with friends. How might we make the physical activity and the digital social interaction equally engaging, so that neither feels like an add-on?*
 
-- **Song lines:** 14 original demo phrases were written for this project and are labelled as original demo content in the code. They are not lyrics from any commercial song. We did not search every existing song, so this is a good-faith statement; phrases are deliberately generic and short. Players creating their own puzzles are asked to use their own words or words they have permission to use.
-- **Music:** generated live in the browser with the Web Audio API (`src/lib/audio.ts`). No recordings are used or downloaded.
-- **Graphics:** logo, tiles, backgrounds and the dance silhouette are original CSS and SVG. No stock images, icon packs or web fonts are used.
-- **Software:** React, Vite, TypeScript, Vitest, Playwright and ESLint (open-source licences).
-- **Emoji:** the game uses 10 emoji as a special communication mode, always with text labels. They are standard Unicode characters rendered by the user's system.
-- **To use licensed audio instead:** place the file in `public/audio/`, reference it from a small audio player component, and record its licence in this section. The prototype does not do this.
+The answer chosen: make the puzzle the key that unlocks the dance, and make the social act (sending a puzzle) the way the movement break spreads.
 
-## 15. Accessibility, safety, ethics and privacy
+## 11. Design thinking: Ideate
 
-**Accessibility [Implemented]**
-- Keyboard play for the puzzle, all buttons and dialogs; visible focus outline; skip link; focus moves to the page content on navigation.
-- Three ways to move tiles: drag, tap-to-swap, keyboard.
-- Large touch targets (the automated mobile test checks that interactive controls are at least 40 px).
-- Dark theme with high-contrast text; text labels accompany every emoji and icon action.
-- Reduced motion: the animated guide defaults to off when the system requests reduced motion, and can be toggled in Settings; the written cue is always shown.
-- Live regions announce puzzle feedback and low time.
-- **Not yet tested:** screen readers, high-zoom layouts, colour-vision simulations, and a formal contrast audit.
+Three concepts were compared. The scores are the team's **initial self-assessment** (1 weak, 5 strong), not data.
 
-**Safety**
-- Safety checklist on the movement screen and in the Rule Book; beginner-friendly low-impact moves; **Pause** and **Skip** always available.
-- Seated / low-impact alternative that earns identical points, so no one is penalised for choosing it.
-- No claim of medical benefit; no body measurement or tracking.
+| Concept | Idea | Simplicity | Wellness value | Social | Originality | Hybrid balance | Feasibility | Total |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **RHYTHM RUSH** | Unscramble a song line, then dance to it; share your own puzzle | 4 | 4 | 5 | 4 | 4 | 4 | **25** |
+| **MOVE & MATCH** | Screen shows a symbol or colour; players match it with a movement, faster each round | 5 | 4 | 3 | 3 | 4 | 5 | 24 |
+| **MOOD IN MOTION** | Draw an emotion card and express it in movement while a friend guesses | 3 | 5 | 4 | 4 | 3 | 4 | 23 |
 
-**Ethics**
-- No violence, body-shaming or offensive content. Conflict is friendly.
-- Creator phrases are validated (length, characters) and checked against a small basic word list. This is a limited safeguard, not moderation.
-- No fake friends, fake feeds or simulated sharing success. The game never claims a challenge was posted anywhere.
+**Selected: RHYTHM RUSH.** It has the clearest separation between a digital half and a physical half, a natural social hook (the puzzle link), it demonstrates in two minutes, and music can be original. MOVE & MATCH has a thin digital part and a weak social part; MOOD IN MOTION depends on personal emotions, scoring is subjective, and it risks seeming to give emotional advice. Variations tried on paper: scored two-player turns (built in the first prototype, then removed), and timed puzzles (removed to keep the puzzle calm).
 
-**Privacy**
-- No camera, microphone, location or biometric data. No server, accounts, analytics or API keys.
-- Names, settings, unlocks and scores stay in the browser's localStorage.
-- Challenge links contain only the phrase and an optional nickname (visible to anyone who has the link).
+## 12. Design thinking: Prototype
 
-## 16. Testing plan and actual results
+Built as a working browser game (React, TypeScript, Vite). **[Implemented]**
 
-### 16.1 Plan
-Human playtest script, observation sheet and 50/50 measurement method: [`PLAYTEST_PLAN.md`](PLAYTEST_PLAN.md).
+1. **Song puzzle:** pointer-based drag board with reflow animation, tap-swap, keyboard control, automatic checking, a celebration burst.
+2. **Dance:** a joint-angle rig for the shadow dancer (nine moves, seated variant), driven by the audio clock, with cues and the stage.
+3. **Sharing:** the puzzle maker, link codec, share buttons and the friend's challenge flow.
+4. **Rule Book:** short, covering the seven elements.
+Prototype versions: v1 (scored two-player game, retired) and this redesign.
 
-### 16.2 Actual results so far: automated developer testing only
+## 13. Design thinking: Test
 
-These were run by the developer on a Windows machine with desktop Google Chrome. **They are not user tests.**
+### 13.1 Procedure (proposed, for real people)
+Use `docs/PLAYTEST_PLAN.md`: 3 to 5 consenting participants aged about 18 to 24, an unassisted first play, a checklist, timing of puzzle, dance and social task, and a short interview. **[NOT YET COLLECTED]**
+
+### 13.2 Testing actually completed: automated developer testing only
+Run by the developer on Windows with desktop Google Chrome. **These are not user tests.**
 
 | Check | Method | Result |
 | --- | --- | --- |
 | Type-check, lint, production build | `npm run check` | `npm run check` exited with code 0: type-check clean, lint clean, build succeeded |
-| Scoring, scrambling, hints, session flow, theme unlock, storage sanitising, challenge-link encode/decode/validation, emoji budget, Rule Book numbers match code | Vitest unit tests | 48 tests in 4 files, all passed |
-| Full journey (Home > Setup > Puzzle > Music > Dance > Results > Theme unlock > Next round), two players | Playwright | Passed |
-| Incorrect answer, hint, no duplicate scoring, timeout, skip puzzle, skip movement, seated scoring | Playwright | Passed |
-| Pause/Resume, Rule Book during play pauses timer, keyboard tile movement, restart, leave confirmation, name validation | Playwright | Passed |
-| Create puzzle validation, preview, copy link (clipboard checked), open link in a second tab and play the real challenge, malformed links, paste link, native share present/absent | Playwright | Passed |
-| Refresh persistence of settings and theme unlock | Playwright | Passed |
-| Audio fallback when Web Audio is unavailable | Playwright (AudioContext removed) | Passed; game continues |
-| Mobile layout (375 x 667 emulated viewport, touch): no sideways scroll, targets at least 40 px, tap-to-swap, full round | Playwright emulation | Passed |
-| Dance figure animates and freezes when paused | Playwright (computed transforms) | Passed |
-| Visual inspection of Home, Puzzle, Dance (standing, seated) | Screenshots reviewed by the developer | Done; one defect found (section 17) |
+| Puzzle logic, scramble and hints, Devanagari, dancer poses are finite and continuous at all beats, each move visibly changes, cue timing and count-in, every routine 20 to 45 s, challenge-link encode/decode and hostile inputs, share URLs, storage sanitising, emoji budget, Rule Book numbers match the code | Vitest | 49 tests in 4 files, all passed |
+| Title tap and keyboard start; shuffled tiles; no submit, check or verify button; wrong arrangement is gentle and never shows the answer; automatic detection; invitation shown; music engine not created until the dance button; "not now" never starts music | Playwright | Passed |
+| Mouse drag, keyboard move, tap-swap, nudge, shuffle again | Playwright | Passed |
+| Full Level 1 in real time: count-in, cues change on the beat, dancer pose changes, pause freezes dancer and cues, resume, automatic end, celebration, Next level, Level 2 Hindi line, progress saved | Playwright | Passed |
+| Restart dance, dance again, end dance, seated version (chair shown, upper-body cues), audio-unavailable fallback, Rule Book opens during dance and pauses it, level replay and locking, refresh | Playwright | Passed |
+| Puzzle maker validation, reviewed scramble matches the friend's puzzle, copy link (clipboard read back), friend opens real puzzle and song, share URLs for WhatsApp, Telegram and Email, native share present and absent, malformed and legacy links, Devanagari puzzle, paste-a-link | Playwright | Passed |
+| Mobile (390 px, touch): no sideways scroll on title, puzzle, invitation, dance, pause, celebrate, create and Rule Book; controls at least 40 px; **finger drag** of a tile; taps after a drag | Playwright with touch emulation and raw touch input | Passed |
+| Visual inspection: title, puzzle states, invitation, dance (standing and seated), celebration, create screen, Rule Book, phone views; a contact sheet of every move at several beats | Screenshots reviewed by the developer | Done; defects found and fixed (section 14) |
 
-Counts at the time of writing: 48 unit tests passed; 22 browser tests passed in a clean full run. In one earlier full run, a single browser test failed with `net::ERR_NETWORK_CHANGED` while loading the page (a transient network event on the test machine); it passed when re-run alone and in the later full run. Reproduce with `npm run check` and `npm run test:e2e`.
+Browser tests: 31 passed in the final full run.
 
-### 16.3 What has NOT been tested
-- **Any real human playtest** (understanding rules without coaching, enjoyment, comfort, real 50/50 balance): [NOT YET COLLECTED].
-- **A real movement session.** The movement phase was only tested as software (timers, buttons, scoring). No one has verified that the moves are comfortable or well explained.
-- Real audio output quality or loudness on speakers and headphones (automated tests cannot hear).
-- Real phones and tablets, Safari and Firefox, screen readers.
-- Sharing between two devices over a hosted URL, and the real native share sheet on a phone.
+### 13.3 What has NOT been tested
+- **Any human playtest.** Understanding without coaching, enjoyment, comfort, whether the cues are easy to follow, and the real hybrid balance are all unknown.
+- **Whether the moves are comfortable or safe** when actually performed.
+- **How the music sounds** to real listeners, or its loudness on real speakers. Automated tests cannot hear.
+- Real phones and tablets, Safari, Firefox, screen readers, high zoom, colour-vision checks, a contrast audit.
+- Native Hindi review of the phrase, and cross-device sharing over the live site.
 
-### 16.4 Playtest results
+### 13.4 Playtest results
 
-| Participant | Date | Unassisted understanding | Digital time (s) | Physical time (s) | Comfort / enjoyment notes | Bugs / barriers |
-| --- | --- | --- | --- | --- | --- | --- |
-| P1 | | | | | | |
-| P2 | | | | | | |
-| P3 | | | | | | |
-| P4 | | | | | | |
-| P5 | | | | | | |
+| Participant | Date | Unassisted start? | Puzzle time (s) | Dance time (s) | Followed the dance? | Comfort / enjoyment | Bugs / barriers |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| P1 | | | | | | | |
+| P2 | | | | | | | |
+| P3 | | | | | | | |
+| P4 | | | | | | | |
+| P5 | | | | | | | |
 
-## 17. Iteration log
+## 14. Design thinking: Refine (iteration log)
 
-Entries 1 and 2 come from **developer testing**. Rows 3 onward are **placeholders for playtest-driven changes**; none has happened yet.
+Entries 1 to 6 come from **developer testing**. Rows 7 onward are **placeholders for playtest-driven changes**; none has happened yet.
 
 | # | Issue | Evidence | Change | Retest result |
 | --- | --- | --- | --- | --- |
-| 1 | The unlock rule was ambiguous. "Round" means a pair of turns in two-player mode, so "two completed rounds" could be read two ways. | Found while writing the automated unlock test: one two-player round gives two successful turns, which unlocks the next theme. | Defined the unit as a **song-and-dance turn** (puzzle solved and movement completed, counted per player turn). Updated the screens, Rule Book (in-app and `docs/RULE_BOOK.md`), and README. The decision on whether "round" in the brief should mean a turn is flagged for faculty (section 9). | Unit test and Playwright test confirm one solo turn gives 1 of 2, the second unlocks Retro Rewind, and a two-player round unlocks it too. A unit test checks the Rule Book wording matches the code. |
-| 2 | The Pause button icon looked like a single block, not two bars. | Seen in a screenshot of the Dance screen during developer inspection (the bars' gap was too small at 20 px). | Widened the gap between the two bars in the icon path (`src/components/Icon.tsx`). | Re-captured the button after the change: two separate bars are now visible. Automated tests do not check icon appearance, so this was a visual check by the developer. |
-| 3 | *[placeholder]* | *[evidence from playtest: observation, quote, timing]* | *[change]* | *[retest with whom, how, and the result, including if it failed]* |
-| 4 | *[placeholder]* | | | |
-| 5 | *[placeholder]* | | | |
+| 1 | After dragging a tile with a **finger**, later taps were ignored and the tile looked stuck | Automated touch-drag test: the event log showed `lostpointercapture` before `pointerup` because React moves the tile in the DOM during a drag, so the tile never heard the finger lift | Listen for pointer move, up and cancel on the window instead of relying on pointer capture | Regression tests: after a mouse drag and after a touch drag, no tile is left dragging and tapping swaps tiles. Passed, plus 12 repeated touch-solve rounds in a throwaway stress test |
+| 2 | A dragged tile could overshoot its target and land one place too far | Mouse-drag test failed: dropped word was one slot off, because tiles of different widths reflow under the pointer | Swap only once the pointer passes the middle of the target tile | Mouse and touch drag tests pass |
+| 3 | The **seated** dancer looked like a short standing figure, so "seated" was not communicated | Reviewed the pose contact sheet for seated mode | Added a visible chair with backrest and seat, spread the knees | Re-rendered the contact sheet: reads clearly as seated. Visual check only |
+| 4 | Arms in front of the body (clap) vanished into the torso, and the arm-lift move passed through a T-pose on every beat | Pose contact sheet | Pale edge on arms; torso reshaped; arm lifts now peak on the beat; hips sway period matches its cue | Re-rendered contact sheet; unit tests check poses are finite, continuous and moving |
+| 5 | The count-in cue wrapped off the screen and the beat dots fell below the fold on a 1280 x 720 screen | Screenshots at laptop and phone sizes | Shorter count-in cue ("Find your spot"), capped stage height, cropped stage on phones | Re-captured screenshots: fixed |
+| 6 | Mobile title wordmark was clipped at the right edge | Phone screenshot | Smaller responsive size | Re-captured: fixed |
+| 7 | *[placeholder]* | *[playtest evidence]* | *[change]* | *[retest with whom, how, and result, including if it failed]* |
+| 8 | *[placeholder]* | | | |
 
-**Requirement note.** The assignment asks for at least one evidence-based improvement after testing. Entries 1 and 2 are real but come from developer testing. Add at least one change driven by a human playtest and re-test it before submission.
+**Requirement note.** The assignment asks for at least one evidence-based improvement after testing. Entries 1 to 6 are genuine but come from the developer's testing. Add at least one change driven by a human playtest and re-test it before submission.
 
-## 18. Known limitations and future improvements
+## 15. Accessibility, safety, ethics and privacy
 
-**Known limitations**
-- Movement completion is self-reported by design; there is no tracking.
-- The silhouette is a simple front-facing figure; some moves (for example step-touch) are approximated. Written cues are always shown.
-- 50/50 balance is a design target and unvalidated. The timing log excludes hand-overs and feedback.
-- Challenge links work between devices only if the game is hosted publicly.
-- The content filter is a small word list, not moderation.
-- A round in progress is not saved on refresh.
-- Only desktop Chrome and an emulated mobile viewport were tested.
-- Synthesised music is simple.
+**Accessibility [Implemented]**: keyboard play for puzzle and every control; tap-to-swap as an alternative to dragging; visible focus; skip link; focus moves on navigation; live regions announce puzzle progress; dance cues shown as large text as well as animation; seated version; reduced-motion preference turns off decorative motion (the dancer keeps moving, because it is the content); high-contrast cream-on-plum text; 44 px minimum controls. **Not yet tested:** screen readers, zoom, colour-vision, formal contrast audit.
 
-**Possible future improvements** (not implemented)
-- Real playtest-driven tuning of timers and moves.
-- Optional recorded, properly licensed music.
-- More themes and phrase packs, and a daily challenge.
-- Better movement illustrations or a side-view figure; per-move difficulty levels.
-- A screen-reader and colour-contrast audit.
-- Optional two-device play with a shared room (would require a backend, which the assignment avoids).
+**Safety**: safety line on the invitation and in the Rule Book; low-impact beginner moves; pause and skip always available; no pressure to perform. No camera or body tracking.
 
-## 19. How to run and demonstrate the prototype
+**Ethics**: friendly conflict only; no scores or body comparison; custom lines validated and checked against a small word list (not moderation); no fake friends or fake sharing success.
+
+**Privacy**: no server, accounts, analytics or keys. Progress and sound settings are in the browser's localStorage. A challenge link contains only the line, song, shuffle and optional nickname, visible to anyone with the link.
+
+## 16. Originality and copyright
+
+- **Lyric lines:** original, written for this project. We did not search every existing song, so this is a good-faith statement; the lines are deliberately generic.
+- **Music:** original, generated live. No recordings or third-party music services.
+- **Graphics and animation:** original SVG and CSS, including the dancer rig and logo. No stock images, icon packs or video.
+- **Fonts:** Bricolage Grotesque and Figtree (SIL Open Font License 1.1), bundled locally via `@fontsource-variable` packages.
+- **Software:** React, Vite, TypeScript, Vitest, Playwright, ESLint (open-source licences).
+- The UI does not copy any commercial game.
+
+## 17. Limitations and future improvements
+
+**Limitations**: the dancer is a simple front-facing figure with nine moves; completion is not checked, by design; music is synthesised and simple; Hindi unreviewed; only desktop Chrome and an emulated phone tested; no real playtests; the word filter is basic; a level in progress is not saved on refresh; sharing between devices needs the hosted site.
+
+**Possible next steps (not built)**: playtest-driven tuning of puzzle length and routines; a native-speaker review and more Hindi lines; licensed or commissioned recorded music; side-view or more detailed dancer; more levels and a daily challenge; a screen-reader and contrast audit.
+
+## 18. How to run, demonstrate and deploy
 
 ```bash
 npm install
-npm run dev        # open http://localhost:5173
+npm run dev          # http://localhost:5173
+npm run check        # type-check, lint, unit tests, build
+npm run test:e2e     # browser tests (needs Google Chrome)
+npm run deploy       # publish to GitHub Pages (gh-pages branch)
 ```
 
-Class demo, about 5 minutes:
-1. Settings > **Quick demo** for both timers (20 s puzzle, 24 s movement). Use **Standard** for real playtests.
-2. Start game > two names > Fresh Beats. Show the step track (Digital / Digital / Physical).
-3. Player 1: Start puzzle, make a wrong answer, use a hint, solve, Continue. Play track, adjust volume, Continue to movement. Show **Seated / low-impact** and Pause.
-4. Player 2 takes a turn. Show the results, the winner, and the theme unlock banner (Retro Rewind).
-5. Create a puzzle, make a link, copy it, open it in a second tab. Mention that a public host is needed for friends.
-6. Open the Rule Book during play. Show Settings > Playtest timing log.
-7. Reset for the next audience: Settings > Reset progress and scores.
+**Live:** <https://heenaparmar-dotcom.github.io/Hybrid-Game-A1/>
 
-Checks: `npm run check` (type-check, lint, unit tests, build) and `npm run test:e2e` (browser tests).
+**Demo script (about 5 minutes):** tap the title; drag the tiles (show a wrong order, then the right one, with no button); the invitation; pause and the seated switch on the dance; Level 2 (Hindi); Make a puzzle, preview, create, copy and open the link on a phone; open *How to play*.
+
+## 19. Faculty discussion and feedback
+
+**Status: [NOT YET COLLECTED].** No faculty feedback has been received or is claimed.
+
+| Field | Entry |
+| --- | --- |
+| Date | |
+| Faculty member(s) | |
+| Questions asked | |
+| Feedback on RHYTHM RUSH (their words) | |
+| Feedback on the other two concepts | |
+| Suggested changes | |
+| Accepted, and why | |
+| Not accepted, and why | |
 
 ## 20. Final reflection template
 
-*To be completed after real playtesting. Do not fill in before the evidence exists.*
+*Complete this only after real playtesting.*
 
-1. **What did we set out to achieve?** *(your words)*
-2. **What did players actually do?** *(link to observations in 16.4)*
-3. **Was the 50/50 target met? Evidence:** *(stopwatch shares, perceived balance)*
-4. **Which hypotheses (H1 to H4) were supported, partly supported or contradicted?** *(table)*
-5. **What surprised us?**
-6. **What did we change because of evidence, and did it work?** *(link to iteration log)*
-7. **What would we change next?**
-8. **What did we learn about designing for wellness without making medical claims?**
-9. **Individual contributions** *(if group work)*
+1. What did we set out to achieve?
+2. What did players actually do? (link to 13.4)
+3. Was the hybrid balance reached? Evidence: stopwatch shares, perceived balance.
+4. Which hypotheses (H1 to H4) were supported, partly supported or contradicted?
+5. What surprised us?
+6. What did we change because of evidence, and did it work? (link to section 14)
+7. What would we change next?
+8. What did we learn about designing for wellness without medical claims?
+9. Individual contributions (if group work).

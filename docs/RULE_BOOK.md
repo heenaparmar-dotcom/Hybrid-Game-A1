@@ -2,152 +2,92 @@
 
 **Solve the song. Catch the beat. Own the move.**
 
-RHYTHM RUSH is a hybrid wellness game for friends. You unscramble a song line on a screen (digital), then get up and move to an original beat (physical). This is the full manual. The same text is available inside the game from the **Rule Book** button.
+This is the same Rule Book that opens inside the game from **How to play**. A new player should get it in one or two minutes.
 
 ---
 
-## Quick start
+## The game in 30 seconds
 
-1. Choose **Start game** (two players) or **Solo practice**, then pick a theme.
-2. **Solve** the scrambled song line before the timer ends (digital).
-3. **Listen** to the generated track and preview the moves (digital).
-4. **Move** through the 8-move sequence in a clear space, standing or seated (physical).
-5. Confirm you finished, collect points, then **challenge a friend** with your own puzzle link.
-
-Clear a safe space, keep water nearby, and move only as far as feels comfortable.
-
----
+1. **Solve the song.** A lyric line is scrambled into word tiles. Drag them into order. The game notices when you are right, so there is no button to press.
+2. **Unlock the dance.** When the line is right, you can choose to dance to its song.
+3. **Move.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.
+4. **Challenge a friend.** Write your own puzzle and send a link so a friend can take a movement break too.
 
 ## 1. Players
 
-- **Target audience:** college students and young adults, about 18 to 24 years old.
-- **Two-player mode:** exactly two players share one device and take turns. No accounts and no second device are needed.
-- **Solo practice:** one player practises and tries to beat a personal best.
-- **Turns:** in each round, Player 1 plays a full turn (solve, listen, move), then Player 2 plays a full turn with a different song line. The screen always shows whose turn it is.
-- **Winner:** the player with the higher round total wins the round. Match totals add up across rounds. Equal totals are a tie, and both players win.
+- **Who it is for:** college students and young adults, about 18 to 24.
+- **How many:** one player on one device. Friends join by opening a challenge link on their own device, so the best way to play is 2 or more friends sending each other puzzles. The game does not have accounts or live multiplayer.
 
 ## 2. Goals
 
-- Solve the scrambled word puzzle.
-- Complete the physical movement phase.
-- Earn points and unlock new themes.
-- Challenge a friend with a puzzle you created, shared as a link.
+- Put each scrambled lyric back in order.
+- Follow the dance for the song you unlocked.
+- Finish all 3 levels.
+- Make a puzzle and invite a friend to take a movement break.
 
 ## 3. Rules
 
-### Setup
-Pick one or two players, edit names (up to 16 characters; the two names must differ), choose an unlocked theme, and make sure you have room to move. Timer lengths can be changed in Settings; the defaults below are the standard game.
-
-### Puzzle and timer
-- Each turn has one scrambled song line. Put the words in the correct order. The default countdown is **45 seconds** and starts when you press **Start puzzle**.
-- Move tiles by dragging, by tapping one tile and then another to swap them, or with the keyboard (Enter picks a tile up, the arrow keys move it, Escape puts it down). The **Left** and **Right** buttons move a picked-up tile one place.
-- **Submit answer** checks your order. A wrong answer costs no points: you are told how many words are in the right place and can keep trying until time runs out.
-- A solved puzzle can only score once. Once it is solved the Submit button disappears.
-- **Hint:** locks the next correct word in place. Each hint costs **20 points** from the puzzle score, up to **3 hints** per puzzle. Puzzle points never go below 0.
-- **Timeout or skip:** the answer is shown, you earn no puzzle points, and you still continue to the music and movement.
-- **Reshuffle** re-mixes the tiles that are not locked. **Restart puzzle** resets the timer, tiles and hints; use it fairly (for example after an interruption). Restarts are recorded.
-
-### Music and movement
-- Press **Play track** to hear the original generated music (browsers need a tap or click before they play sound). If sound fails, the game continues without it.
-- The movement phase shows **8 moves**, one at a time, across a countdown of **120 seconds** by default. Use **Start**, **Pause** and **Resume** as needed.
-- The game cannot see you. When the countdown ends, **you** confirm with **I completed it**. Please play honestly.
-- Choose **Standing** or **Seated / low-impact** at any time. Both earn identical points.
-
-### Scoring
-
-| Action | Points |
-| --- | --- |
-| Correct puzzle answer | 100 |
-| Speed bonus (scales with the time left on the puzzle timer) | 0 to 50 |
-| Each hint used | -20 from the puzzle points (never below 0) |
-| Completing the movement phase (standing or seated) | 100 |
-| Skipping the movement phase | 0 (you may continue) |
-
-Turn total = puzzle points + speed bonus + movement points. Best possible turn: **250**.
-
-### Theme unlocks
-A **song-and-dance turn** is a turn where you solved the puzzle **and** completed the movement. Every **2** song-and-dance turns unlock the next theme. Each player's turn counts on its own, so in a two-player game one round where both players solve and move unlocks a theme.
-
-| Theme | Availability |
-| --- | --- |
-| Fresh Beats | Available from the start |
-| Retro Rewind | Unlocks after 2 song-and-dance turns |
-| Hook-Step Party | Unlocks after 4 song-and-dance turns |
-
-Unlocks are saved in your browser.
-
-### Skipping and accessibility
-You may skip a puzzle or a movement at any time. Choosing the seated option never reduces your score. You can turn the animated guide off in Settings and follow the written cues instead.
-
-### Winning and replaying
-After each round the results screen shows every score. Choose **Next round**, **Replay** (new match, same players), **Change theme**, **Challenge a friend** or **Return home**. Each turn is scored exactly once, even if you revisit a screen.
+- **Rearranging:** drag a tile to a new place, or tap one tile and then another to swap them. With a keyboard, press Enter on a tile to pick it up, use the arrow keys to move it, and press Enter to put it down.
+- **Checking:** the game checks the order every time it changes. When it matches, the words light up and the song unlocks. A wrong order never costs anything, and the game only tells you how many words are in the right place.
+- **Nudge:** if you are stuck, a Nudge button appears and locks one correct word in place.
+- **The dance:** it starts only when you press the dance button, and the music starts at the same moment. You can pause or mute at any time.
+- **Moving on:** when the routine ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.
+- **Your own puzzles:** a line of 3 to 8 words, up to 60 characters. Use your own words or words you have permission to use.
 
 ## 4. Space
 
-- **Digital space:** the browser interface holds the puzzle, timer, music controls, movement guide and scores.
-- **Physical space:** a clear, safe area, about two metres across if standing, or a stable chair if seated.
-- **How they connect:** the screen tells you what to do and when, and your body does it in the room. The digital solve leads into the physical dance, and your physical confirmation unlocks the movement score.
+- **Digital space:** the browser, where the puzzle, the music and the dance guide appear.
+- **Physical space:** a clear patch of floor, roughly two big steps in every direction, or a stable chair for the seated version.
+
+The dancer is on the left of the stage and *your spot* is on the right. Copy the dancer like a mirror: when they go right on the screen, you go right.
 
 ## 5. Time
 
-A standard turn lasts about four minutes. The design target is roughly **50% digital and 50% physical**. This is an intended target that still needs to be checked in playtesting; the game logs your actual screen times to help (Settings > Playtest timing log).
+These are planned times, not measured results.
 
-| Phase | Planned time |
-| --- | --- |
-| Digital: puzzle countdown | 45 s (hard limit) |
-| Digital: listen and preview (soft guide) | about 30 s |
-| Digital: feedback and hand-over | about 45 s |
-| **Digital total** | **about 2:00** |
-| **Physical: movement countdown** | **2:00** |
-
-When the puzzle timer runs out, the answer is revealed and play continues to the music. When the movement timer ends, you confirm completion or continue without movement points. Timers stop while the Rule Book is open or when you press Pause.
+- **Puzzle:** there is no timer. Most people should need around a minute or less.
+- **Dance:** 39 to 42 seconds, including a short count-in. Each dance has 34 to 38 seconds of moves.
+- **One level:** about 2 to 3 minutes. **All 3 levels:** about 8 to 10 minutes.
 
 ## 6. Resources
 
-| Resource | How it supports play |
-| --- | --- |
-| Word tiles | The puzzle pieces you reorder |
-| Timer | Creates pacing and friendly pressure |
-| Generated audio | An original track made in your browser; sets the tempo for movement |
-| Movement animation | The silhouette that demonstrates each move |
-| Points | The shared score you compare |
-| Hints | Limited help: up to 3 per puzzle, 20 points each |
-| Themes | Unlockable sounds, colours and move orders |
-| Challenge links | A self-contained link to a puzzle you made, shared by you |
+- **You need:** a phone, tablet or computer with a browser, and room to move.
+- **Internet:** the game itself works offline once loaded. You need internet to open or send challenge links.
+- **In the game:** draggable word tiles, original music made in your browser, the dancer animation, and challenge links.
 
 ## 7. Conflict
 
-The challenge is friendly and non-violent. It comes from time pressure, puzzle difficulty, comparing scores with a friend, and finishing the movement phase. Nobody is eliminated and nobody is judged on their body or ability.
+The challenge is friendly and there is no violence. It comes from three things: working out a scrambled lyric, remembering and following the dance, and keeping up with the beat. Sharing a puzzle is an invitation, not a competition. There are no scores or rankings.
 
 ---
 
-## Example round
+## Make and share a puzzle
 
-1. Sam and Priya choose Fresh Beats. It is Sam's turn.
-2. Sam sees the tiles *skies / neon / under / Dancing*, uses one hint, and solves it with 30 s left of 45: 80 puzzle points + 33 speed bonus.
-3. Sam plays the track, completes the movement and earns 100. Turn total: **213**.
-4. Priya takes her turn. The results screen names the round winner and shows progress toward the next theme.
+1. Open *Make a puzzle* from the title screen or the end of a level.
+2. Type your line and choose a song. We scramble it and show you the result. Press *Shuffle again* if you want a different one.
+3. Press *Create challenge*, then copy the link or open WhatsApp, Telegram or Email with a ready message.
 
-## Safety and accessibility
+The game never sends anything for you. You choose who gets it and press send. A link made on `localhost` only works on the same computer, so create links from the hosted game. A friend who opens your link goes straight to your puzzle, with the same shuffle you reviewed and the song you chose.
 
-- Clear the floor, wear comfortable footwear, and keep water nearby.
-- Move gently. Stop at once if you feel pain, dizziness or discomfort. Skipping is always allowed.
-- Seated and low-impact options are first-class and score the same.
-- The game works with keyboard, touch and mouse, has visible keyboard focus, large touch targets, and respects reduced-motion settings.
-- The game needs no camera, microphone, location or body tracking.
-- Be kind. Do not use phrases that mock, shame or exclude anyone.
+## Replay and restart
 
-> **Wellness note:** RHYTHM RUSH encourages enjoyable activity, music and friendship. It is not a medical treatment or therapy and makes no health claims.
+- Use *Shuffle again* on the puzzle screen to start the puzzle over.
+- Use *Dance again* after a dance, or *Restart dance* from the pause screen.
+- Tap a finished level in the level dots to play it again.
 
-## Privacy and sharing
+## Safety and access
 
-- Settings, names, best scores and unlocks are stored only in your own browser (localStorage). Nothing is sent to a server.
-- A challenge link contains only the puzzle phrase and an optional nickname, encoded in the link. Do not put personal details in a phrase or nickname.
-- Phrases: 3 to 8 words, up to 60 characters. Use only your own original words, or words you have permission to use.
-- The game never posts anywhere. You copy the link and choose where to send it.
-- A link made on `localhost` only works on the same computer. Friends need the game hosted at a public web address.
-- Optional emoji check-ins use exactly 10 emoji, each with a text label: happy, calm, energised, a bit tired, strong, connected, nice moves, great song, great dance, clever puzzle.
+- Clear the floor, wear comfortable shoes and keep water nearby.
+- Move gently. Stop if you feel pain or dizziness. You can always pause or skip.
+- **Seated version:** choose it before the dance. The dancer sits on a chair and the cues use the upper body.
+- Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation.
+- The game needs no camera, microphone or location, and it does not watch you move. You decide how it went.
 
-## Original content and licensing
+> **Wellness note:** this is a game that encourages enjoyable movement, music and time with friends. It is not a medical treatment.
 
-All song lines are original demo content written for this project, not lyrics from any commercial song. Music is generated live in your browser with the Web Audio API. The logo, tiles, backgrounds and dancing silhouette are original CSS and SVG. No stock images, fonts or recordings are used. If you create your own puzzle, use your own words.
+## Privacy, music and emoji
+
+- Your progress and sound settings are saved only in this browser.
+- A challenge link contains only the line, the chosen song, the word order and an optional nickname. Do not put personal details in them.
+- All songs are original and made live in your browser. All lyric lines were written for this game.
+- There are 8 emoji in the game, each with a text label: happy, calm, energised, a bit tired, strong, nice moves, great song, great dance.

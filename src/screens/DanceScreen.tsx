@@ -1,141 +1,161 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AudioControls, AudioNotice, useMusicStatus } from '../components/AudioControls';
-import { DanceFigure } from '../components/DanceFigure';
 import { Icon } from '../components/Icon';
-import type { ThemeId } from '../data/phrases';
-import { sequenceFor } from '../data/moves';
-import { themeById } from '../data/themes';
+import { Stage } from '../components/Stage';
+import { COUNT_IN_BEATS, routineBeats, type Track } from '../data/tracks';
 import { music } from '../lib/audio';
-import { SCORING } from '../lib/constants';
-import { formatClock, useCountdown } from '../lib/useCountdown';
+import { poseAtBeat, stateAt } from '../lib/routine';
 
 interface Props {
-  themeId: ThemeId;
-  moveSeconds: number;
-  animatedGuide: boolean;
+  track: Track;
+  kicker: string;
+  seated: boolean;
+  /** True while something else (like the Rule Book) is covering the game. */
+  externalPause: boolean;
   volume: number;
   muted: boolean;
-  paused: boolean;
   onVolume: (v: number) => void;
   onMuted: (m: boolean) => void;
-  onDone: (result: { completed: boolean; moveMs: number; seated: boolean }) => void;
+  onFinish: () => void;
+  onSkip: () => void;
+  onRestart: () => void;
 }
 
-type Phase = 'ready' | 'running' | 'paused' | 'finished';
-
-export function DanceScreen({ themeId, moveSeconds, animatedGuide, volume, muted, paused, onVolume, onMuted, onDone }: Props) {
-  const moves = sequenceFor(themeId);
-  const theme = themeById(themeId);
-  const totalMs = moveSeconds * 1000;
-  const perMove = totalMs / moves.length;
-  const [phase, setPhase] = useState<Phase>('ready');
-  const [seated, setSeated] = useState(false);
+/**
+ * The hook-step challenge. The routine is driven by the music clock (or by a silent clock if sound is unavailable),
+ * so the cues and the dancer stay on the beat. Nothing watches the player: they simply dance along.
+ */
+export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart }: Props) {
+  const [mode, setMode] = useState<'pending' | 'audio' | 'silent'>('pending');
+  const [beat, setBeat] = useState(-COUNT_IN_BEATS);
+  const [userPaused, setUserPaused] = useState(false);
+  const [done, setDone] = useState(false);
   const status = useMusicStatus();
-
-  const cd = useCountdown(totalMs, phase === 'running' && !paused, () => {
-    setPhase('finished');
-    music.stop();
-  });
-
-  useEffect(() => () => music.stop(), []);
-  // The Rule Book overlay pauses movement and music, then resumes them.
+  const paused = userPaused || externalPause;
+  const silent = useRef({ elapsed: 0, last: null as number | null });
+  const finishRef = useRef(onFinish);
   useEffect(() => {
-    if (paused && music.getStatus() === 'playing') void music.pause();
-    if (!paused && phase === 'running' && music.getStatus() === 'paused') void music.resume();
-  }, [paused, phase]);
+    finishRef.current = onFinish;
+  });
+  const total = routineBeats(track);
 
-  const idx = Math.min(moves.length - 1, Math.floor(cd.elapsedMs / perMove));
-  const move = phase === 'ready' ? moves[0] : moves[idx];
-  const next = moves[idx + 1];
-  const running = phase === 'running' && !paused;
-  const animate = animatedGuide && (phase === 'ready' || running);
+  // The music was started by the button press on the previous screen. Find out whether it is really playing.
+  useEffect(() => {
+    let alive = true;
+    void music.ready().then((s) => {
+      if (alive) setMode(s === 'playing' ? 'audio' : 'silent');
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  const start = () => {
-    setPhase('running');
-    void music.start(themeId);
-  };
-  const pause = () => {
-    setPhase('paused');
-    void music.pause();
-  };
-  const resume = () => {
-    setPhase('running');
-    void music.resume();
-  };
-  const leave = (completed: boolean) => {
-    music.stop();
-    onDone({ completed, moveMs: cd.exactElapsedMs(), seated });
-  };
+  // Pause or resume the sound together with the dance.
+  useEffect(() => {
+    if (mode !== 'audio' || done) return;
+    if (paused) void music.pause();
+    else void music.resume();
+  }, [paused, mode, done]);
+
+  // The beat clock.
+  useEffect(() => {
+    if (mode === 'pending' || done) return;
+    const s = silent.current;
+    let raf = 0;
+    if (mode === 'silent' && !paused) s.last = performance.now();
+    const tick = () => {
+      let seconds: number;
+      if (mode === 'audio') {
+        seconds = music.songTime() ?? 0;
+      } else {
+        const now = performance.now();
+        if (s.last !== null) s.elapsed += now - s.last;
+        s.last = paused ? null : now;
+        seconds = s.elapsed / 1000;
+      }
+      const b = (seconds * track.bpm) / 60 - COUNT_IN_BEATS;
+      setBeat(b);
+      if (b >= total) {
+        setDone(true);
+        music.fadeOut(1);
+        window.setTimeout(() => finishRef.current(), 900);
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (mode === 'silent' && s.last !== null) {
+        s.elapsed += performance.now() - s.last;
+        s.last = null;
+      }
+    };
+  }, [mode, paused, done, track.bpm, total]);
+
+  const st = useMemo(() => stateAt(track, beat, seated), [track, beat, seated]);
+  const pose = useMemo(() => poseAtBeat(track, beat, seated), [track, beat, seated]);
+  const pulse = Math.max(0, 1 - (((beat % 1) + 1) % 1) * 2);
+  const countdown = st.phase === 'countin' ? st.countNumber : null;
+  const go = st.phase === 'dance' && beat < 1.2;
 
   return (
-    <div className="screen dance">
-      <h1 className="sr-only">Dance challenge</h1>
-      <div className="dance-grid">
-        <div className="card figure-card">
-          <div className={`beat-ring ${animate ? 'is-on' : ''}`} style={{ ['--beat' as string]: `${60 / theme.bpm}s` }} aria-hidden="true" />
-          <DanceFigure moveId={move.id} seated={seated} animate={animate} beat={60 / theme.bpm} label={`Animated silhouette showing: ${move.name}`} />
-          {!animatedGuide && <p className="hint-text center-text">Animation is off (Settings). Follow the written cue.</p>}
+    <section className="screen dance" aria-labelledby="dance-title">
+      <header className="dance-head">
+        <div>
+          <p className="kicker">{kicker}</p>
+          <h1 id="dance-title" className="dance-title">{track.title}</h1>
         </div>
+        <div className="dance-tools">
+          <AudioControls volume={volume} muted={muted} onVolume={onVolume} onMuted={onMuted} compact />
+          <button type="button" className="btn btn-small" onClick={() => setUserPaused(true)} disabled={done || userPaused} data-testid="pause-dance">
+            <Icon name="pause" size={18} /> Pause
+          </button>
+        </div>
+      </header>
 
-        <div className="dance-info">
-          <div className={`timer ${phase === 'finished' ? 'is-done' : ''}`} role="timer" aria-label="Movement time left" data-testid="move-timer">
-            <span className="timer-num">{formatClock(cd.remainingMs)}</span>
-            <span className="timer-bar" aria-hidden="true"><span style={{ width: `${(cd.remainingMs / totalMs) * 100}%` }} /></span>
-          </div>
-
-          <div className="seg" role="radiogroup" aria-label="Movement style">
-            <button type="button" role="radio" aria-checked={!seated} className={!seated ? 'is-on' : ''} onClick={() => setSeated(false)} data-testid="style-standing"><Icon name="stand" /> Standing</button>
-            <button type="button" role="radio" aria-checked={seated} className={seated ? 'is-on' : ''} onClick={() => setSeated(true)} data-testid="style-seated"><Icon name="seat" /> Seated / low-impact</button>
-          </div>
-          <p className="hint-text">Both styles earn the same {SCORING.movePoints} points. Choose whatever feels good, and change any time.</p>
-
-          {phase === 'finished' ? (
-            <div className="card result" data-testid="dance-finished">
-              <h2>Sequence finished!</h2>
-              <p>The game cannot see you, so you decide. Did you complete the movement (in any style that worked for you)?</p>
+      <div className="stage-wrap">
+        <Stage pose={pose} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
+        {countdown !== null && <div className="count-big" aria-hidden="true" key={countdown}>{countdown}</div>}
+        {go && !paused && <div className="count-big go" aria-hidden="true">GO!</div>}
+        {done && <div className="count-big go" aria-hidden="true" data-testid="dance-done-flash">Nice!</div>}
+        {userPaused && (
+          <div className="pause-panel" role="dialog" aria-label="Dance paused" data-testid="pause-panel">
+            <h2>Paused</h2>
+            <div className="row center">
+              <button type="button" className="btn btn-primary" onClick={() => setUserPaused(false)} autoFocus data-testid="resume-dance"><Icon name="play" /> Resume</button>
+              <button type="button" className="btn" onClick={onRestart} data-testid="restart-dance"><Icon name="restart" /> Restart dance</button>
+              <button type="button" className="btn btn-ghost" onClick={onSkip} data-testid="end-dance">End dance</button>
             </div>
-          ) : (
-            <div className="card move-card" aria-live="polite">
-              <span className="chip">{phase === 'ready' ? 'First move' : `Move ${idx + 1} of ${moves.length}`}</span>
-              <h2 className="move-name" data-testid="move-name">{move.name}</h2>
-              <p className="move-cue" data-testid="move-cue">{seated ? move.seatedCue : move.cue}</p>
-              {phase !== 'ready' && next && <p className="hint-text">Up next: {next.name}</p>}
-            </div>
-          )}
-
-          <ol className="seq" aria-label="Movement progress">
-            {moves.map((m, i) => (
-              <li key={i} className={phase === 'finished' || (phase !== 'ready' && i < idx) ? 'is-done' : phase !== 'ready' && i === idx ? 'is-current' : ''} aria-label={`${m.name}${i === idx && phase !== 'ready' && phase !== 'finished' ? ', current' : ''}`}>
-                <span />
-              </li>
-            ))}
-          </ol>
-
-          {phase === 'ready' && (
-            <div className="safety">
-              <strong>Before you start:</strong> clear about two metres of floor (or take a stable chair), keep water nearby, and move gently. Stop if anything hurts.
-            </div>
-          )}
-          <AudioNotice status={status} />
-
-          <div className="row wrap">
-            {phase === 'ready' && <button className="btn btn-primary btn-xl" onClick={start} data-testid="dance-start"><Icon name="play" /> Start moving</button>}
-            {phase === 'running' && <button className="btn btn-primary btn-lg" onClick={pause} data-testid="dance-pause"><Icon name="pause" /> Pause</button>}
-            {phase === 'paused' && <button className="btn btn-primary btn-lg" onClick={resume} data-testid="dance-resume"><Icon name="play" /> Resume</button>}
-            {phase === 'finished' && (
-              <>
-                <button className="btn btn-primary btn-xl" onClick={() => leave(true)} data-testid="dance-complete"><Icon name="check" /> I completed it (+{SCORING.movePoints})</button>
-                <button className="btn" onClick={() => leave(false)} data-testid="dance-skip-after">I could not finish: continue (+0)</button>
-              </>
-            )}
-            {phase !== 'finished' && (
-              <button className="btn btn-ghost" onClick={() => leave(false)} data-testid="dance-skip"><Icon name="skip" /> Skip movement (+0)</button>
-            )}
+            <AudioControls volume={volume} muted={muted} onVolume={onVolume} onMuted={onMuted} />
           </div>
-          {phase !== 'finished' && phase !== 'ready' && <p className="hint-text">The Complete button appears when the countdown ends.</p>}
-          <AudioControls volume={volume} muted={muted} onVolume={onVolume} onMuted={onMuted} />
+        )}
+      </div>
+
+      <div className="cue-panel" aria-live="off">
+        <p className="cue-kicker" data-testid="cue-kicker">
+          {st.phase === 'countin' ? 'Get ready' : `Move ${st.moveIndex + 1} of ${track.moves.length} · ${st.move.name} · Round ${st.round} of ${st.rounds}`}
+        </p>
+        <p className="cue" data-testid="cue" key={`${st.moveIndex}-${st.cueIndex}-${st.phase}`}>{st.cue}</p>
+        <p className="next">{st.phase === 'dance' && st.next ? `Next: ${st.next.name}` : st.phase === 'countin' ? `First: ${st.move.name}` : ' '}</p>
+      </div>
+
+      <div className="beat-row">
+        <div className="beat-dots" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className={st.beatInBar === i && !paused && mode !== 'pending' ? 'on' : ''} />
+          ))}
+        </div>
+        <div className="progress-line" role="progressbar" aria-label="Dance progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(st.progress * 100)}>
+          <span style={{ width: `${st.progress * 100}%` }} />
         </div>
       </div>
-    </div>
+
+      <AudioNotice status={mode === 'silent' ? (status === 'blocked' ? 'blocked' : 'unavailable') : 'idle'} />
+      {seated && <p className="fine center-text">Seated version: the dancer sits, and the cues use your upper body.</p>}
+      <div className="row center">
+        <button type="button" className="link-btn" onClick={onSkip} data-testid="skip-dance-now">Skip the rest</button>
+      </div>
+    </section>
   );
 }

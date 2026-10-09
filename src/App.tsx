@@ -1,26 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Icon } from './components/Icon';
-import { Logo } from './components/Logo';
+import { LevelBar } from './components/LevelBar';
 import { Modal } from './components/Modal';
 import { RuleBook } from './components/RuleBook';
-import { TurnBar } from './components/TurnBar';
-import type { ThemeId } from './data/phrases';
-import { unlockedThemeIds } from './data/themes';
+import { LEVEL_COUNT, levelByNumber } from './data/levels';
+import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
-import { CHALLENGE_PARAM, parseChallengeInput } from './lib/challenge';
-import { advanceTurn, commitTurn, isRoundComplete, startNextRound, startSession, turnKey } from './lib/session';
-import { defaultStore, loadStore, saveStore, type Store } from './lib/storage';
-import type { Mode, PuzzleDraft, ScreenId, Session } from './lib/types';
+import { CHALLENGE_PARAM, parseChallengeInput, type ChallengeData } from './lib/challenge';
+import { loadStore, saveStore, type Store } from './lib/storage';
+import { prefersReducedMotion } from './lib/useBeat';
+import { CelebrateScreen } from './screens/CelebrateScreen';
 import { ChallengeScreen, type Incoming } from './screens/ChallengeScreen';
 import { CreateScreen } from './screens/CreateScreen';
 import { DanceScreen } from './screens/DanceScreen';
-import { HomeScreen } from './screens/HomeScreen';
-import { MusicScreen } from './screens/MusicScreen';
+import { InviteScreen } from './screens/InviteScreen';
 import { PuzzleScreen } from './screens/PuzzleScreen';
-import { ResultsScreen } from './screens/ResultsScreen';
-import { SettingsScreen } from './screens/SettingsScreen';
-import { SetupScreen } from './screens/SetupScreen';
-import { ThemeScreen } from './screens/ThemeScreen';
+import { TitleScreen } from './screens/TitleScreen';
+
+type Run = { kind: 'level'; level: number } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
+type Stage = 'puzzle' | 'invite' | 'dance' | 'celebrate';
+type View =
+  | { name: 'title' }
+  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean }
+  | { name: 'create' }
+  | { name: 'challenge' };
 
 function readIncoming(): Incoming {
   const hash = window.location.hash;
@@ -29,232 +32,236 @@ function readIncoming(): Incoming {
   return res.ok ? { kind: 'ok', data: res.value } : { kind: 'error', message: res.error };
 }
 
-const PLAY_SCREENS: ScreenId[] = ['puzzle', 'music', 'dance'];
+/** Everything the three play stages need to know about the current run. */
+function describe(run: Run) {
+  if (run.kind === 'level') {
+    const level = levelByNumber(run.level);
+    return {
+      phrase: level.phrase,
+      track: trackById(level.trackId),
+      kicker: `Level ${level.n} · ${level.name}`,
+      prompt: level.prompt,
+      meaning: level.meaning,
+      initialOrder: undefined as number[] | undefined,
+      from: undefined as string | undefined,
+    };
+  }
+  const { data } = run;
+  return {
+    phrase: data.phrase,
+    track: trackById(data.track ?? 'sunrise'),
+    kicker: run.tryout ? 'Your puzzle' : data.from ? `${data.from}'s puzzle` : "A friend's puzzle",
+    prompt: `${data.phrase.split(' ').length} words. Put the line back in order, then dance.`,
+    meaning: undefined,
+    initialOrder: data.order,
+    from: data.from,
+  };
+}
 
 export default function App() {
   const [store, setStore] = useState<Store>(() => loadStore());
   const [incoming, setIncoming] = useState<Incoming>(() => readIncoming());
-  const [screen, setScreen] = useState<ScreenId>(() => (readIncoming().kind === 'none' ? 'home' : 'challenge'));
-  const [mode, setMode] = useState<Mode>('duo');
-  const [themeId, setThemeId] = useState<ThemeId>('fresh');
-  const [session, setSession] = useState<Session | null>(null);
+  const [view, setView] = useState<View>(() => (readIncoming().kind === 'none' ? { name: 'title' } : { name: 'challenge' }));
   const [rulesOpen, setRulesOpen] = useState(false);
-  const [leaveTarget, setLeaveTarget] = useState<ScreenId | null>(null);
-  const committed = useRef(new Set<string>());
+  const [splash, setSplash] = useState<string | null>(null);
+  const keyCounter = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => saveStore(store), [store]);
   useEffect(() => {
-    music.setVolume(store.settings.volume);
-    music.setMuted(store.settings.muted);
-  }, [store.settings.volume, store.settings.muted]);
+    music.setVolume(store.volume);
+    music.setMuted(store.muted);
+  }, [store.volume, store.muted]);
+
   useEffect(() => {
     const onHash = () => {
       const inc = readIncoming();
       setIncoming(inc);
       if (inc.kind !== 'none') {
         music.stop();
-        setSession(null);
-        setScreen('challenge');
+        setView({ name: 'challenge' });
       }
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
-  // Move focus to the page content on navigation (keyboard and screen-reader friendly).
+
+  // Move focus to the page content when the screen changes, unless a control on the new screen already took it.
+  const stageKey = view.name === 'play' ? `${view.key}-${view.stage}` : view.name;
   useEffect(() => {
     window.scrollTo(0, 0);
-    mainRef.current?.focus({ preventScroll: true });
-  }, [screen]);
+    const a = document.activeElement;
+    if (!a || a === document.body || !mainRef.current?.contains(a)) mainRef.current?.focus({ preventScroll: true });
+  }, [stageKey]);
 
-  const setSettings = useCallback((patch: Partial<Store['settings']>) => setStore((s) => ({ ...s, settings: { ...s.settings, ...patch } })), []);
+  useEffect(() => {
+    if (!splash) return;
+    const id = window.setTimeout(() => setSplash(null), prefersReducedMotion() ? 600 : 1500);
+    return () => window.clearTimeout(id);
+  }, [splash]);
 
-  const activeTheme: ThemeId = session?.themeId ?? themeId;
-  const successful = store.progress.successfulRounds;
-  const paused = rulesOpen || leaveTarget !== null;
+  const setVolume = useCallback((volume: number) => setStore((s) => ({ ...s, volume })), []);
+  const setMuted = useCallback((muted: boolean) => setStore((s) => ({ ...s, muted })), []);
 
-  const goHome = () => {
+  const newKey = () => ++keyCounter.current;
+
+  const goTitle = () => {
     music.stop();
-    setSession(null);
-    setLeaveTarget(null);
     if (window.location.hash) window.history.replaceState(null, '', window.location.pathname + window.location.search);
     setIncoming({ kind: 'none' });
-    setScreen('home');
+    setView({ name: 'title' });
   };
-  const nav = (s: ScreenId) => {
+
+  const startLevel = (n: number) => {
     music.stop();
-    setScreen(s);
+    const level = levelByNumber(n);
+    setSplash(`Level ${level.n}|${level.name}`);
+    setView({ name: 'play', run: { kind: 'level', level: level.n }, stage: 'puzzle', key: newKey(), skipped: false });
   };
-  /** Leaving mid-turn asks first, because the unfinished turn is lost. */
-  const requestLeave = (target: ScreenId) => {
-    if (PLAY_SCREENS.includes(screen)) setLeaveTarget(target);
-    else if (target === 'home') goHome();
-    else nav(target);
-  };
-  const confirmLeave = () => {
-    const target = leaveTarget ?? 'home';
-    setLeaveTarget(null);
-    if (target === 'home') goHome();
-    else {
-      setSession(null);
-      nav(target);
-    }
+  const resumeLevel = () => startLevel(store.completed >= LEVEL_COUNT ? 1 : store.completed + 1);
+
+  const startChallenge = (data: ChallengeData, tryout: boolean) => {
+    music.stop();
+    setSplash(tryout ? 'Your puzzle|Try it first' : data.from ? `${data.from}'s puzzle|A friend challenged you` : "A friend's puzzle|You have been challenged");
+    setView({ name: 'play', run: { kind: 'challenge', data, tryout }, stage: 'puzzle', key: newKey(), skipped: false });
   };
 
-  const beginSolo = (text: string, from?: string) => {
-    const theme = unlockedThemeIds(successful).includes(themeId) ? themeId : 'fresh';
-    setSession(startSession('solo', [store.settings.names[0]], theme, { text, from }));
-    setScreen('puzzle');
+  const toStage = (stage: Stage, skipped = false) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped } : v));
+
+  /** Called from a click, so the audio context is allowed to start. */
+  const startDance = (track: Track) => {
+    void music.start(track.id);
+    setView((v) => (v.name === 'play' ? { ...v, stage: 'dance', key: newKey(), skipped: false } : v));
   };
 
-  const onPuzzleDone = (draft: PuzzleDraft) => {
-    setSession((s) => (s ? { ...s, draft } : s));
-    setScreen('music');
-  };
-  const onMusicDone = (listenMs: number) => {
-    setSession((s) => (s ? { ...s, listenMs } : s));
-    setScreen('dance');
-  };
-  const onDanceDone = (res: { completed: boolean; moveMs: number; seated: boolean }) => {
-    if (!session) return;
-    const key = turnKey(session);
-    if (committed.current.has(key)) return; // a turn can only be scored once
-    committed.current.add(key);
-    const out = commitTurn(session, store, { moveCompleted: res.completed, seated: res.seated, moveMs: res.moveMs });
-    setStore(out.store);
-    if (isRoundComplete(out.session)) {
-      setSession(out.session);
-      setScreen('results');
-    } else {
-      setSession(advanceTurn(out.session));
-      setScreen('puzzle');
+  const finishRun = (skipped: boolean) => {
+    if (view.name !== 'play') return;
+    if (view.run.kind === 'level') {
+      const n = view.run.level;
+      setStore((s) => ({ ...s, completed: Math.max(s.completed, n) }));
     }
+    toStage('celebrate', skipped);
   };
 
-  const content = () => {
-    switch (screen) {
-      case 'home':
-        return (
-          <HomeScreen
-            onStartDuo={() => { setMode('duo'); setScreen('setup'); }}
-            onStartSolo={() => { setMode('solo'); setScreen('setup'); }}
-            onNav={nav}
-            onRules={() => setRulesOpen(true)}
-          />
-        );
-      case 'setup':
-        return (
-          <SetupScreen
-            mode={mode}
-            names={store.settings.names}
-            onChangeMode={setMode}
-            onBack={() => setScreen('home')}
-            onContinue={(names) => { setSettings({ names }); setScreen('themes'); }}
-          />
-        );
-      case 'themes':
-        return (
-          <ThemeScreen
-            successfulRounds={successful}
-            selected={unlockedThemeIds(successful).includes(themeId) ? themeId : 'fresh'}
-            onSelect={setThemeId}
-            onBack={() => setScreen(session ? 'results' : 'setup')}
-            onStart={() => {
-              const names = mode === 'duo' ? [...store.settings.names] : [store.settings.names[0]];
-              setSession(startSession(mode, names, themeId));
-              setScreen('puzzle');
-            }}
-          />
-        );
-      case 'puzzle':
-        return session && (
-          <>
-            <TurnBar session={session} step="puzzle" />
-            <PuzzleScreen key={turnKey(session)} phrase={session.phrase.text} playerName={session.names[session.turnInRound]} puzzleSeconds={store.settings.puzzleSeconds} paused={paused} onDone={onPuzzleDone} />
-          </>
-        );
-      case 'music':
-        return session && (
-          <>
-            <TurnBar session={session} step="music" />
-            <MusicScreen key={turnKey(session)} phrase={session.phrase.text} custom={session.phrase.custom} from={session.phrase.from} themeId={session.themeId} volume={store.settings.volume} muted={store.settings.muted} paused={paused} onVolume={(v) => setSettings({ volume: v })} onMuted={(m) => setSettings({ muted: m })} onDone={onMusicDone} />
-          </>
-        );
-      case 'dance':
-        return session && (
-          <>
-            <TurnBar session={session} step="dance" />
-            <DanceScreen key={turnKey(session)} themeId={session.themeId} moveSeconds={store.settings.moveSeconds} animatedGuide={store.settings.animatedGuide} volume={store.settings.volume} muted={store.settings.muted} paused={paused} onVolume={(v) => setSettings({ volume: v })} onMuted={(m) => setSettings({ muted: m })} onDone={onDanceDone} />
-          </>
-        );
-      case 'results':
-        return session && (
-          <ResultsScreen
-            session={session}
-            successfulRounds={successful}
-            onNext={() => { setSession(startNextRound(session)); setScreen('puzzle'); }}
-            onReplay={() => { setSession(startSession(session.mode, session.names, session.themeId, session.phrase.custom ? { text: session.phrase.text, from: session.phrase.from } : undefined)); setScreen('puzzle'); }}
-            onThemes={() => { setMode(session.mode); setScreen('themes'); }}
-            onChallenge={() => nav('create')}
-            onHome={goHome}
-          />
-        );
-      case 'create':
-        return <CreateScreen onTry={beginSolo} onBack={() => setScreen(session ? 'results' : 'home')} />;
-      case 'challenge':
-        return (
-          <ChallengeScreen
-            incoming={incoming}
-            onLoad={(data) => setIncoming({ kind: 'ok', data })}
-            onPlay={() => incoming.kind === 'ok' && beginSolo(incoming.data.phrase, incoming.data.from)}
-            onCreate={() => setScreen('create')}
-            onBack={goHome}
-          />
-        );
-      case 'settings':
-        return (
-          <SettingsScreen
-            store={store}
-            onChange={setStore}
-            onReset={() => setStore((s) => ({ ...s, progress: defaultStore().progress, scores: defaultStore().scores, timingLog: [] }))}
-            onBack={() => setScreen('home')}
-          />
-        );
+  const body = () => {
+    if (view.name === 'title') {
+      return <TitleScreen completed={store.completed} onStart={resumeLevel} onStartOver={() => { setStore((s) => ({ ...s, completed: 0 })); startLevel(1); }} />;
     }
+    if (view.name === 'create') {
+      return <CreateScreen onTry={(data) => startChallenge(data, true)} onOpenLink={(data) => { setIncoming({ kind: 'ok', data }); setView({ name: 'challenge' }); }} />;
+    }
+    if (view.name === 'challenge') {
+      return (
+        <ChallengeScreen
+          incoming={incoming}
+          onAccept={() => incoming.kind === 'ok' && startChallenge(incoming.data, false)}
+          onPlayLevels={() => { goTitle(); resumeLevel(); }}
+          onMake={() => setView({ name: 'create' })}
+        />
+      );
+    }
+
+    const info = describe(view.run);
+    const levelNo = view.run.kind === 'level' ? view.run.level : null;
+    const hasNext = levelNo !== null && levelNo < LEVEL_COUNT;
+    return (
+      <>
+        {levelNo !== null && view.stage !== 'dance' && <LevelBar current={levelNo} completed={store.completed} onSelect={startLevel} />}
+        {view.stage === 'puzzle' && (
+          <PuzzleScreen
+            key={view.key}
+            kicker={info.kicker}
+            prompt={info.prompt}
+            phrase={info.phrase}
+            initialOrder={info.initialOrder}
+            songTitle={info.track.title}
+            meaning={info.meaning}
+            onSolved={() => toStage('invite')}
+          />
+        )}
+        {view.stage === 'invite' && (
+          <InviteScreen
+            track={info.track}
+            phrase={info.phrase}
+            seated={store.seated}
+            onSeated={(seated) => setStore((s) => ({ ...s, seated }))}
+            onAccept={() => startDance(info.track)}
+            onSkip={() => finishRun(true)}
+          />
+        )}
+        {view.stage === 'dance' && (
+          <DanceScreen
+            key={view.key}
+            track={info.track}
+            kicker={info.kicker}
+            seated={store.seated}
+            externalPause={rulesOpen}
+            volume={store.volume}
+            muted={store.muted}
+            onVolume={setVolume}
+            onMuted={setMuted}
+            onFinish={() => finishRun(false)}
+            onSkip={() => { music.stop(); finishRun(true); }}
+            onRestart={() => startDance(info.track)}
+          />
+        )}
+        {view.stage === 'celebrate' && (
+          <CelebrateScreen
+            kind={view.run.kind === 'level' ? 'level' : view.run.tryout ? 'tryout' : 'challenge'}
+            level={levelNo !== null ? { n: levelNo, name: levelByNumber(levelNo).name, total: LEVEL_COUNT } : undefined}
+            from={info.from}
+            skipped={view.skipped}
+            hasNext={hasNext}
+            onNext={() => startLevel((levelNo ?? 0) + 1)}
+            onAgain={() => startDance(info.track)}
+            onMake={() => { music.stop(); setView({ name: 'create' }); }}
+            onLevels={() => (view.run.kind === 'level' ? startLevel(1) : resumeLevel())}
+            onBackToCreate={() => setView({ name: 'create' })}
+          />
+        )}
+      </>
+    );
   };
+
+  const [splashTitle, splashSub] = (splash ?? '|').split('|');
 
   return (
-    <div className="app" data-theme={activeTheme}>
+    <div className={`app view-${view.name}`}>
       <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); mainRef.current?.focus(); }}>Skip to content</a>
       <header className="topbar">
-        <button className="logo-btn" onClick={() => requestLeave('home')} aria-label="RHYTHM RUSH home" data-testid="logo-home"><Logo size="sm" /></button>
+        {view.name !== 'title' ? (
+          <button type="button" className="wordmark-small" onClick={goTitle} data-testid="home" aria-label="RHYTHM RUSH, back to the title screen">
+            RHYTHM <span>RUSH</span>
+          </button>
+        ) : (
+          <span />
+        )}
         <nav className="topnav" aria-label="Main">
-          {screen !== 'home' && <button className="btn btn-ghost" onClick={() => requestLeave('home')} data-testid="nav-home"><Icon name="home" /><span className="nav-text">Home</span></button>}
-          <button className="btn btn-ghost" onClick={() => setRulesOpen(true)} data-testid="nav-rules"><Icon name="book" /><span className="nav-text">Rule Book</span></button>
-          <button className="btn btn-ghost" onClick={() => requestLeave('settings')} data-testid="nav-settings"><Icon name="gear" /><span className="nav-text">Settings</span></button>
+          {view.name !== 'create' && (
+            <button type="button" className="nav-btn" onClick={() => { music.stop(); setView({ name: 'create' }); }} data-testid="nav-make">
+              <Icon name="plus" size={18} /> <span>Make a puzzle</span>
+            </button>
+          )}
+          <button type="button" className="nav-btn" onClick={() => setRulesOpen(true)} data-testid="nav-rules">
+            <Icon name="book" size={18} /> <span>How to play</span>
+          </button>
         </nav>
       </header>
 
-      <main id="main" ref={mainRef} tabIndex={-1} className="main" data-screen={screen}>
-        {content()}
+      <main id="main" ref={mainRef} tabIndex={-1} className="main" data-view={view.name} data-stage={view.name === 'play' ? view.stage : undefined}>
+        {body()}
       </main>
 
-      <footer className="footer">
-        <p>Original demo content and generated music. A game for fun, not a medical treatment. Move gently and stop if anything hurts.</p>
-      </footer>
+      {splash && (
+        <div className="splash" aria-hidden="true" data-testid="splash">
+          <p className="splash-kicker">{splashTitle}</p>
+          <p className="splash-title">{splashSub}</p>
+        </div>
+      )}
 
       {rulesOpen && (
-        <Modal title="Rule Book" onClose={() => setRulesOpen(false)} wide>
+        <Modal title="How to play" onClose={() => setRulesOpen(false)} wide>
           <RuleBook />
-        </Modal>
-      )}
-      {leaveTarget && (
-        <Modal title="Leave this round?" onClose={() => setLeaveTarget(null)}>
-          <p>Your progress in this round will be lost. Saved settings, unlocks and best scores are kept.</p>
-          <div className="row">
-            <button className="btn btn-primary" onClick={() => setLeaveTarget(null)}>Keep playing</button>
-            <button className="btn" onClick={confirmLeave} data-testid="confirm-leave">Leave round</button>
-          </div>
         </Modal>
       )}
     </div>
