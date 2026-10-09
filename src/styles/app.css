@@ -110,8 +110,6 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 .title-art { position: absolute; right: -3%; bottom: 0; height: min(74%, 640px); width: auto; aspect-ratio: 600 / 520; pointer-events: none; }
 .title-floor { fill: rgba(255, 93, 77, 0.22); }
 /* Three black silhouettes on the plum background: no image, no white box. A thin cream rim keeps the black shapes readable. */
-.title-dancers .dancer { --c: #08010f; }
-.title-dancers .dancer .edge { display: none; }
 .title-dancers { filter: drop-shadow(0 0 1.5px rgba(255, 242, 224, 0.85)) drop-shadow(0 0 14px rgba(255, 93, 77, 0.45)); }
 .title-dancer { animation: dancer-in 0.8s var(--ease-out) both; }
 @keyframes dancer-in { from { opacity: 0; transform: translateY(34px); } to { opacity: 1; transform: none; } }

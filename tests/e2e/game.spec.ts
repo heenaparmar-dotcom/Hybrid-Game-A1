@@ -28,11 +28,11 @@ test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submi
 test('title art: three original black silhouettes, no image and no white background', async ({ page }) => {
   await page.goto('./');
   const art = page.locator('.title-art');
-  await expect(art.locator('.dancer')).toHaveCount(3);
+  await expect(art.locator('.sil')).toHaveCount(3);
   await expect(art.locator('image, img, foreignObject')).toHaveCount(0); // only vector shapes, no pasted picture
   await expect(page.locator('.title-stage img, .title-stage picture, .title-stage canvas')).toHaveCount(0);
   const info = await art.evaluate((svg) => {
-    const dancers = Array.from(svg.querySelectorAll('.dancer'));
+    const dancers = Array.from(svg.querySelectorAll('.sil'));
     const fills = dancers.map((d) => getComputedStyle(d.querySelector('ellipse')!).fill);
     return { bg: getComputedStyle(svg).backgroundColor, fills };
   });

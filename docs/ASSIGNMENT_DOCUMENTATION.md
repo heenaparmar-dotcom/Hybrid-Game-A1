@@ -39,7 +39,7 @@ The first prototype was a scored, timed, two-player game on one device. After re
 
 - **Palette:** deep plum stage, warm coral and tangerine energy, cream type, a little lime and mint for success and "your spot". **[Implemented]**
 - **Type:** Bricolage Grotesque (expressive display, condensed at large sizes) with Figtree for reading text; both are open-licensed and bundled locally.
-- **Identity:** a condensed, bouncing wordmark (RHYTHM in cream, RUSH in a skewed coral with a tangerine shadow); a live title composition of the dancer with colour-trail "echoes" and radiating sound-wave rings; the puzzle shown as a lyric line with start and end bars, like a bar of music; a curtain wipe from the tap point and a bold level splash as transitions.
+- **Identity:** a condensed, bouncing wordmark (RHYTHM in cream, RUSH in a skewed coral with a tangerine shadow); a title composition of three original black dancer silhouettes (hand-drawn vector shapes with streaming hair, easing between two poses each; inspired by the energy of a reference photo but not traced from it, and with no image file); the puzzle shown as a lyric line with start and end bars, like a bar of music; a curtain wipe from the tap point and a bold level splash as transitions.
 - **Avoided on purpose:** gradient-everything, glass panels, dashboard cards, random floating decorations, fake statistics or leaderboards. Emoji are limited to 8 (limit 10), each with a text label, and appear only in the optional mood check-in and friend reactions.
 - **Responsive:** laptop, tablet and phone layouts; the stage is cropped on phones to make the dancers larger.
 

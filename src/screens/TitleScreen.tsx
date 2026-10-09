@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { DancerFigure } from '../components/Dancer';
+import { lerpSilPose, SilhouetteFigure } from '../components/Silhouette';
 import { LEVEL_COUNT } from '../data/levels';
-import { ease, lerpPose, REST, type Pose } from '../lib/dancer';
+import { SIL_DANCERS } from '../data/silhouettes';
+import { ease } from '../lib/dancer';
 import { prefersReducedMotion, useBeat } from '../lib/useBeat';
 
 interface Props {
@@ -9,32 +10,6 @@ interface Props {
   onStart: () => void;
   onStartOver: () => void;
 }
-
-/**
- * Three original black dancers, each held between two poses. They are drawn with the same rig as the dance screen,
- * so there is no image file and no background: only the silhouettes sit on the title screen.
- */
-const pose = (p: Partial<Pose>): Pose => ({ ...REST, ...p });
-const DANCERS: { x: number; y: number; scale: number; delay: number; phase: number; a: Pose; b: Pose }[] = [
-  {
-    // left: one arm reaching up, a leg kicked out
-    x: -140, y: 108, scale: 1.0, delay: 0.1, phase: 0,
-    a: pose({ sL: 152, eL: -8, sR: 52, eR: -38, tL: 4, tR: 26, liftR: 0.35, lean: -7, x: -4, head: -5 }),
-    b: pose({ sL: 122, eL: -10, sR: 76, eR: -30, tL: 6, tR: 16, liftR: 0.15, lean: -2, x: 0, head: -2 }),
-  },
-  {
-    // centre: both arms up in a V, bouncing
-    x: 0, y: 98, scale: 1.12, delay: 0.3, phase: 0.5,
-    a: pose({ sL: 162, eL: 0, sR: 162, eR: 0, tL: 15, tR: 15, y: 0, head: 3 }),
-    b: pose({ sL: 128, eL: -26, sR: 128, eR: -26, tL: 9, tR: 9, y: 7, head: -3 }),
-  },
-  {
-    // right: hand on hip, other arm up, hips leaning
-    x: 142, y: 110, scale: 0.98, delay: 0.5, phase: 1,
-    a: pose({ sL: 58, eL: -85, sR: 142, eR: -18, tL: 5, tR: 17, liftR: 0.3, lean: 8, x: 6, head: 5 }),
-    b: pose({ sL: 58, eL: -85, sR: 108, eR: -30, tL: 7, tR: 10, lean: 3, x: 2, head: 2 }),
-  },
-];
 
 /** The first screen: one big gesture (tap anywhere on the screen) into the game. */
 export function TitleScreen({ completed, onStart, onStartOver }: Props) {
@@ -55,7 +30,6 @@ export function TitleScreen({ completed, onStart, onStartOver }: Props) {
     window.setTimeout(onStart, 620);
   };
 
-
   return (
     <div
       className={`title-stage ${leaving ? 'is-leaving' : ''}`}
@@ -75,10 +49,10 @@ export function TitleScreen({ completed, onStart, onStartOver }: Props) {
       <svg className="title-art" viewBox="-300 -260 600 520" aria-hidden="true" focusable="false">
         <ellipse className="title-floor" cx="0" cy="214" rx="230" ry="24" />
         <g className="title-dancers">
-          {DANCERS.map((d, i) => (
+          {SIL_DANCERS.map((d, i) => (
             <g key={i} transform={`translate(${d.x} ${d.y}) scale(${d.scale})`}>
               <g className="title-dancer" style={{ animationDelay: `${d.delay}s` }}>
-                <DancerFigure pose={lerpPose(d.a, d.b, reduce ? 0 : swing(d.phase))} />
+                <SilhouetteFigure pose={lerpSilPose(d.a, d.b, reduce ? 0 : swing(d.phase))} />
               </g>
             </g>
           ))}
