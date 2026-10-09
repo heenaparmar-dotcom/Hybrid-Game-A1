@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { lerpSilPose, SilhouetteFigure } from '../components/Silhouette';
+import { HumanFigure } from '../components/Silhouette';
 import { LEVEL_COUNT } from '../data/levels';
 import { SIL_DANCERS } from '../data/silhouettes';
-import { ease } from '../lib/dancer';
+import { figureAt, GROUND, keyframes, toHumanPose } from '../lib/human';
 import { prefersReducedMotion, useBeat } from '../lib/useBeat';
 
 interface Props {
@@ -11,12 +11,14 @@ interface Props {
   onStartOver: () => void;
 }
 
+/** Each dancer's cycle of poses, worked out once. */
+const FRAMES = SIL_DANCERS.map((d) => keyframes(toHumanPose(d.a), toHumanPose(d.b)));
+const FLOOR_Y = 218;
+
 /** The first screen: one big gesture (tap anywhere on the screen) into the game. */
 export function TitleScreen({ completed, onStart, onStartOver }: Props) {
   const reduce = prefersReducedMotion();
-  const beat = useBeat(96, !reduce);
-  // 0 to 1 and back every 4 beats, offset per dancer so they are not in lockstep.
-  const swing = (phase: number) => ease((Math.sin((beat / 2 + phase) * Math.PI) + 1) / 2);
+  const beat = useBeat(96, !reduce, 30);
   const [leaving, setLeaving] = useState<{ x: number; y: number } | null>(null);
   const next = completed >= LEVEL_COUNT ? 1 : completed + 1;
 
@@ -50,9 +52,9 @@ export function TitleScreen({ completed, onStart, onStartOver }: Props) {
         <ellipse className="title-floor" cx="0" cy="214" rx="230" ry="24" />
         <g className="title-dancers">
           {SIL_DANCERS.map((d, i) => (
-            <g key={i} transform={`translate(${d.x} ${d.y}) scale(${d.scale})`}>
+            <g key={i} transform={`translate(${d.x} ${FLOOR_Y - GROUND * d.scale}) scale(${d.scale})`}>
               <g className="title-dancer" style={{ animationDelay: `${d.delay}s` }}>
-                <SilhouetteFigure pose={lerpSilPose(d.a, d.b, reduce ? 0 : swing(d.phase))} />
+                <HumanFigure fig={figureAt(FRAMES[i], reduce ? 0 : beat, d.phase)} baggy={d.baggy} />
               </g>
             </g>
           ))}

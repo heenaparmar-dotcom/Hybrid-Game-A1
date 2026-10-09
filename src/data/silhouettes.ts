@@ -34,6 +34,8 @@ export interface SilDancer {
   scale: number;
   delay: number;
   phase: number;
+  /** Loose wide-leg trousers instead of fitted legs. */
+  baggy?: boolean;
   a: SilPose;
   b: SilPose;
 }
@@ -57,7 +59,7 @@ export const SIL_DANCERS: readonly SilDancer[] = [
   },
   {
     // centre: deep lunge, one arm straight up, the other out, head tipped back, long hair falling
-    x: 0, y: 96, scale: 0.98, delay: 0.3, phase: 0.5,
+    x: 0, y: 96, scale: 0.98, delay: 0.3, phase: 0.5, baggy: true,
     a: {
       pelvis: [0, 14], ls: [-26, -62], rs: [10, -70], head: [-16, -91], tilt: -22,
       le: [-62, -52], lw: [-96, -40], re: [16, -110], rw: [22, -146],

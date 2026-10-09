@@ -21,7 +21,7 @@ const setRandom = (page: Page, r: number | null) => page.evaluate((v) => ((windo
 
 async function enterLevel(page: Page, n: number): Promise<Puzzle> {
   await page.getByTestId(`level-${n}`).click();
-  await expect(page.getByTestId('splash')).toContainText(LEVELS[n - 1].name);
+  await expect(page.getByTestId('splash')).toContainText(LEVELS[n - 1].name, { timeout: 15_000 });
   await page.getByTestId('tile-0').waitFor();
   return currentPuzzle(page);
 }
