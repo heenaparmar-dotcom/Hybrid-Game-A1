@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../../src/data/levels';
 import { PUZZLES } from '../../src/data/puzzles';
 import { MOVES } from '../../src/data/moves';
-import { BEATS_PER_MOVE, COUNT_IN_BEATS, MAX_ROUTINE_SECONDS, TRACKS, routineBeats, routineSeconds, totalSeconds } from '../../src/data/tracks';
+import { BEATS_PER_MOVE, COUNT_IN_BEATS, DANCE_TOTAL_SECONDS, TRACKS, routineBeats, routineSeconds, totalSeconds } from '../../src/data/tracks';
+import { DANCE_SECONDS, PUZZLE_SECONDS, puzzleSeconds } from '../../src/lib/timing';
 import { MOVE_IDS, REST, poseAt } from '../../src/lib/dancer';
 import { poseAtBeat, stateAt } from '../../src/lib/routine';
 import { applyHint, applyOrder, countCorrect, moveTile, orderOf, sameOrder, scramble, swapTiles, tokenise } from '../../src/lib/scramble';
@@ -23,12 +24,18 @@ describe('levels and songs', () => {
   it('includes both Hindi and English songs', () => {
     expect(new Set(TRACKS.map((t) => t.language))).toEqual(new Set(['English', 'Hindi']));
   });
-  it('every routine is 20 to 45 seconds including the count-in', () => {
+  it('every dance lasts exactly 30 seconds including the count-in', () => {
+    expect(DANCE_SECONDS).toBe(30);
+    expect(DANCE_TOTAL_SECONDS).toBe(30);
     for (const t of TRACKS) {
-      expect(routineSeconds(t)).toBeGreaterThanOrEqual(20);
-      expect(totalSeconds(t)).toBeLessThanOrEqual(MAX_ROUTINE_SECONDS);
+      expect(totalSeconds(t), t.id).toBeCloseTo(30, 6);
+      expect(routineSeconds(t) + (COUNT_IN_BEATS * 60) / t.bpm, t.id).toBeCloseTo(30, 6);
       expect(routineBeats(t)).toBe(t.moves.length * BEATS_PER_MOVE * t.repeats);
     }
+  });
+  it('the puzzle timer is 10 seconds (browser tests may lengthen it, players cannot)', () => {
+    expect(PUZZLE_SECONDS).toBe(10);
+    expect(puzzleSeconds()).toBe(10); // no window in this test environment: the default applies
   });
   it('every move used by a song exists and has four cues (standing and seated)', () => {
     for (const t of TRACKS) {

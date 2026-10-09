@@ -154,6 +154,8 @@ export interface BuildOptions {
   phase: number;
   /** Hair angle from the same motion a little earlier, so it trails the head. */
   laggedHair?: number;
+  /** A light hop (SVG units): the whole figure lifts off the floor between beats and lands on each beat. */
+  hop?: number;
 }
 
 /** Forward kinematics: joint angles and fixed bone lengths in, joint positions out. The lowest foot is placed on the ground. */
@@ -204,7 +206,8 @@ export function buildFigure(p: HumanPose, o: BuildOptions): Figure {
 
   const all: Pt[] = [pelvis, spineTop, neckTop, head, ls, rs, le, re, lw, rw, lhand, rhand, hl, hr, lk, rk, la, ra, ltoe, rtoe];
   const lowest = Math.max(la[1] + 6, ra[1] + 6, ltoe[1] + 2, rtoe[1] + 2);
-  const shift = GROUND - lowest;
+  const hopLift = (o.hop ?? 0) * Math.abs(Math.sin(Math.PI * (t + o.phase)));
+  const shift = GROUND - lowest - hopLift;
   all.forEach((pt) => {
     pt[1] += shift;
   });
@@ -220,11 +223,11 @@ export function buildFigure(p: HumanPose, o: BuildOptions): Figure {
 }
 
 /** Everything the renderer needs for one dancer at one moment. */
-export function figureAt(frames: HumanPose[], beat: number, phase: number): Figure {
+export function figureAt(frames: HumanPose[], beat: number, phase: number, hop = 0): Figure {
   const pose = poseAtBeat(frames, beat);
   // the hair trails the body by about a third of a beat
   const lagged = poseAtBeat(frames, beat - 0.35).hair + 9 * Math.sin(beat * 2.6 + phase * 4);
-  return buildFigure(pose, { beat, phase, laggedHair: lagged });
+  return buildFigure(pose, { beat, phase, laggedHair: lagged, hop });
 }
 
 export const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);

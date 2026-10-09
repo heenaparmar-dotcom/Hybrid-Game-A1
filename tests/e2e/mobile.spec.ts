@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { currentPuzzle, installRandomControl, norm, setRandom, solveToInvite, tileTexts } from './helpers';
+import { PIN_FOUR_TILES, currentPuzzle, installRandomControl, norm, setRandom, solveToInvite, tileTexts } from './helpers';
 
 test.use({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
 
@@ -36,7 +36,7 @@ test('mobile: every screen fits, touch targets are large, and tiles drag with a 
   await page.goto('./');
   await noHorizontalScroll(page, 'title');
   await touchTargetsOk(page, 'title');
-  await setRandom(page, 0); // a four-word puzzle, so the drag test has room to drag
+  await setRandom(page, PIN_FOUR_TILES); // a four-tile puzzle, so the drag test has room to drag
   await page.getByTestId('title-stage').tap();
   await expect(page.getByTestId('tile-0')).toBeVisible();
   await setRandom(page, null);
@@ -97,6 +97,7 @@ test('mobile: make-a-puzzle screen and rule book fit the screen', async ({ page 
 });
 
 test('mobile: seated dance fits and the stage is cropped for small screens', async ({ page }) => {
+  await installRandomControl(page);
   await page.goto('./');
   await page.getByTestId('title-stage').tap();
   await page.getByTestId('tile-0').waitFor();

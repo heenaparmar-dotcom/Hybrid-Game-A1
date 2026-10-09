@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { audioCreated, currentPuzzle, noAudio, solveByTaps, solveCurrent, solveToInvite, startGame, tileTexts, trackAudio, norm } from './helpers';
+import { PIN_FOUR_TILES, audioCreated, currentPuzzle, installRandomControl, setRandom, noAudio, solveByTaps, solveCurrent, solveToInvite, startGame, tileTexts, trackAudio, norm } from './helpers';
 
 test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submit button', async ({ page }) => {
   await page.goto('./');
   await expect(page.getByRole('heading', { name: 'Rhythm Rush' })).toBeVisible();
-  await expect(page.getByText('Tap to start', { exact: true })).toBeVisible();
+  await expect(page.locator('.start-text')).toHaveText('TAP TO START'); // exactly this wording
   await expect(page.getByText('Tap anywhere to start')).toHaveCount(0);
   await expect(page.getByText('Solve the song. Catch the beat. Own the move.')).toBeVisible();
   // secondary features are reachable without starting the game
@@ -78,7 +78,7 @@ test('correct order is detected automatically, then the dance invitation appears
   expect(await audioCreated(page)).toBe(0);
   await solveCurrent(page);
   await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
-  await expect(page.getByTestId('song-unlocked')).toContainText('Sunrise Sway');
+  await expect(page.getByTestId('song-title')).toContainText('Chaiyya Chaiyya'); // the pinned Warm Up song
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
   await expect(page.getByRole('heading', { name: 'You cracked the song!' })).toBeVisible();
   expect(await audioCreated(page)).toBe(0); // still silent: the player has not accepted yet
@@ -126,15 +126,26 @@ test('keyboard: pick up a tile with Enter, move it with the arrows, put it down'
   await expect(page.getByTestId('puzzle-live')).toContainText(/Moved|Put/);
 });
 
-test('shuffle again restarts the puzzle; a nudge locks a correct word after a while', async ({ page }) => {
+test('shuffle again restarts the puzzle', async ({ page }) => {
   await startGame(page);
   const puzzle = await currentPuzzle(page);
   await page.getByTestId('shuffle-again').click();
   expect((await tileTexts(page)).join(' ')).not.toBe(puzzle.phrase);
+  await expect(page.getByTestId('nudge')).toHaveCount(0); // timed puzzles have no nudge: the hint button is the help
+});
+
+test('your own (untimed) puzzle: a nudge locks a correct word after a while', async ({ page }) => {
+  await installRandomControl(page);
+  await page.goto('./');
+  await page.getByTestId('nav-make').click();
+  await page.getByTestId('phrase-input').fill('Dance like nobody knows');
+  await page.getByTestId('try-puzzle').click();
+  await page.getByTestId('tile-0').waitFor();
+  await expect(page.getByTestId('puzzle-timer')).toHaveCount(0); // no countdown on your own puzzle
   await expect(page.getByTestId('nudge')).toBeVisible({ timeout: 20_000 });
   await page.getByTestId('nudge').click();
   const t = await tileTexts(page);
-  expect(norm(t[0])).toBe(norm(puzzle.phrase.split(' ')[0]));
+  expect(norm(t[0])).toBe('dance');
   await expect(page.getByTestId('tile-0')).toHaveClass(/is-locked/);
 });
 
@@ -153,7 +164,7 @@ test('full Level 1: puzzle, dance with synced cues and a moving dancer, pause, c
   await expect(page.getByTestId('cue')).toHaveText('Sway left', { timeout: 6000 });
   const shape2 = await page.locator('.dancer-wrap').innerHTML();
   expect(shape2).not.toBe(shape1);
-  await expect(page.getByTestId('cue-kicker')).toContainText('Move 1 of 4');
+  await expect(page.getByTestId('cue-kicker')).toContainText('Move 1 of 3');
 
   // pause freezes the dance, resume continues
   await page.getByTestId('pause-dance').click();
@@ -174,7 +185,7 @@ test('full Level 1: puzzle, dance with synced cues and a moving dancer, pause, c
   // next level: a longer Hindi line
   await page.getByTestId('next-level').click();
   await expect(page.getByTestId('splash')).toContainText('Find the Beat');
-  await expect(page.getByTestId('tile-4')).toBeVisible(); // five tiles
+  await expect(page.getByTestId('tile-0')).toBeVisible();
   const l2 = await currentPuzzle(page);
   expect(l2.level).toBe(2);
   await solveByTaps(page, l2.phrase);
@@ -243,6 +254,7 @@ test('audio fallback: when Web Audio is unavailable the dance still runs, silent
 });
 
 test('rule book: reachable from the title, documents all seven elements, and pauses the dance when opened', async ({ page }) => {
+  await installRandomControl(page);
   await page.goto('./');
   await page.getByTestId('nav-rules').click();
   const dialog = page.getByRole('dialog', { name: 'How to play' });
@@ -253,8 +265,10 @@ test('rule book: reachable from the title, documents all seven elements, and pau
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
 
+  await setRandom(page, PIN_FOUR_TILES); // the Sunrise Sway song, so the first cue is known
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
+  await setRandom(page, null);
   await solveToInvite(page);
   await page.getByTestId('accept-dance').click();
   await expect(page.getByTestId('cue')).toHaveText('Sway right', { timeout: 10_000 });

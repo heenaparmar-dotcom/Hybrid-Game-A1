@@ -7,6 +7,8 @@
  * Entries with a `song` are Hindi film-song challenges. They contain ONLY the song title (as the scrambled words) and a short
  * factual hint (year and film). No lyrics from those songs are used anywhere, and no recording of them is played.
  */
+import type { TrackId } from './tracks';
+
 export interface Puzzle {
   id: string;
   level: 1 | 2 | 3;
@@ -19,6 +21,8 @@ export interface Puzzle {
    * `hint` stays on screen while the player solves it; `title` is shown once it is solved.
    */
   song?: { title: string; hint: string };
+  /** Which of the game's own original dance tracks to use for this puzzle (default: the level's track). */
+  trackId?: TrackId;
 }
 
 export const PUZZLES: readonly Puzzle[] = [
@@ -45,17 +49,17 @@ export const PUZZLES: readonly Puzzle[] = [
   { id: 'l1-20', level: 1, phrase: 'Dance before your breakfast' },
 
   // Level 1: Hindi film songs. The words to arrange are the song title.
-  { id: 'l1-s01', level: 1, phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
-  { id: 'l1-s02', level: 1, phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' } },
-  { id: 'l1-s03', level: 1, phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
-  { id: 'l1-s04', level: 1, phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
-  { id: 'l1-s05', level: 1, phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
-  { id: 'l1-s06', level: 1, phrase: 'Aankh Marey', song: { title: 'Aankh Marey', hint: '2018 · Simmba' } },
+  { id: 'l1-s01', level: 1, trackId: 'hookstep', phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
+  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' } },
+  { id: 'l1-s03', level: 1, trackId: 'sunrise', phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
+  { id: 'l1-s04', level: 1, trackId: 'hookstep', phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
+  { id: 'l1-s05', level: 1, trackId: 'nacho', phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
+  { id: 'l1-s06', level: 1, trackId: 'hookstep', phrase: 'Aankh Marey', song: { title: 'Aankh Marey', hint: '2018 · Simmba' } },
   // Two identical words cannot be shuffled, so this one adds the film name to the fragments: Dil Se, Chaiyya, Chaiyya.
-  { id: 'l1-s07', level: 1, phrase: 'Dil Se Chaiyya Chaiyya', song: { title: 'Chaiyya Chaiyya', hint: '1998 · Famously filmed on top of a moving train' } },
-  { id: 'l1-s08', level: 1, phrase: 'Kajra Re', song: { title: 'Kajra Re', hint: '2005 · Bunty Aur Babli' } },
-  { id: 'l1-s09', level: 1, phrase: 'Jai Jai Shivshankar', song: { title: 'Jai Jai Shivshankar', hint: '2019 · War' } },
-  { id: 'l1-s10', level: 1, phrase: 'Dilliwaali Girlfriend', song: { title: 'Dilliwaali Girlfriend', hint: '2013 · Yeh Jawaani Hai Deewani' } },
+  { id: 'l1-s07', level: 1, trackId: 'sunrise', phrase: 'Dil Se Chaiyya Chaiyya', song: { title: 'Chaiyya Chaiyya', hint: '1998 · Famously filmed on top of a moving train' } },
+  { id: 'l1-s08', level: 1, trackId: 'nacho', phrase: 'Kajra Re', song: { title: 'Kajra Re', hint: '2005 · Bunty Aur Babli' } },
+  { id: 'l1-s09', level: 1, trackId: 'nacho', phrase: 'Jai Jai Shivshankar', song: { title: 'Jai Jai Shivshankar', hint: '2019 · War' } },
+  { id: 'l1-s10', level: 1, trackId: 'hookstep', phrase: 'Dilliwaali Girlfriend', song: { title: 'Dilliwaali Girlfriend', hint: '2013 · Yeh Jawaani Hai Deewani' } },
 
   // Level 2: five Hindi words (Roman script)
   { id: 'l2-01', level: 2, phrase: 'Aaj dil khol ke nacho', meaning: 'Today, dance with an open heart' },
@@ -114,11 +118,23 @@ export function puzzlesForLevel(level: number): Puzzle[] {
 }
 
 /**
+ * Levels that are played with the Hindi film-song puzzles only. The original word-order lines stay in this file
+ * (nothing was deleted) but Warm Up and Find the Beat now draw only from the song puzzles.
+ */
+export const SONG_ONLY_LEVELS: readonly number[] = [1, 2];
+
+/** The puzzles a level actually draws from. */
+export function playablePuzzles(level: number): Puzzle[] {
+  const all = puzzlesForLevel(level);
+  return SONG_ONLY_LEVELS.includes(level) ? all.filter((p) => p.song) : all;
+}
+
+/**
  * Pick a random puzzle for a level, never the one just played (when the level has another one to offer).
  * The candidate list keeps the data order, so a given random number maps to a given puzzle (handy for tests).
  */
 export function pickPuzzle(level: number, previousId?: string, rng: () => number = Math.random): Puzzle {
-  const pool = puzzlesForLevel(level);
+  const pool = playablePuzzles(level);
   const candidates = pool.length > 1 ? pool.filter((p) => p.id !== previousId) : pool;
   return candidates[Math.min(candidates.length - 1, Math.floor(rng() * candidates.length))];
 }

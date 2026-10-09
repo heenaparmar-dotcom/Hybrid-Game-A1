@@ -1,10 +1,10 @@
 import { expect, type Page } from '@playwright/test';
-import { PUZZLES, type Puzzle } from '../../src/data/puzzles';
+import { playablePuzzles, type Puzzle } from '../../src/data/puzzles';
 import { currentPuzzle, installRandomControl, setRandom } from './helpers';
 
 /** Open the game with progress pre-set, then press the title (which starts level `completed + 1`). */
-export async function openWithProgress(page: Page, completed: number, waitFor: 'tiles' | 'listen' = 'tiles') {
-  await installRandomControl(page);
+export async function openWithProgress(page: Page, completed: number, waitFor: 'tiles' | 'listen' = 'tiles', opts: { realTimer?: boolean } = {}) {
+  await installRandomControl(page, opts);
   await page.addInitScript((c) => {
     if (!localStorage.getItem('rhythmrush.v2')) localStorage.setItem('rhythmrush.v2', JSON.stringify({ completed: c, volume: 0.7, muted: false, seated: false }));
   }, completed);
@@ -28,7 +28,7 @@ export async function enterLevel(page: Page, n: number, name: string): Promise<P
  * where candidates are the level's puzzles minus the one just shown, so the right random number selects the target.
  */
 export async function enterPinned(page: Page, level: number, name: string, target: Puzzle, last: Record<number, string | undefined>): Promise<Puzzle> {
-  const pool = PUZZLES.filter((p) => p.level === level);
+  const pool = playablePuzzles(level);
   const candidates = pool.filter((p) => p.id !== last[level]);
   const index = candidates.findIndex((p) => p.id === target.id);
   expect(index, `${target.id} must be selectable`).toBeGreaterThanOrEqual(0);

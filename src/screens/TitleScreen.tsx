@@ -54,7 +54,7 @@ export function TitleScreen({ completed, onStart, onStartOver }: Props) {
           {SIL_DANCERS.map((d, i) => (
             <g key={i} transform={`translate(${d.x} ${FLOOR_Y - GROUND * d.scale}) scale(${d.scale})`}>
               <g className="title-dancer" style={{ animationDelay: `${d.delay}s` }}>
-                <HumanFigure fig={figureAt(FRAMES[i], reduce ? 0 : beat, d.phase)} baggy={d.baggy} />
+                <HumanFigure fig={figureAt(FRAMES[i], reduce ? 0 : beat, d.phase, reduce ? 0 : d.hop)} baggy={d.baggy} />
               </g>
             </g>
           ))}
@@ -79,7 +79,7 @@ export function TitleScreen({ completed, onStart, onStartOver }: Props) {
 
       <div className="start-prompt">
         <span className="tap-dot" aria-hidden="true" />
-        <span className="start-text">Tap to start</span>
+        <span className="start-text">TAP TO START</span>
         {completed > 0 && completed < LEVEL_COUNT && <span className="start-sub">Continue at level {next}</span>}
         {completed > 0 && (
           <button

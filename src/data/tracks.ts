@@ -22,7 +22,8 @@ export interface Track {
 export const BEATS_PER_MOVE = 8;
 /** Beats of "find your spot" before the routine starts. */
 export const COUNT_IN_BEATS = 8;
-export const MAX_ROUTINE_SECONDS = 45;
+/** Every dance (count-in included) lasts this many seconds. The lengths below are chosen so the maths is exact. */
+export const DANCE_TOTAL_SECONDS = 30;
 
 export const TRACKS: readonly Track[] = [
   {
@@ -33,7 +34,7 @@ export const TRACKS: readonly Track[] = [
     style: 'Warm pop groove',
     blurb: 'Easy sways and big reaches. A gentle first dance.',
     bpm: 112,
-    moves: ['sway', 'reach', 'step', 'clap'],
+    moves: ['sway', 'reach', 'step'],
     repeats: 2,
   },
   {
@@ -43,9 +44,9 @@ export const TRACKS: readonly Track[] = [
     language: 'Hindi',
     style: 'Dhol-inspired groove',
     blurb: 'Bhangra-style lifts and a hands-on-hips sway.',
-    bpm: 108,
-    moves: ['step', 'bhangra', 'hips', 'clap'],
-    repeats: 2,
+    bpm: 96,
+    moves: ['step', 'bhangra', 'hips', 'clap', 'reach'],
+    repeats: 1,
   },
   {
     id: 'hookstep',
@@ -54,9 +55,9 @@ export const TRACKS: readonly Track[] = [
     language: 'English',
     style: 'Latin-pop, Zumba-inspired',
     blurb: 'Marching, turning and waving. The liveliest of the three.',
-    bpm: 126,
-    moves: ['march', 'twist', 'wave', 'bhangra', 'reach'],
-    repeats: 2,
+    bpm: 128,
+    moves: ['march', 'twist', 'wave', 'bhangra', 'reach', 'sway', 'step'],
+    repeats: 1,
   },
 ];
 

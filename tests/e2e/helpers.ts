@@ -34,24 +34,29 @@ export async function noAudio(page: Page) {
  * Lets a test steer Math.random (null = real randomness). Level puzzles are picked at random, so a test that needs a
  * particular kind of puzzle pins the choice instead of hoping for it.
  */
-export async function installRandomControl(page: Page) {
-  await page.addInitScript(() => {
-    const w = window as unknown as { __r: number | null };
+export async function installRandomControl(page: Page, opts: { realTimer?: boolean } = {}) {
+  await page.addInitScript((realTimer) => {
+    const w = window as unknown as { __r: number | null; __RR_PUZZLE_SECONDS?: number };
+    // the real game gives 10 seconds per puzzle; most tests lengthen it so slow steps are not cut off by the timer
+    if (!realTimer) w.__RR_PUZZLE_SECONDS = 600;
     w.__r = null;
     const real = Math.random;
     Math.random = () => (w.__r !== null ? w.__r : real());
-  });
+  }, !!opts.realTimer);
 }
 export const setRandom = (page: Page, r: number | null) => page.evaluate((v) => ((window as unknown as { __r: number | null }).__r = v), r);
 
 /**
- * Start from the title screen and get past the level splash.
- * Pinned to the first Level 1 puzzle ("Sway with the sunrise", four words) so tests that rely on a normal-size puzzle are stable.
+ * Random number that makes Warm Up pick its 7th song, "Dil Se Chaiyya Chaiyya": the only four-tile song puzzle, which uses the
+ * "Sunrise Sway" dance. Tests that drag tiles or need a normal-size puzzle pin it so they are stable.
  */
+export const PIN_FOUR_TILES = 0.65;
+
+/** Start from the title screen and get past the level splash (pinned to the four-tile song puzzle). */
 export async function startGame(page: Page) {
   await installRandomControl(page);
   await page.goto('./');
-  await setRandom(page, 0);
+  await setRandom(page, PIN_FOUR_TILES);
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
   await setRandom(page, null);

@@ -6,6 +6,8 @@ interface Props {
   phrase: string;
   /** Shown after a film-song title puzzle: says plainly which music the dance uses. */
   songNote?: string;
+  /** The puzzle timer ran out: the answer was revealed, and the dance is still on offer. */
+  timedOut?: boolean;
   seated: boolean;
   onSeated: (v: boolean) => void;
   onAccept: () => void;
@@ -13,11 +15,11 @@ interface Props {
 }
 
 /** The dance invitation. Music starts only when the player presses the big button. */
-export function InviteScreen({ track, phrase, songNote, seated, onSeated, onAccept, onSkip }: Props) {
+export function InviteScreen({ track, phrase, songNote, timedOut, seated, onSeated, onAccept, onSkip }: Props) {
   return (
     <section className="screen invite" aria-labelledby="invite-title">
-      <p className="kicker">Song unlocked</p>
-      <h1 id="invite-title" className="invite-title">You cracked the song!</h1>
+      <p className="kicker">{timedOut ? 'Time ran out' : 'Song unlocked'}</p>
+      <h1 id="invite-title" className="invite-title" data-testid="invite-title">{timedOut ? "Here's the song!" : 'You cracked the song!'}</h1>
       <p className="invite-lyric">"{phrase}"</p>
       <p className="sub">
         <strong>{track.title}</strong> · {track.style} · about {Math.round(totalSeconds(track))} seconds

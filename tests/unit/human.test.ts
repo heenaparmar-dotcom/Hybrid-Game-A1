@@ -36,6 +36,22 @@ describe('title dancers move like a person', () => {
     });
   });
 
+  it('the airborne dancer hops: she leaves the floor between beats, lands on each beat and never sinks into it', () => {
+    const d = SIL_DANCERS[2];
+    expect(d.hop).toBeGreaterThan(0);
+    const frames = framesFor(2);
+    let maxLift = 0;
+    for (let beat = 0; beat < 8; beat += 0.05) {
+      const f = figureAt(frames, beat, d.phase, d.hop);
+      const lowest = Math.max(f.la[1] + 6, f.ra[1] + 6, f.ltoe[1] + 2, f.rtoe[1] + 2);
+      expect(lowest).toBeLessThanOrEqual(GROUND + 0.001);
+      maxLift = Math.max(maxLift, GROUND - lowest);
+    }
+    expect(maxLift).toBeGreaterThan(d.hop! * 0.8);
+    const onBeat = figureAt(frames, 4 - d.phase, d.phase, d.hop); // phase puts the foot-down moment on the beat
+    expect(Math.max(onBeat.la[1] + 6, onBeat.ra[1] + 6, onBeat.ltoe[1] + 2, onBeat.rtoe[1] + 2)).toBeCloseTo(GROUND, 1);
+  });
+
   it('every coordinate is a finite number', () => {
     SIL_DANCERS.forEach((d, i) => {
       const frames = framesFor(i);

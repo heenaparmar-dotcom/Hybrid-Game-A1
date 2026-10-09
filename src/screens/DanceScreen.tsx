@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AudioControls, AudioNotice, useMusicStatus } from '../components/AudioControls';
 import { Icon } from '../components/Icon';
 import { Stage } from '../components/Stage';
-import { COUNT_IN_BEATS, routineBeats, type Track } from '../data/tracks';
+import { COUNT_IN_BEATS, DANCE_TOTAL_SECONDS, routineBeats, type Track } from '../data/tracks';
 import { music } from '../lib/audio';
 import { poseAtBeat, stateAt } from '../lib/routine';
 
@@ -97,6 +97,9 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
   const pose = useMemo(() => poseAtBeat(track, beat, seated), [track, beat, seated]);
   const pulse = Math.max(0, 1 - (((beat % 1) + 1) % 1) * 2);
   const countdown = st.phase === 'countin' ? st.countNumber : null;
+  // seconds left of the 30-second dance (the count-in is part of it)
+  const elapsedSeconds = ((beat + COUNT_IN_BEATS) * 60) / track.bpm;
+  const secondsLeft = done ? 0 : Math.max(0, Math.min(DANCE_TOTAL_SECONDS, Math.ceil(DANCE_TOTAL_SECONDS - elapsedSeconds)));
   const go = st.phase === 'dance' && beat < 1.2;
 
   return (
@@ -105,6 +108,10 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         <div>
           <p className="kicker">{kicker}</p>
           <h1 id="dance-title" className="dance-title">{track.title}</h1>
+        </div>
+        <div className="dance-timer" role="timer" aria-label="Dance time left" data-testid="dance-timer">
+          <span className="dance-timer-num" data-testid="dance-timer-num">{secondsLeft}</span>
+          <span className="dance-timer-unit">sec</span>
         </div>
         <div className="dance-tools">
           <AudioControls volume={volume} muted={muted} onVolume={onVolume} onMuted={onMuted} compact />

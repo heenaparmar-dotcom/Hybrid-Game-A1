@@ -22,7 +22,7 @@ RHYTHM RUSH is a small music-and-movement game for friends. **[Implemented]**
 
 1. A short original lyric is scrambled into word tiles. The player drags them into order. There is **no submit button**: the game checks after every change and recognises the right order by itself.
 2. Solving it unlocks a dance invitation: "You cracked the song! Ready to dance to it?" Music starts only when the player presses the button.
-3. A **shadow dancer** demonstrates a routine of about 35 seconds on a stage, with the player's own spot beside it. Large cues change on the beat.
+3. A **shadow dancer** demonstrates a routine that lasts exactly 30 seconds (with a visible countdown) on a stage, with the player's own spot beside it. Large cues change on the beat.
 4. After a short celebration the player continues through three levels, or writes their own puzzle and sends a link to a friend, so the friend takes a movement break too.
 
 **Wellness purpose.** Enjoyable movement, a playful mental warm-up, music and connection with friends. The game makes **no medical claims**.
@@ -51,9 +51,11 @@ The first prototype was a scored, timed, two-player game on one device. After re
 | 2 | Find the Beat | 20 original Hindi lines in Roman script, each with an English meaning, e.g. "Aaj dil khol ke nacho" ("Today, dance with an open heart") | Nacho Aaj (dhol-inspired groove, 108 BPM) | 5 | step, arm lifts, hands on hips, clap, repeated twice |
 | 3 | Feel the Rhythm | 20 original English lines, e.g. "Let the rhythm carry us forward" | Hook-Step Party (Latin-pop, Zumba-inspired, 126 BPM) | 6 | march, turn, wave, arm lifts, reach, repeated twice |
 
-Each time a level is entered, the game picks one of that level's 20 lines at random (never the one just played) and shuffles its tiles freshly. The three pools are separate: 60 distinct lines in total. Difficulty rises through more words, a line in another language, and longer, livelier routines. **[Implemented]** Each routine is 34 to 38 seconds of moves plus an 8-beat count-in, 39 to 42 seconds in total (limit 45) **[Verified by automated test]**.
+Each time a level is entered, the game picks one puzzle at random (never the one just played) and shuffles its tiles freshly. Warm Up and Find the Beat have a 10-second countdown (stopping the moment the puzzle is solved, revealing the answer on timeout) and every dance lasts exactly 30 seconds. Difficulty rises through more words, a line in another language, and longer, livelier routines. **[Implemented]** Each routine is 34 to 38 seconds of moves plus an 8-beat count-in, 39 to 42 seconds in total (limit 45) **[Verified by automated test]**.
 
 **Hindi film-song challenges and the listening level (added later).** Warm Up now also contains 10 Hindi film-song challenges and Find the Beat 5 more. In every one the scrambled words are the song's **title** (a title is not a lyric excerpt) with a short factual hint (year and film); no lyrics are reproduced and no film-song recording is played. The dance still uses the game's own original track, and the invitation says so. Feel the Rhythm is now a listening level: two clips, each with three answer choices. With no licensed recording available, the clips are clearly labelled placeholders (original generated music with a computer voice speaking an original line), and `src/data/listen.ts` documents how to configure a licensed file. The pools are merged, not replaced: Warm Up has 30 puzzles, Find the Beat 25, and Feel the Rhythm's 20 word-order puzzles remain in the data but are no longer used. **Not yet checked:** the film and year hints on the Warm Up songs (from general knowledge), a native-speaker review of the Hindi text, and how the placeholder clips sound to listeners.
+
+**Final-version update.** Warm Up and Find the Beat now draw ONLY from the Hindi film-song puzzles (10 and 5). Warm Up has a small Hint button (the timer keeps running); Find the Beat shows its hint all the time. Each Warm Up song names which of the game's own original dance tracks it uses. The 20 original lines per level remain in the data file but are not played in these two levels. The Rule Book was updated for the timers, the timeout reveal and the listening level.
 
 Puzzle details **[Implemented]**: drag with mouse or finger (pointer events), tap-to-swap as a single-pointer alternative, keyboard control; the tiles reflow with a short slide; gentle feedback ("2 of 4 words are in the right place") that never reveals the answer; a *Nudge* after about 14 seconds that locks one correct word; *Shuffle again*.
 
@@ -95,7 +97,7 @@ Social interaction is a core requirement, so sharing is designed in rather than 
 | **Goals** | Reconstruct each lyric, complete the dance, finish three levels, and invite a friend with a puzzle of your own. |
 | **Rules** | Tiles are rearranged by drag, tap-swap or keyboard; the game detects the right order automatically; the dance starts only when the player presses the button; the routine can be paused or skipped; puzzles must pass validation; links are shared only by the player. |
 | **Space** | Digital: the browser (puzzle, stage, cues). Physical: a clear patch of floor about two big steps each way, or a chair. The stage shows the dancer and "your spot" side by side to connect the two. |
-| **Time** | No puzzle timer. Dance 39 to 42 seconds including the count-in. A level is planned at about 2 to 3 minutes, all three at about 8 to 10 (estimates). |
+| **Time** | Puzzle: 10 seconds (Warm Up and Find the Beat). Dance: exactly 30 seconds including the count-in. Listening level: no timer. A level is planned at about a minute to a minute and a half, all three at about 4 to 5 minutes (estimates). |
 | **Resources** | A device with a browser, word tiles, generated music, the dancer animation, challenge links, and floor space. Internet only for opening or sending links. |
 | **Conflict** | Friendly and non-violent: deciphering a scrambled line, remembering and following moves, keeping to the beat. Sharing is an invitation, not a contest. |
 
@@ -105,7 +107,7 @@ The brief frames the game as about half physical activity and half digital and s
 
 - **Physical:** the dance, about 35 to 40 seconds per level, with a seated version.
 - **Digital and social:** the puzzle (no fixed length), reading the invitation, creating a puzzle, and sending and opening links.
-- Because the puzzle has no timer, the split depends on how long players take. Puzzles are short on purpose (4 to 6 words). **[NOT YET COLLECTED]:** real timings. The stopwatch method is in `docs/PLAYTEST_PLAN.md` section 4. If puzzles take far longer than the dances, the plan is to shorten lines or lengthen routines, then re-test.
+- The puzzle is capped at 10 seconds and the dance is exactly 30, so a Warm Up level is planned at roughly a quarter puzzle, three quarters dance (plus the invitation, and sharing time). That is a design intent: puzzles that end early or by timeout change the split. **[NOT YET COLLECTED]:** real timings. The stopwatch method is in `docs/PLAYTEST_PLAN.md` section 4. If puzzles take far longer than the dances, the plan is to shorten lines or lengthen routines, then re-test.
 
 ## 9. Design thinking: Empathise
 
@@ -163,7 +165,7 @@ Run by the developer on Windows with desktop Google Chrome. **These are not user
 | Check | Method | Result |
 | --- | --- | --- |
 | Type-check, lint, production build | `npm run check` | `npm run check` exited with code 0: type-check clean, lint clean, build succeeded |
-| Puzzle pools (60 lines, 20 per level, no overlap, rising word counts, all pass the custom-puzzle validation), random selection that never repeats the previous puzzle, title-dancer movement (bone lengths never change, feet stay on the floor, motion is smooth and lively), puzzle logic, scramble and hints, Devanagari, dancer poses are finite and continuous at all beats, each move visibly changes, cue timing and count-in, every routine 20 to 45 s, challenge-link encode/decode and hostile inputs, share URLs, storage sanitising, emoji budget, Rule Book numbers match the code | Vitest | 81 tests in 7 files, all passed |
+| Puzzle pools (60 lines, 20 per level, no overlap, rising word counts, all pass the custom-puzzle validation), random selection that never repeats the previous puzzle, title-dancer movement (bone lengths never change, feet stay on the floor, motion is smooth and lively), puzzle logic, scramble and hints, Devanagari, dancer poses are finite and continuous at all beats, each move visibly changes, cue timing and count-in, every routine 20 to 45 s, challenge-link encode/decode and hostile inputs, share URLs, storage sanitising, emoji budget, Rule Book numbers match the code | Vitest | 87 tests in 7 files, all passed |
 | Title tap and keyboard start; shuffled tiles; no submit, check or verify button; wrong arrangement is gentle and never shows the answer; automatic detection; invitation shown; music engine not created until the dance button; "not now" never starts music | Playwright | Passed |
 | Mouse drag, keyboard move, tap-swap, nudge, shuffle again | Playwright | Passed |
 | **All 60 level puzzles solved through the game** (each forced once by controlling the random number), with the success state and meaning shown; entering a level again varies the puzzle and the shuffle; the title art is three vector silhouettes on a transparent background | Playwright | Passed |
@@ -177,7 +179,7 @@ Run by the developer on Windows with desktop Google Chrome. **These are not user
 | Smoke test of the **deployed** site (`BASE_URL=... npm run test:e2e`): title start, no submit button, automatic detection, music waits for the button, create and share link opened in a second tab, malformed and legacy links, audio fallback, Rule Book, phone layout and touch drag | Playwright against the live GitHub Pages address | 8 selected tests passed (the full suite was run locally, not against the live site) |
 | Visual inspection: title, puzzle states, invitation, dance (standing and seated), celebration, create screen, Rule Book, phone views; a contact sheet of every move at several beats | Screenshots reviewed by the developer | Done; defects found and fixed (section 14) |
 
-Browser tests: 48 passed in the final full run.
+Browser tests: see the final summary for the count of the last full run.
 
 ### 13.3 What has NOT been tested
 - **Any human playtest.** Understanding without coaching, enjoyment, comfort, whether the cues are easy to follow, and the real hybrid balance are all unknown.

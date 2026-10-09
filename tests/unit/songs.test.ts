@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LISTEN_CHALLENGES, listenOrder, shuffledOptions } from '../../src/data/listen';
-import { PUZZLES, pickPuzzle, puzzlesForLevel } from '../../src/data/puzzles';
+import { PUZZLES, pickPuzzle, playablePuzzles, puzzlesForLevel } from '../../src/data/puzzles';
 import { applyHint, sameOrder, scramble, swapTiles, tokenise } from '../../src/lib/scramble';
 
 const seeded = (seed: number) => () => {
@@ -98,8 +98,27 @@ describe('Level 2 (Find the Beat): the 5 specified puzzles', () => {
   });
 });
 
+describe('Warm Up and Find the Beat are played with the Hindi film-song puzzles only', () => {
+  it('Warm Up draws from exactly the 10 songs and Find the Beat from exactly the 5 specified puzzles', () => {
+    expect(playablePuzzles(1)).toHaveLength(10);
+    expect(playablePuzzles(2)).toHaveLength(5);
+    for (const p of [...playablePuzzles(1), ...playablePuzzles(2)]) expect(p.song, p.id).toBeDefined();
+  });
+  it('every random pick for levels 1 and 2 is a song, and the original lines are never picked there', () => {
+    const rng = seeded(99);
+    for (let i = 0; i < 300; i++) {
+      expect(pickPuzzle(1, undefined, rng).song).toBeDefined();
+      expect(pickPuzzle(2, undefined, rng).song).toBeDefined();
+    }
+  });
+  it('each Warm Up song names the original dance track it uses; the dance configuration is valid', () => {
+    for (const p of songs(1)) expect(['sunrise', 'nacho', 'hookstep'], p.id).toContain(p.trackId);
+    expect(new Set(songs(1).map((p) => p.trackId)).size).toBeGreaterThan(1); // variety across songs
+  });
+});
+
 describe('selection includes the songs and never repeats the last puzzle', () => {
-  it('over many draws every song in Levels 1 and 2 comes up', () => {
+  it('over many draws every song in Levels 1 and 2 comes up (and the 10-song / 5-song pools are small enough to hit them all)', () => {
     for (const level of [1, 2]) {
       const rng = seeded(17 * level);
       const seen = new Set<string>();

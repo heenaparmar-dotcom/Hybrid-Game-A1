@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../../src/data/levels';
 import { EMOJI } from '../../src/data/emoji';
-import { TRACKS, routineSeconds, totalSeconds } from '../../src/data/tracks';
+import { TRACKS, totalSeconds } from '../../src/data/tracks';
+import { DANCE_SECONDS, PUZZLE_SECONDS } from '../../src/lib/timing';
 import { PHRASE_LIMITS } from '../../src/lib/challenge';
 
 const rules = readFileSync('docs/RULE_BOOK.md', 'utf8');
@@ -14,11 +15,19 @@ describe('docs/RULE_BOOK.md matches the game', () => {
   it('covers all seven game design elements', () => {
     for (const h of ['## 1. Players', '## 2. Goals', '## 3. Rules', '## 4. Space', '## 5. Time', '## 6. Resources', '## 7. Conflict']) expect(rules).toContain(h);
   });
-  it('states the real dance and level durations', () => {
-    const totals = TRACKS.map((t) => Math.round(totalSeconds(t)));
-    const moves = TRACKS.map((t) => Math.round(routineSeconds(t)));
-    expect(rules).toContain(`${Math.min(...totals)} to ${Math.max(...totals)} seconds, including a short count-in`);
-    expect(rules).toContain(`${Math.round(routineSeconds(TRACKS[0]))} to ${Math.max(...moves)} seconds of moves`);
+  it('states the real puzzle timer and dance length', () => {
+    expect(rules).toContain(`you have ${PUZZLE_SECONDS} seconds`);
+    expect(rules).toContain(`**Puzzle:** ${PUZZLE_SECONDS} seconds in Warm Up and Find the Beat`);
+    expect(rules).toContain(`**Dance:** ${DANCE_SECONDS} seconds, including a short count-in`);
+    expect(rules).toContain(`It lasts ${DANCE_SECONDS} seconds, with a countdown`);
+    for (const t of TRACKS) expect(Math.round(totalSeconds(t))).toBe(DANCE_SECONDS); // the document is true for every song
+  });
+  it('explains the new rules: timeout reveal, hint button, listening level', () => {
+    expect(rules).toContain("**Time's up:**");
+    expect(rules).toContain('correct order is shown');
+    expect(rules).toContain('small Hint button');
+    expect(rules).toContain('**Feel the Rhythm:**');
+    expect(rules).toContain('three options');
   });
   it('states the real level count, phrase limits and emoji count', () => {
     expect(rules).toContain(`Finish all ${LEVELS.length} levels`);

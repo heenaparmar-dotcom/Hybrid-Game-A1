@@ -16,6 +16,9 @@ test('Warm Up: all 10 Hindi songs appear as challenges with their hint, shuffled
     const shown = await enterPinned(page, 1, name(1), target, last);
     const song = shown.song!;
     shownTitles.push(song.title);
+    // Warm Up keeps the hint behind a small Hint button
+    await expect(page.getByTestId('puzzle-hint')).toHaveCount(0);
+    await page.getByTestId('puzzle-hint-button').click();
     await expect(page.getByTestId('puzzle-hint')).toContainText(song.hint);
     const tiles = (await tileTexts(page)).map((t) => t.trim());
     expect(tiles.map(norm).sort()).toEqual(shown.phrase.split(' ').map(norm).sort());

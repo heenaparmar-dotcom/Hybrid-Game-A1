@@ -36,6 +36,8 @@ export interface SilDancer {
   phase: number;
   /** Loose wide-leg trousers instead of fitted legs. */
   baggy?: boolean;
+  /** Height (SVG units) of a light hop, for a dancer who is slightly airborne on the off-beat. */
+  hop?: number;
   a: SilPose;
   b: SilPose;
 }
@@ -74,18 +76,18 @@ export const SIL_DANCERS: readonly SilDancer[] = [
     },
   },
   {
-    // right: bent knees and a twist, one arm up-right, the other swinging low, hair flicked up
-    x: 160, y: 104, scale: 0.95, delay: 0.5, phase: 1,
+    // right: lightly airborne, one knee bent and lifted, one arm up-right and the other swinging low, hair flicked up
+    x: 160, y: 104, scale: 0.95, delay: 0.5, phase: 1, hop: 7,
     a: {
       pelvis: [0, 8], ls: [-20, -72], rs: [18, -80], head: [8, -104], tilt: -10,
       le: [-56, -54], lw: [-72, -22], re: [42, -112], rw: [62, -142],
-      lk: [-34, 60], la: [-24, 112], rk: [46, 52], ra: [40, 106],
+      lk: [-22, 56], la: [-26, 110], rk: [46, 40], ra: [34, 88],
       hair: 228, hairLen: 62,
     },
     b: {
       pelvis: [0, 8], ls: [-20, -72], rs: [17, -80], head: [7, -104], tilt: -4,
-      le: [-54, -58], lw: [-76, -30], re: [36, -114], rw: [52, -146],
-      lk: [-36, 58], la: [-30, 110], rk: [44, 52], ra: [36, 106],
+      le: [-52, -62], lw: [-80, -44], re: [34, -114], rw: [48, -148],
+      lk: [-20, 58], la: [-22, 112], rk: [40, 46], ra: [28, 96],
       hair: 216, hairLen: 64,
     },
   },

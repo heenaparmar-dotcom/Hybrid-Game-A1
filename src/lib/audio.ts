@@ -49,7 +49,7 @@ const SYNTHS: Record<TrackId, Synth> = {
     lead: { wave: 'triangle', vol: 0.13, len: 1.7 },
   },
   nacho: {
-    bpm: 108, root: 146.83, scale: [0, 1, 4, 5, 7, 8, 10], chords: [0, 0, 1, 0],
+    bpm: 96, root: 146.83, scale: [0, 1, 4, 5, 7, 8, 10], chords: [0, 0, 1, 0],
     kick: [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
     snare: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
     hat: [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
@@ -62,7 +62,7 @@ const SYNTHS: Record<TrackId, Synth> = {
     lead: { wave: 'sawtooth', vol: 0.085, len: 2.3, lowpass: 1700, vibrato: true },
   },
   hookstep: {
-    bpm: 126, root: 196, scale: [0, 2, 3, 5, 7, 8, 10], chords: [0, -4, 3, -2],
+    bpm: 128, root: 196, scale: [0, 2, 3, 5, 7, 8, 10], chords: [0, -4, 3, -2],
     kick: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0],
     snare: [0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,1,0],
     hat: [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1],

@@ -10,6 +10,7 @@ import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
 import { CHALLENGE_PARAM, parseChallengeInput, type ChallengeData } from './lib/challenge';
 import { loadStore, saveStore, type Store } from './lib/storage';
+import { puzzleSeconds } from './lib/timing';
 import { prefersReducedMotion } from './lib/useBeat';
 import { CelebrateScreen } from './screens/CelebrateScreen';
 import { ChallengeScreen, type Incoming } from './screens/ChallengeScreen';
@@ -25,7 +26,7 @@ type Run = { kind: 'level'; level: number; puzzle?: Puzzle; listen?: ListenChall
 type Stage = 'puzzle' | 'invite' | 'dance' | 'celebrate';
 type View =
   | { name: 'title' }
-  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean }
+  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean; timedOut?: boolean }
   | { name: 'create' }
   | { name: 'challenge' };
 
@@ -43,9 +44,11 @@ function describe(run: Run) {
     const puzzle = run.puzzle;
     return {
       phrase: puzzle?.phrase ?? run.listen?.[run.listen.length - 1]?.line ?? '',
-      track: trackById(level.trackId),
+      track: trackById(puzzle?.trackId ?? level.trackId),
       kicker: `Level ${level.n} · ${level.name}`,
-      prompt: puzzle?.song ? 'A Hindi film song. Put the title in order, and use the hint.' : level.prompt,
+      prompt: puzzle?.song ? (level.n === 1 ? 'A Hindi film song. Put the title in order. Need help? Tap Hint.' : 'A Hindi film song. Put the title in order, and use the hint.') : level.prompt,
+      timeLimit: puzzle?.song ? puzzleSeconds() : undefined,
+      hintMode: (level.n === 1 ? 'button' : 'visible') as 'button' | 'visible',
       meaning: puzzle?.meaning,
       song: puzzle?.song,
       initialOrder: undefined as number[] | undefined,
@@ -60,6 +63,8 @@ function describe(run: Run) {
     prompt: `${data.phrase.split(' ').length} words. Put the line back in order, then dance.`,
     meaning: undefined,
     song: undefined,
+    timeLimit: undefined as number | undefined,
+    hintMode: 'visible' as 'button' | 'visible',
     initialOrder: data.order,
     from: data.from,
   };
@@ -142,7 +147,7 @@ export default function App() {
     setView({ name: 'play', run: { kind: 'challenge', data, tryout }, stage: 'puzzle', key: newKey(), skipped: false });
   };
 
-  const toStage = (stage: Stage, skipped = false) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped } : v));
+  const toStage = (stage: Stage, skipped = false, timedOut = false) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped, timedOut } : v));
 
   /** Called from a click, so the audio context is allowed to start. */
   const startDance = (track: Track) => {
@@ -205,13 +210,17 @@ export default function App() {
             songTitle={info.track.title}
             meaning={info.meaning}
             song={info.song}
-            onSolved={() => toStage('invite')}
+            hintMode={info.hintMode}
+            timeLimit={info.timeLimit}
+            paused={splash !== null || rulesOpen}
+            onSolved={({ timedOut }) => toStage('invite', false, timedOut)}
           />
         )}
         {view.stage === 'invite' && (
           <InviteScreen
             track={info.track}
             phrase={info.phrase}
+            timedOut={view.timedOut}
             songNote={info.song ? `That was ${info.song.title}. The dance uses our own original track, ${info.track.title}, because the recording of the film song is not included in this game.` : undefined}
             seated={store.seated}
             onSeated={(seated) => setStore((s) => ({ ...s, seated }))}

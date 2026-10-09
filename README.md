@@ -31,14 +31,14 @@ No API keys, accounts, database or backend. The game works offline once loaded.
 
 ## How it plays
 
-1. **Title screen:** tap or click anywhere (or press Enter) to begin.
+1. **Title screen:** press **TAP TO START** (or tap or click anywhere, or press Enter) to begin.
 2. **Level puzzle:** scrambled word tiles sit on a lyric line. Drag them (mouse or finger), tap two to swap, or use the keyboard. **There is no submit button:** the order is checked after every change. A wrong order is never punished; you only hear how many words are in place. A *Nudge* appears after a while.
 3. **Dance invitation:** "You cracked the song! Ready to dance to it?" Music starts only when you press **YES, LET'S DANCE**.
-4. **Dance:** a count-in, then a routine of about 35 seconds. A shadow dancer demonstrates each move with large cues synced to the beat; *your spot* is beside it. Pause, mute, restart, or skip any time. A seated, low-impact version is one switch away.
+4. **Dance:** exactly **30 seconds** (a short count-in is part of it), with a visible countdown. A shadow dancer demonstrates each move with large cues synced to the beat; *your spot* is beside it. Pause, mute, restart, or skip any time. A seated, low-impact version is one switch away.
 5. **Celebrate and continue:** next level, dance again, or challenge a friend.
 6. **Three levels:** *Warm Up* and *Find the Beat* are word-order puzzles; *Feel the Rhythm* is a listening level. Every time a puzzle level is entered, one of its puzzles is picked at random (never the one just played).
-   - **Warm Up** (30 puzzles): 20 original four-word English lines, plus **10 Hindi film-song challenges** (Badtameez Dil, Kala Chashma, Gallan Goodiyaan, London Thumakda, What Jhumka?, Aankh Marey, Chaiyya Chaiyya, Kajra Re, Jai Jai Shivshankar, Dilliwaali Girlfriend). Each one scrambles the song **title** and shows a hint (year and film).
-   - **Find the Beat** (25 puzzles): 20 original Hindi lines, plus **5 film-song title puzzles** with hints (Pehla Nasha, Do Dil Mil Rahe Hain, Tujhe Dekha To Ye Jaana Sanam, Kuch Kuch Hota Hai, Pardesi Pardesi Jaana Nahi). Repeated words are separate tiles and the order is checked by position.
+   - **Warm Up:** a **10-second** puzzle. The words of one of **10 Hindi film-song titles** are scrambled (Badtameez Dil, Kala Chashma, Gallan Goodiyaan, London Thumakda, What Jhumka?, Aankh Marey, Chaiyya Chaiyya, Kajra Re, Jai Jai Shivshankar, Dilliwaali Girlfriend). A small **Hint** button shows the film and year without stopping the timer. If time runs out, the correct order is shown and the dance is still offered.
+   - **Find the Beat:** the same 10-second timer, with **5 specified film-song title puzzles** and their hints always visible (Pehla Nasha, Do Dil Mil Rahe Hain, Tujhe Dekha To Ye Jaana Sanam, Kuch Kuch Hota Hai, Pardesi Pardesi Jaana Nahi). Repeated words are separate tiles and the order is checked by position. The 20 original English and Hindi lines from earlier versions are still in `src/data/puzzles.ts` but these two levels now draw only from the song puzzles.
    - **Feel the Rhythm:** two **listening challenges**. Press Play, hear a short clip with a line in it, and choose the line you heard from three options. Pause and replay are available. There is nothing to rearrange. (Its 20 earlier word-order puzzles are still in `src/data/puzzles.ts` but are no longer used by this level.)
 7. **Make a puzzle:** write a line, review the scramble, pick one of the three songs, and share a link by copy, native share, WhatsApp, Telegram or Email. A friend who opens it plays that exact puzzle, with the same shuffle and song.
 

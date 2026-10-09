@@ -8,10 +8,11 @@ This is the same Rule Book that opens inside the game from **How to play**. A ne
 
 ## The game in 30 seconds
 
-1. **Solve the song.** A lyric line is scrambled into word tiles. Drag them into order. The game notices when you are right, so there is no button to press.
-2. **Unlock the dance.** When the line is right, you can choose to dance to its song.
-3. **Move.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.
-4. **Challenge a friend.** Write your own puzzle and send a link so a friend can take a movement break too.
+1. **Solve the song.** In Warm Up and Find the Beat, the words of a Hindi film-song title are scrambled into tiles. Drag them into order within 10 seconds. The game notices when you are right, so there is no button to press.
+2. **Unlock the dance.** When you crack the song (or time runs out and the answer is shown), you are invited to dance. Nothing plays until you say yes.
+3. **Move for 30 seconds.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.
+4. **Listen.** In Feel the Rhythm you hear a short clip and pick the line you heard.
+5. **Challenge a friend.** Write your own puzzle and send a link so a friend can take a movement break too.
 
 ## 1. Players
 
@@ -20,44 +21,47 @@ This is the same Rule Book that opens inside the game from **How to play**. A ne
 
 ## 2. Goals
 
-- Put each scrambled lyric back in order.
-- Follow the dance for the song you unlocked.
+- Solve the song puzzles by putting the scrambled words in order.
+- Identify the music in the listening challenges.
+- Follow the 30-second dance routines.
 - Finish all 3 levels.
-- Make a puzzle and invite a friend to take a movement break.
+- Make a puzzle and challenge a friend to take a movement break.
 
 ## 3. Rules
 
-- **Rearranging:** drag a tile to a new place, or tap one tile and then another to swap them. With a keyboard, press Enter on a tile to pick it up, use the arrow keys to move it, and press Enter to put it down.
-- **Checking:** the game checks the order every time it changes. When it matches, the words light up and the song unlocks. A wrong order never costs anything, and the game only tells you how many words are in the right place.
-- **Nudge:** if you are stuck, a Nudge button appears and locks one correct word in place.
-- **The dance:** it starts only when you press the dance button, and the music starts at the same moment. You can pause or mute at any time.
-- **Moving on:** when the routine ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.
-- **Your own puzzles:** a line of 3 to 8 words, up to 60 characters. Use your own words or words you have permission to use.
+- **Rearranging:** drag a tile to a new place, or tap one tile and then another to swap them. With a keyboard, press Enter on a tile to pick it up, use the arrow keys to move it, and press Enter to put it down. Repeated words are separate tiles.
+- **Timer (Warm Up and Find the Beat):** you have 10 seconds. It starts when the puzzle appears and stops the moment you are right. It pauses while the Rule Book is open. *Shuffle again* starts the puzzle and the timer over.
+- **Checking:** the game checks the order every time it changes. A wrong order costs nothing. When it matches, the words light up and you move on.
+- **Time's up:** if the timer reaches zero, the correct order is shown and you can continue to the dance.
+- **Hint:** in Warm Up, the small Hint button shows the film and year of the song. The timer keeps running. In Find the Beat the hint is always shown.
+- **The dance:** it starts only when you press the dance button, and the music starts at the same moment. It lasts 30 seconds, with a countdown. You can pause, mute or skip at any time.
+- **Feel the Rhythm:** press Play to hear a clip, choose the line you heard from three options, and replay or pause as you like. A wrong choice never ends the level. When you are right, move on to the next clip.
+- **Moving on:** when a dance ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.
+- **Your own puzzles:** a line of 3 to 8 words, up to 60 characters. Use your own words or words you have permission to use. They have no timer.
 
 ## 4. Space
 
 - **Digital space:** the browser, where the puzzle, the music and the dance guide appear.
-- **Physical space:** a clear patch of floor, roughly two big steps in every direction, or a stable chair for the seated version.
+- **Physical space:** a small clear patch of floor, roughly two big steps in every direction, or a stable chair for the seated version.
 
 The dancer is on the left of the stage and *your spot* is on the right. Copy the dancer like a mirror: when they go right on the screen, you go right.
 
 ## 5. Time
 
-These are planned times, not measured results.
-
-- **Puzzle:** there is no timer. Most people should need around a minute or less.
-- **Dance:** 39 to 42 seconds, including a short count-in. Each dance has 34 to 38 seconds of moves.
-- **One level:** about 2 to 3 minutes. **All 3 levels:** about 8 to 10 minutes.
+- **Puzzle:** 10 seconds in Warm Up and Find the Beat.
+- **Dance:** 30 seconds, including a short count-in.
+- **Listening level:** no timer. Each clip is about 9 seconds long.
+- **One level:** about a minute to a minute and a half. **All 3 levels:** about 4 to 5 minutes. These are planned times, not measured results.
 
 ## 6. Resources
 
 - **You need:** a phone, tablet or computer with a browser, and room to move.
 - **Internet:** the game itself works offline once loaded. You need internet to open or send challenge links.
-- **In the game:** draggable word tiles, original music made in your browser, the dancer animation, and challenge links.
+- **In the game:** draggable word tiles, a countdown, original music made in your browser, the dancer animation, and challenge links.
 
 ## 7. Conflict
 
-The challenge is friendly and there is no violence. It comes from three things: working out a scrambled lyric, remembering and following the dance, and keeping up with the beat. Sharing a puzzle is an invitation, not a competition. There are no scores or rankings.
+The challenge is friendly and there is no violence. It comes from working out a scrambled song title against the clock, recognising a line in a music clip, and keeping up with the dancer. Sharing a puzzle is an invitation, not a competition. There are no scores or rankings.
 
 ---
 
@@ -71,7 +75,7 @@ The game never sends anything for you. You choose who gets it and press send. A 
 
 ## Replay and restart
 
-- Use *Shuffle again* on the puzzle screen to start the puzzle over.
+- Use *Shuffle again* on the puzzle screen to start the puzzle and its timer over.
 - Use *Dance again* after a dance, or *Restart dance* from the pause screen.
 - Tap a finished level in the level dots to play it again.
 
@@ -80,7 +84,7 @@ The game never sends anything for you. You choose who gets it and press send. A 
 - Clear the floor, wear comfortable shoes and keep water nearby.
 - Move gently. Stop if you feel pain or dizziness. You can always pause or skip.
 - **Seated version:** choose it before the dance. The dancer sits on a chair and the cues use the upper body.
-- Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation.
+- Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation. In the listening level you can show the words if you cannot listen.
 - The game needs no camera, microphone or location, and it does not watch you move. You decide how it went.
 
 > **Wellness note:** this is a game that encourages enjoyable movement, music and time with friends. It is not a medical treatment.
@@ -89,5 +93,5 @@ The game never sends anything for you. You choose who gets it and press send. A 
 
 - Your progress and sound settings are saved only in this browser.
 - A challenge link contains only the line, the chosen song, the word order and an optional nickname. Do not put personal details in them.
-- All songs are original and made live in your browser. All lyric lines were written for this game.
+- The film-song puzzles use only the song title and a short fact about it. No film-song lyrics or recordings are in the game. All music is original and made live in your browser, and the listening clips are demo clips with a computer voice.
 - There are 8 emoji in the game, each with a text label: happy, calm, energised, a bit tired, strong, nice moves, great song, great dance.

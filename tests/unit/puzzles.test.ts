@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../../src/data/levels';
-import { PUZZLES, pickPuzzle, puzzlesForLevel } from '../../src/data/puzzles';
+import { PUZZLES, pickPuzzle, playablePuzzles, puzzlesForLevel } from '../../src/data/puzzles';
 import { applyHint, normaliseWord, sameOrder, scramble, swapTiles, tokenise } from '../../src/lib/scramble';
 import { validatePhrase } from '../../src/lib/challenge';
 
@@ -101,11 +101,11 @@ describe('random selection', () => {
         seen.add(next.id);
         prev = next.id;
       }
-      expect(seen.size).toBe(puzzlesForLevel(l.n).length);
+      expect(seen.size).toBe(playablePuzzles(l.n).length);
     }
   });
   it('maps a random number to a puzzle in a predictable way (the browser test relies on this)', () => {
-    const pool = puzzlesForLevel(2);
+    const pool = playablePuzzles(2);
     expect(pickPuzzle(2, undefined, () => 0).id).toBe(pool[0].id);
     expect(pickPuzzle(2, undefined, () => 0.9999).id).toBe(pool[pool.length - 1].id);
     expect(pickPuzzle(2, pool[0].id, () => 0).id).toBe(pool[1].id); // skips the previous one

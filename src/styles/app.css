@@ -183,6 +183,24 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 .burst-shape { position: absolute; left: -12px; top: -12px; opacity: 0; animation: burst 1.2s cubic-bezier(0.15, 0.7, 0.3, 1) forwards; }
 @keyframes burst { 0% { transform: translate(0, 0) scale(0.2) rotate(0); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; } }
 
+/* Puzzle countdown, hint button and dance countdown */
+.puzzle-timer { display: inline-flex; align-items: baseline; gap: 0.45rem; position: relative; padding: 0.3rem 1.2rem 0.7rem; border-radius: 999px; border: 2px solid var(--line); background: rgba(255, 242, 224, 0.06); min-width: 150px; justify-content: center; }
+.puzzle-timer-num { font: 800 2.2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.puzzle-timer-unit { font: 700 0.8rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.puzzle-timer-bar { position: absolute; left: 14px; right: 14px; bottom: 7px; height: 5px; border-radius: 999px; background: rgba(255, 242, 224, 0.15); overflow: hidden; }
+.puzzle-timer-bar span { display: block; height: 100%; background: var(--lime); border-radius: 999px; transition: width 0.25s linear; }
+.puzzle-timer.is-low { border-color: var(--coral); }
+.puzzle-timer.is-low .puzzle-timer-num { color: var(--coral); }
+.puzzle-timer.is-low .puzzle-timer-bar span { background: var(--coral); }
+.puzzle-timer.is-stopped { opacity: 0.6; }
+.hint-btn { align-self: center; }
+.board-wrap.is-revealed .staff { border-style: solid; border-color: var(--tangerine); }
+.board-wrap.is-revealed .tile { background: var(--cream); }
+.timeout-big { color: var(--tangerine); }
+.dance-timer { display: inline-flex; align-items: baseline; gap: 0.4rem; padding: 0.35rem 1.1rem; border-radius: 999px; border: 2px solid var(--line); }
+.dance-timer-num { font: 800 2rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.dance-timer-unit { font: 700 0.75rem var(--body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
 /* Song hints, and the level 3 listening screen */
 .puzzle-hint { display: inline-flex; gap: 0.6rem; align-items: baseline; justify-content: center; padding: 0.35rem 1rem; border-radius: 999px; border: 1.5px solid rgba(255, 154, 61, 0.55); background: rgba(255, 154, 61, 0.1); font-weight: 600; }
 .puzzle-hint span { font: 800 0.72rem var(--body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--tangerine); }

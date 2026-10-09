@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { LEVELS } from '../../src/data/levels';
-import { puzzlesForLevel, type Puzzle } from '../../src/data/puzzles';
+import { playablePuzzles, type Puzzle } from '../../src/data/puzzles';
 import { currentPuzzle, solveByTaps, tileTexts } from './helpers';
 import { enterLevel, enterPinned, openWithProgress } from './support';
 
@@ -24,7 +24,7 @@ test('entering a level again gives a different puzzle each time, with a fresh sh
       orders.add((await tileTexts(page)).join('|'));
       await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
     }
-    expect(new Set(seen.map((p) => p.id)).size, `level ${level} variety`).toBeGreaterThanOrEqual(4);
+    expect(new Set(seen.map((p) => p.id)).size, `level ${level} variety`).toBeGreaterThanOrEqual(3);
     expect(orders.size).toBeGreaterThanOrEqual(5);
   }
 });
@@ -38,7 +38,7 @@ test('"Shuffle again" keeps the same puzzle but re-mixes the tiles', async ({ pa
   expect((await tileTexts(page)).join(' ')).not.toBe(p.phrase);
 });
 
-test('every puzzle in Levels 1 and 2 (including all 15 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
+test('every puzzle played in Levels 1 and 2 (all 15 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
   test.setTimeout(600_000);
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = {};
@@ -46,11 +46,11 @@ test('every puzzle in Levels 1 and 2 (including all 15 Hindi film-song puzzles) 
   const solved = new Set<string>();
 
   for (const level of [1, 2]) {
-    const pool = puzzlesForLevel(level);
+    const pool = playablePuzzles(level);
     const order = [...pool].sort((a, b) => Number(a.id === last[level]) - Number(b.id === last[level]));
     for (const target of order) {
       const shown = await enterPinned(page, level, name(level), target, last);
-      if (shown.song) await expect(page.getByTestId('puzzle-hint')).toContainText(shown.song.hint); // the hint is there while solving
+      if (shown.song && level === 2) await expect(page.getByTestId('puzzle-hint')).toContainText(shown.song.hint); // Find the Beat shows its hint while solving
       await solveByTaps(page, shown.phrase);
       await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
       if (shown.song) await expect(page.getByTestId('song-title')).toContainText(shown.song.title);
@@ -58,8 +58,8 @@ test('every puzzle in Levels 1 and 2 (including all 15 Hindi film-song puzzles) 
       solved.add(shown.id);
     }
   }
-  expect(solved.size).toBe(puzzlesForLevel(1).length + puzzlesForLevel(2).length);
-  expect(solved.size).toBe(55);
+  expect(solved.size).toBe(playablePuzzles(1).length + playablePuzzles(2).length);
+  expect(solved.size).toBe(15);
 });
 
 test('a solved level 2 puzzle still leads to the dance invitation, and the next level is the listening level', async ({ page }) => {
