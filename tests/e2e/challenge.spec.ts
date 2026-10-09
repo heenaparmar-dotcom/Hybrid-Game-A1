@@ -6,7 +6,7 @@ test.beforeEach(async ({ context }) => {
 });
 
 test('create: validation, reviewed scramble, copy link, a friend opens the REAL puzzle with the same shuffle and song', async ({ page, context }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await expect(page.getByTestId('puzzle-preview')).toHaveCount(0);
   await expect(page.getByTestId('make-link')).toBeDisabled();
@@ -34,7 +34,9 @@ test('create: validation, reviewed scramble, copy link, a friend opens the REAL 
   await expect(page.getByTestId('share-panel')).toBeVisible();
   const url = await page.getByTestId('challenge-url').inputValue();
   expect(url).toContain('#challenge=');
-  await expect(page.getByTestId('local-warning')).toBeVisible(); // honest about localhost
+  // honest about localhost: the warning shows only when the game is running on localhost
+  if (new URL(page.url()).hostname === 'localhost') await expect(page.getByTestId('local-warning')).toBeVisible();
+  else await expect(page.getByTestId('local-warning')).toHaveCount(0);
   await page.getByTestId('copy-link').click();
   await expect(page.getByTestId('share-status')).toContainText('Link copied');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
@@ -70,7 +72,7 @@ test('create: validation, reviewed scramble, copy link, a friend opens the REAL 
 });
 
 test('share buttons: WhatsApp, Telegram and Email open ready messages; nothing claims to be sent', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('phrase-input').fill('Share the happy beat');
   await page.getByTestId('make-link').click();
@@ -91,7 +93,7 @@ test('share buttons: WhatsApp, Telegram and Email open ready messages; nothing c
 
 test('native share is offered only when the browser supports it', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'share', { value: undefined, configurable: true }));
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('phrase-input').fill('Share the happy beat');
   await page.getByTestId('make-link').click();
@@ -109,7 +111,7 @@ test('native share is used when available', async ({ page }) => {
       configurable: true,
     });
   });
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('phrase-input').fill('Share the happy beat');
   await page.getByTestId('make-link').click();
@@ -119,7 +121,7 @@ test('native share is used when available', async ({ page }) => {
 });
 
 test('try it first: the creator plays their own puzzle and goes back to sharing', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('phrase-input').fill('Dance like nobody knows');
   await page.getByTestId('try-puzzle').click();
@@ -133,7 +135,7 @@ test('try it first: the creator plays their own puzzle and goes back to sharing'
 });
 
 test('a Hindi (Devanagari) puzzle can be made, shared and solved', async ({ page, context }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   const phrase = 'आज दिल खोल के नाचो';
   await page.getByTestId('phrase-input').fill(phrase);
@@ -149,7 +151,7 @@ test('a Hindi (Devanagari) puzzle can be made, shared and solved', async ({ page
 
 test('malformed challenge links are handled safely and the app stays usable', async ({ page }) => {
   for (const hash of ['#challenge=%%%', '#challenge=abc', '#challenge=' + 'A'.repeat(900), '#challenge=eyJ2IjoyfQ']) {
-    await page.goto('/' + hash);
+    await page.goto('./' + hash);
     await page.reload();
     await expect(page.getByTestId('challenge-error')).toBeVisible();
     await expect(page.getByTestId('accept-challenge')).toHaveCount(0);
@@ -160,7 +162,7 @@ test('malformed challenge links are handled safely and the app stays usable', as
 
 test('links made before songs and shuffles existed still open', async ({ page }) => {
   const data = Buffer.from(JSON.stringify({ v: 1, p: 'Find your rhythm, find your flow' })).toString('base64url');
-  await page.goto(`/#challenge=${data}`);
+  await page.goto(`./#challenge=${data}`);
   await expect(page.getByTestId('incoming-challenge')).toContainText('A friend challenged you');
   await expect(page.getByTestId('incoming-challenge')).toContainText('Sunrise Sway'); // default song
   await page.getByTestId('accept-challenge').click();
@@ -170,7 +172,7 @@ test('links made before songs and shuffles existed still open', async ({ page })
 });
 
 test('paste a link on the make screen; bad pastes show an error', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('paste-link').fill('not a link');
   await page.getByTestId('open-link').click();
@@ -183,7 +185,7 @@ test('paste a link on the make screen; bad pastes show an error', async ({ page 
 });
 
 test('song preview on the make screen plays and stops on demand', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').click();
   await page.getByTestId('preview-sunrise').click();
   await expect(page.getByTestId('preview-sunrise')).toHaveAccessibleName(/Stop Sunrise Sway|Preview Sunrise Sway/);

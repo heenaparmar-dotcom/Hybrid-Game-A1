@@ -6,8 +6,10 @@ import { cpSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const run = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, stdio: 'inherit', shell: process.platform === 'win32' });
-const read = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8', shell: process.platform === 'win32' }).trim();
+// Only npm needs a shell on Windows (it is a .cmd file). Running git directly keeps arguments with spaces intact.
+const needsShell = (cmd) => cmd === 'npm' && process.platform === 'win32';
+const run = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, stdio: 'inherit', shell: needsShell(cmd) });
+const read = (cmd, args) => execFileSync(cmd, args, { encoding: 'utf8', shell: needsShell(cmd) }).trim();
 
 const remote = read('git', ['remote', 'get-url', 'origin']);
 console.log(`Building and publishing to ${remote} (branch gh-pages)`);

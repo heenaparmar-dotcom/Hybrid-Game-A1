@@ -32,7 +32,7 @@ export async function noAudio(page: Page) {
 
 /** Start from the title screen and get past the level splash. */
 export async function startGame(page: Page) {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });

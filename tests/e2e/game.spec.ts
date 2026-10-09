@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { LEVEL1, LEVEL2, audioCreated, noAudio, solveByTaps, solveToInvite, startGame, tileTexts, trackAudio, norm } from './helpers';
 
 test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submit button', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByRole('heading', { name: 'Rhythm Rush' })).toBeVisible();
   await expect(page.getByText('Tap anywhere to start')).toBeVisible();
   await expect(page.getByText('Solve the song. Catch the beat. Own the move.')).toBeVisible();
@@ -23,7 +23,7 @@ test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submi
 });
 
 test('title screen also starts with the keyboard', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('title-stage').focus();
   await page.keyboard.press('Enter');
   await expect(page.getByTestId('tile-0')).toBeVisible();
@@ -152,7 +152,7 @@ test('full Level 1: puzzle, dance with synced cues and a moving dancer, pause, c
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
 
   // progress is saved: after a refresh the title offers to continue at level 2... then 3
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByText('Continue at level 2')).toBeVisible();
 });
 
@@ -212,7 +212,7 @@ test('audio fallback: when Web Audio is unavailable the dance still runs, silent
 });
 
 test('rule book: reachable from the title, documents all seven elements, and pauses the dance when opened', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-rules').click();
   const dialog = page.getByRole('dialog', { name: 'How to play' });
   for (const h of ['1. Players', '2. Goals', '3. Rules', '4. Space', '5. Time', '6. Resources', '7. Conflict', 'Make and share a puzzle', 'Safety and access']) {

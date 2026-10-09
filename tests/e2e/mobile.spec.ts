@@ -32,7 +32,7 @@ async function touchDrag(page: Page, from: { x: number; y: number }, to: { x: nu
 }
 
 test('mobile: every screen fits, touch targets are large, and tiles drag with a finger', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await noHorizontalScroll(page, 'title');
   await touchTargetsOk(page, 'title');
   await page.getByTestId('title-stage').tap();
@@ -81,7 +81,7 @@ test('mobile: every screen fits, touch targets are large, and tiles drag with a 
 });
 
 test('mobile: make-a-puzzle screen and rule book fit the screen', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('nav-make').tap();
   await page.getByTestId('phrase-input').fill('Jump into the sunshine');
   await page.getByTestId('make-link').tap();
@@ -94,7 +94,7 @@ test('mobile: make-a-puzzle screen and rule book fit the screen', async ({ page 
 });
 
 test('mobile: seated dance fits and the stage is cropped for small screens', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await page.getByTestId('title-stage').tap();
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
   await page.getByTestId('tile-0').waitFor();
