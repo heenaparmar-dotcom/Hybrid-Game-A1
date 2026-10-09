@@ -42,27 +42,29 @@ test('Find the Beat: the 5 specified puzzles show the exact fragments and hints;
     { fragments: ['PARDESI', 'PARDESI', 'JAANA', 'NAHI'], hint: '1996 · Raja Hindustani' },
   ];
   expect(songs(2)).toHaveLength(5);
-  for (let i = 0; i < spec.length; i++) {
-    const shown = await enterPinned(page, 2, name(2), songs(2)[i], last);
+  const items = songs(2).map((s, i) => ({ song: s, spec: spec[i] }));
+  items.sort((a, b) => Number(a.song.id === last[2]) - Number(b.song.id === last[2]));
+  for (const { song, spec: itemSpec } of items) {
+    const shown = await enterPinned(page, 2, name(2), song, last);
     const tiles = (await tileTexts(page)).map((t) => t.trim());
-    expect([...tiles].sort()).toEqual([...spec[i].fragments].sort()); // exactly the supplied fragments (TOH, capitals, repeats)
-    expect(tiles.join(' ')).not.toBe(spec[i].fragments.join(' '));
-    await expect(page.getByTestId('puzzle-hint')).toContainText(spec[i].hint);
+    expect([...tiles].sort()).toEqual([...itemSpec.fragments].sort()); // exactly the supplied fragments (TOH, capitals, repeats)
+    expect(tiles.join(' ')).not.toBe(itemSpec.fragments.join(' '));
+    await expect(page.getByTestId('puzzle-hint')).toContainText(itemSpec.hint);
 
-    const repeated = spec[i].fragments.find((f, k) => spec[i].fragments.indexOf(f) !== k);
+    const repeated = itemSpec.fragments.find((f, k) => itemSpec.fragments.indexOf(f) !== k);
     if (repeated) {
       // two separate, draggable tiles for the same word
       expect(tiles.filter((t) => t === repeated)).toHaveLength(2);
       // the right words in the wrong places must not count as solved (the check is by position, not by set)
-      const wrong = [spec[i].fragments[0], spec[i].fragments[2], spec[i].fragments[1], spec[i].fragments[3]];
+      const wrong = [itemSpec.fragments[0], itemSpec.fragments[2], itemSpec.fragments[1], itemSpec.fragments[3]];
       await solveByTaps(page, wrong.join(' '));
       await expect(page.getByTestId('song-unlocked')).toHaveCount(0);
-      await expect(page.getByTestId('puzzle-hint')).toContainText(spec[i].hint); // hint still showing
+      await expect(page.getByTestId('puzzle-hint')).toContainText(itemSpec.hint); // hint still showing
     }
     await solveByTaps(page, shown.phrase);
     await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
     // the answer key: tiles now read in the specified sequence
-    expect((await tileTexts(page)).map((t) => t.trim())).toEqual(spec[i].fragments);
+    expect((await tileTexts(page)).map((t) => t.trim())).toEqual(itemSpec.fragments);
     await expect(page.getByTestId('song-title')).toContainText(shown.song!.title);
   }
 });
