@@ -16,7 +16,7 @@ const seeded = (seed: number) => () => {
 describe('levels and songs', () => {
   it('has three levels that get longer, each tied to an existing song', () => {
     expect(LEVELS).toHaveLength(3);
-    const words = LEVELS.map((l) => new Set(PUZZLES.filter((p) => p.level === l.n).map((p) => tokenise(p.phrase).length)));
+    const words = LEVELS.map((l) => new Set(PUZZLES.filter((p) => p.level === l.n && !p.song).map((p) => tokenise(p.phrase).length)));
     expect(words.map((w) => [...w])).toEqual([[4], [5], [6]]); // every puzzle in a level has the same, rising, word count
     for (const l of LEVELS) expect(TRACKS.some((t) => t.id === l.trackId)).toBe(true);
   });
@@ -40,8 +40,8 @@ describe('levels and songs', () => {
       }
     }
   });
-  it('every puzzle has unique words (no ambiguous tiles)', () => {
-    for (const p of PUZZLES) {
+  it('every original puzzle has unique words (no ambiguous tiles)', () => {
+    for (const p of PUZZLES.filter((x) => !x.song)) {
       const t = tokenise(p.phrase);
       expect(new Set(t.map((x) => x.norm)).size, p.id).toBe(t.length);
     }

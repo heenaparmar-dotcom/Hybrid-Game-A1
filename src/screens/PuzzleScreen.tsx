@@ -13,6 +13,8 @@ interface Props {
   songTitle: string;
   /** Plain-English meaning of a non-English line, revealed once solved. */
   meaning?: string;
+  /** For a Hindi film-song puzzle: the hint stays visible while solving, and the title is shown once solved. */
+  song?: { title: string; hint: string };
   /** Called a moment after the puzzle is solved, once the celebration has played. */
   onSolved: () => void;
 }
@@ -24,7 +26,7 @@ const CELEBRATION_MS = 2300;
  * Level screen 1: put the lyric back in order.
  * The order is checked automatically after every change. There is no submit button.
  */
-export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, meaning, onSolved }: Props) {
+export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, meaning, song, onSolved }: Props) {
   const solution = useMemo(() => tokenise(phrase), [phrase]);
   const [order, setOrder] = useState<Token[]>(() => (initialOrder ? applyOrder(solution, initialOrder) : scramble(solution)));
   const [locked, setLocked] = useState(0);
@@ -56,7 +58,7 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
       solvedRef.current = true;
       setSolved(true);
       setFeedback('');
-      setLive(`You got it! Song unlocked: ${songTitle}.`);
+      setLive(song ? `You got it! The song is ${song.title}.` : `You got it! Song unlocked: ${songTitle}.`);
       return;
     }
     const right = countCorrect(next, solution);
@@ -91,6 +93,7 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
       <p className="kicker">{kicker}</p>
       <h1 id="puzzle-title" className="screen-title">Put the song back in order</h1>
       <p className="sub">{prompt}</p>
+      {song && <p className="puzzle-hint" data-testid="puzzle-hint"><span>Hint</span> {song.hint}</p>}
 
       <div className={`board-wrap ${solved ? 'is-solved' : ''}`}>
         <PuzzleBoard order={order} locked={locked} disabled={false} solved={solved} onReorder={onReorder} announce={setLive} />
@@ -101,7 +104,11 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
         {solved ? (
           <div className="unlocked" role="status" data-testid="song-unlocked">
             <p className="unlocked-big">You got it!</p>
-            <p className="unlocked-sub">Song unlocked: <strong>{songTitle}</strong></p>
+            {song ? (
+              <p className="unlocked-sub" data-testid="song-title">Song: <strong>{song.title}</strong> <span className="unlocked-meta">({song.hint})</span></p>
+            ) : (
+              <p className="unlocked-sub">Song unlocked: <strong>{songTitle}</strong></p>
+            )}
             {meaning && <p className="unlocked-meaning">"{meaning}"</p>}
           </div>
         ) : (

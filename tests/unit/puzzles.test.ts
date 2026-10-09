@@ -30,14 +30,14 @@ describe('puzzle pools', () => {
     }
     expect(new Set(PUZZLES.map((p) => bag(p.phrase))).size).toBe(PUZZLES.length);
   });
-  it('difficulty rises: every puzzle has 4, 5 or 6 words for levels 1, 2 and 3', () => {
-    for (const p of PUZZLES) expect(tokenise(p.phrase).length, p.id).toBe(p.level + 3);
+  it('difficulty rises: every original puzzle has 4, 5 or 6 words for levels 1, 2 and 3', () => {
+    for (const p of PUZZLES.filter((x) => !x.song)) expect(tokenise(p.phrase).length, p.id).toBe(p.level + 3);
   });
-  it('every puzzle passes the same validation custom puzzles use (length, characters, kindness)', () => {
-    for (const p of PUZZLES) expect(validatePhrase(p.phrase), p.id).toEqual({ ok: true, value: p.phrase });
+  it('every original puzzle passes the same validation custom puzzles use (length, characters, kindness)', () => {
+    for (const p of PUZZLES.filter((x) => !x.song)) expect(validatePhrase(p.phrase), p.id).toEqual({ ok: true, value: p.phrase });
   });
-  it('Hindi (level 2) puzzles all have a plain-English meaning', () => {
-    for (const p of puzzlesForLevel(2)) expect(p.meaning?.length, p.id).toBeGreaterThan(5);
+  it('original Hindi (level 2) puzzles all have a plain-English meaning', () => {
+    for (const p of puzzlesForLevel(2).filter((x) => !x.song)) expect(p.meaning?.length, p.id).toBeGreaterThan(5);
   });
 });
 

@@ -1,102 +1,75 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { LEVELS } from '../../src/data/levels';
-import { PUZZLES, puzzlesForLevel, type Puzzle } from '../../src/data/puzzles';
-import { currentPuzzle, solveByTaps } from './helpers';
+import { puzzlesForLevel, type Puzzle } from '../../src/data/puzzles';
+import { currentPuzzle, solveByTaps, tileTexts } from './helpers';
+import { enterLevel, enterPinned, openWithProgress } from './support';
 
-/** Seed progress so every level is open, and let a test steer Math.random (null = real randomness). */
-async function openWithControls(page: Page) {
-  await page.addInitScript(() => {
-    if (!localStorage.getItem('rhythmrush.v2')) localStorage.setItem('rhythmrush.v2', JSON.stringify({ completed: 2, volume: 0.7, muted: false, seated: false }));
-    const w = window as unknown as { __r: number | null };
-    w.__r = null;
-    const real = Math.random;
-    Math.random = () => (w.__r !== null ? w.__r : real());
-  });
-  await page.goto('./');
-  await page.getByTestId('title-stage').click(); // progress is 2, so this starts level 3
-  await page.getByTestId('tile-0').waitFor();
-}
+const name = (n: number) => LEVELS[n - 1].name;
 
-const setRandom = (page: Page, r: number | null) => page.evaluate((v) => ((window as unknown as { __r: number | null }).__r = v), r);
-
-async function enterLevel(page: Page, n: number): Promise<Puzzle> {
-  await page.getByTestId(`level-${n}`).click();
-  await expect(page.getByTestId('splash')).toContainText(LEVELS[n - 1].name, { timeout: 15_000 });
-  await page.getByTestId('tile-0').waitFor();
-  return currentPuzzle(page);
-}
+// The 55-puzzle run records thousands of frames; Playwright's trace writer can fail on file cleanup at the very end
+// (an ENOENT unrelated to the game). Traces are only a debugging aid, so they are off for this file.
+test.use({ trace: 'off' });
 
 test('entering a level again gives a different puzzle each time, with a fresh shuffle', async ({ page }) => {
   test.setTimeout(150_000);
-  await openWithControls(page);
-  for (const level of [1, 2, 3]) {
+  await openWithProgress(page, 1); // starts level 2; levels 1 and 2 are open
+  for (const level of [1, 2]) {
     const seen: Puzzle[] = [];
     const orders = new Set<string>();
     for (let i = 0; i < 7; i++) {
-      const p = await enterLevel(page, level);
+      const p = await enterLevel(page, level, name(level));
       expect(p.level).toBe(level);
       if (seen.length) expect(p.id, `level ${level} repeated immediately`).not.toBe(seen[seen.length - 1].id);
       seen.push(p);
-      orders.add((await page.locator('[data-testid^="tile-"]').allTextContents()).join('|'));
+      orders.add((await tileTexts(page)).join('|'));
       await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
     }
     expect(new Set(seen.map((p) => p.id)).size, `level ${level} variety`).toBeGreaterThanOrEqual(4);
-    expect(orders.size).toBeGreaterThanOrEqual(5); // tiles are shuffled differently, not in one fixed order
+    expect(orders.size).toBeGreaterThanOrEqual(5);
   }
 });
 
 test('"Shuffle again" keeps the same puzzle but re-mixes the tiles', async ({ page }) => {
-  await openWithControls(page);
-  const p = await enterLevel(page, 1);
+  await openWithProgress(page, 1);
+  const p = await enterLevel(page, 1, name(1));
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
-  const before = await page.locator('[data-testid^="tile-"]').allTextContents();
   await page.getByTestId('shuffle-again').click();
   expect((await currentPuzzle(page)).id).toBe(p.id);
-  expect((await page.locator('[data-testid^="tile-"]').allTextContents()).join(' ')).not.toBe(p.phrase);
-  void before;
+  expect((await tileTexts(page)).join(' ')).not.toBe(p.phrase);
 });
 
-test('every one of the 60 puzzles can be solved in the game and triggers the success state', async ({ page }) => {
+test('every puzzle in Levels 1 and 2 (including all 15 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
   test.setTimeout(600_000);
-  await openWithControls(page);
+  await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = {};
-  last[3] = (await currentPuzzle(page)).id; // what the title screen picked for level 3
+  last[2] = (await currentPuzzle(page)).id; // what the title screen picked for level 2
   const solved = new Set<string>();
 
-  for (const level of [1, 2, 3]) {
+  for (const level of [1, 2]) {
     const pool = puzzlesForLevel(level);
-    // handle the puzzle currently remembered for this level last: it cannot be picked straight after itself
     const order = [...pool].sort((a, b) => Number(a.id === last[level]) - Number(b.id === last[level]));
     for (const target of order) {
-      const candidates = pool.filter((p) => p.id !== last[level]);
-      const index = candidates.findIndex((p) => p.id === target.id);
-      expect(index, `${target.id} must be selectable`).toBeGreaterThanOrEqual(0);
-      await setRandom(page, (index + 0.5) / candidates.length);
-      const shown = await enterLevel(page, level);
-      await setRandom(page, null);
-      expect(shown.id).toBe(target.id);
-
-      // the success state: tiles light up, "You got it!", the song is unlocked, then the invitation
+      const shown = await enterPinned(page, level, name(level), target, last);
+      if (shown.song) await expect(page.getByTestId('puzzle-hint')).toContainText(shown.song.hint); // the hint is there while solving
       await solveByTaps(page, shown.phrase);
       await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
-      if (shown.meaning) await expect(page.getByTestId('song-unlocked')).toContainText(shown.meaning);
-      last[level] = shown.id;
+      if (shown.song) await expect(page.getByTestId('song-title')).toContainText(shown.song.title);
+      else if (shown.meaning) await expect(page.getByTestId('song-unlocked')).toContainText(shown.meaning);
       solved.add(shown.id);
     }
   }
-  expect(solved.size).toBe(PUZZLES.length);
-  expect(PUZZLES.length).toBeGreaterThanOrEqual(60);
+  expect(solved.size).toBe(puzzlesForLevel(1).length + puzzlesForLevel(2).length);
+  expect(solved.size).toBe(55);
 });
 
-test('a solved level puzzle still leads to the same dance invitation and next level', async ({ page }) => {
-  await openWithControls(page);
-  const p = await enterLevel(page, 2);
+test('a solved level 2 puzzle still leads to the dance invitation, and the next level is the listening level', async ({ page }) => {
+  await openWithProgress(page, 1);
+  const p = await currentPuzzle(page);
   await solveByTaps(page, p.phrase);
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
   await expect(page.getByRole('heading', { name: 'You cracked the song!' })).toBeVisible();
   await expect(page.getByText('Nacho Aaj', { exact: false }).first()).toBeVisible();
   await page.getByTestId('skip-dance').click();
   await page.getByTestId('next-level').click();
-  const next = await currentPuzzle(page);
-  expect(next.level).toBe(3);
+  await expect(page.getByTestId('listen-screen')).toBeVisible();
 });

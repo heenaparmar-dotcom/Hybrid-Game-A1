@@ -3,6 +3,9 @@
  * To add a puzzle, append an entry to the right level: the id must be unique, the words in a line should be distinct,
  * and the number of words must match the level (L1: 4, L2: 5, L3: 6) so the difficulty stays in order.
  * Level 2 lines are Hindi written in Roman letters (readable on every device) with a plain-English meaning.
+ *
+ * Entries with a `song` are Hindi film-song challenges. They contain ONLY the song title (as the scrambled words) and a short
+ * factual hint (year and film). No lyrics from those songs are used anywhere, and no recording of them is played.
  */
 export interface Puzzle {
   id: string;
@@ -11,6 +14,11 @@ export interface Puzzle {
   phrase: string;
   /** Plain-English meaning, shown after solving a non-English line. */
   meaning?: string;
+  /**
+   * Set for the Hindi film-song challenges. The scrambled words are the song's TITLE (a title is not a lyric excerpt).
+   * `hint` stays on screen while the player solves it; `title` is shown once it is solved.
+   */
+  song?: { title: string; hint: string };
 }
 
 export const PUZZLES: readonly Puzzle[] = [
@@ -36,6 +44,19 @@ export const PUZZLES: readonly Puzzle[] = [
   { id: 'l1-19', level: 1, phrase: 'Stretch tall sing small' },
   { id: 'l1-20', level: 1, phrase: 'Dance before your breakfast' },
 
+  // Level 1: Hindi film songs. The words to arrange are the song title.
+  { id: 'l1-s01', level: 1, phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
+  { id: 'l1-s02', level: 1, phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' } },
+  { id: 'l1-s03', level: 1, phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
+  { id: 'l1-s04', level: 1, phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
+  { id: 'l1-s05', level: 1, phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
+  { id: 'l1-s06', level: 1, phrase: 'Aankh Marey', song: { title: 'Aankh Marey', hint: '2018 · Simmba' } },
+  // Two identical words cannot be shuffled, so this one adds the film name to the fragments: Dil Se, Chaiyya, Chaiyya.
+  { id: 'l1-s07', level: 1, phrase: 'Dil Se Chaiyya Chaiyya', song: { title: 'Chaiyya Chaiyya', hint: '1998 · Famously filmed on top of a moving train' } },
+  { id: 'l1-s08', level: 1, phrase: 'Kajra Re', song: { title: 'Kajra Re', hint: '2005 · Bunty Aur Babli' } },
+  { id: 'l1-s09', level: 1, phrase: 'Jai Jai Shivshankar', song: { title: 'Jai Jai Shivshankar', hint: '2019 · War' } },
+  { id: 'l1-s10', level: 1, phrase: 'Dilliwaali Girlfriend', song: { title: 'Dilliwaali Girlfriend', hint: '2013 · Yeh Jawaani Hai Deewani' } },
+
   // Level 2: five Hindi words (Roman script)
   { id: 'l2-01', level: 2, phrase: 'Aaj dil khol ke nacho', meaning: 'Today, dance with an open heart' },
   { id: 'l2-02', level: 2, phrase: 'Dhol bajao saath mein nacho', meaning: 'Play the dhol and dance together' },
@@ -57,6 +78,13 @@ export const PUZZLES: readonly Puzzle[] = [
   { id: 'l2-18', level: 2, phrase: 'Neeche jhuko phir upar utho', meaning: 'Bend down, then rise up' },
   { id: 'l2-19', level: 2, phrase: 'Tez dhun par khoob nacho', meaning: 'Dance a lot to the fast tune' },
   { id: 'l2-20', level: 2, phrase: 'Geet gungunao aur saath jhoomo', meaning: 'Hum a song and sway along' },
+
+  // Level 2: Hindi film songs. The words to arrange are the song title, exactly as supplied (capitals, TOH and repeated words kept).
+  { id: 'l2-s01', level: 2, phrase: 'PEHLA NASHA', song: { title: 'Pehla Nasha', hint: '1992 · Jo Jeeta Wohi Sikandar' } },
+  { id: 'l2-s02', level: 2, phrase: 'DO DIL MIL RAHE HAIN', song: { title: 'Do Dil Mil Rahe Hain', hint: '1998 · Pardes' } },
+  { id: 'l2-s03', level: 2, phrase: 'TUJHE DEKHA TOH YE JAANA SANAM', song: { title: 'Tujhe Dekha To Ye Jaana Sanam', hint: '1995 · Dilwale Dulhania Le Jayenge' } },
+  { id: 'l2-s04', level: 2, phrase: 'KUCH KUCH HOTA HAI', song: { title: 'Kuch Kuch Hota Hai', hint: '1998 · Kuch Kuch Hota Hai' } },
+  { id: 'l2-s05', level: 2, phrase: 'PARDESI PARDESI JAANA NAHI', song: { title: 'Pardesi Pardesi Jaana Nahi', hint: '1996 · Raja Hindustani' } },
 
   // Level 3: six English words
   { id: 'l3-01', level: 3, phrase: 'Let the rhythm carry us forward' },

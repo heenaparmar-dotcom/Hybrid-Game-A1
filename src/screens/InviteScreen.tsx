@@ -4,6 +4,8 @@ import { totalSeconds, type Track } from '../data/tracks';
 interface Props {
   track: Track;
   phrase: string;
+  /** Shown after a film-song title puzzle: says plainly which music the dance uses. */
+  songNote?: string;
   seated: boolean;
   onSeated: (v: boolean) => void;
   onAccept: () => void;
@@ -11,7 +13,7 @@ interface Props {
 }
 
 /** The dance invitation. Music starts only when the player presses the big button. */
-export function InviteScreen({ track, phrase, seated, onSeated, onAccept, onSkip }: Props) {
+export function InviteScreen({ track, phrase, songNote, seated, onSeated, onAccept, onSkip }: Props) {
   return (
     <section className="screen invite" aria-labelledby="invite-title">
       <p className="kicker">Song unlocked</p>
@@ -21,6 +23,7 @@ export function InviteScreen({ track, phrase, seated, onSeated, onAccept, onSkip
         <strong>{track.title}</strong> · {track.style} · about {Math.round(totalSeconds(track))} seconds
       </p>
 
+      {songNote && <p className="fine" data-testid="song-note">{songNote}</p>}
       <p className="invite-ask">Ready to dance to it?</p>
       <button type="button" className="btn btn-hero" onClick={onAccept} data-testid="accept-dance" autoFocus>
         <Icon name="play" size={26} /> YES, LET'S DANCE

@@ -4,6 +4,7 @@ import { LevelBar } from './components/LevelBar';
 import { Modal } from './components/Modal';
 import { RuleBook } from './components/RuleBook';
 import { LEVEL_COUNT, levelByNumber } from './data/levels';
+import { listenOrder, type ListenChallenge } from './data/listen';
 import { pickPuzzle, type Puzzle } from './data/puzzles';
 import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
@@ -15,10 +16,12 @@ import { ChallengeScreen, type Incoming } from './screens/ChallengeScreen';
 import { CreateScreen } from './screens/CreateScreen';
 import { DanceScreen } from './screens/DanceScreen';
 import { InviteScreen } from './screens/InviteScreen';
+import { ListenScreen } from './screens/ListenScreen';
 import { PuzzleScreen } from './screens/PuzzleScreen';
 import { TitleScreen } from './screens/TitleScreen';
 
-type Run = { kind: 'level'; level: number; puzzle: Puzzle } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
+/** Levels 1 and 2 give a word-order puzzle; level 3 gives two listening clips. */
+type Run = { kind: 'level'; level: number; puzzle?: Puzzle; listen?: ListenChallenge[] } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
 type Stage = 'puzzle' | 'invite' | 'dance' | 'celebrate';
 type View =
   | { name: 'title' }
@@ -37,12 +40,14 @@ function readIncoming(): Incoming {
 function describe(run: Run) {
   if (run.kind === 'level') {
     const level = levelByNumber(run.level);
+    const puzzle = run.puzzle;
     return {
-      phrase: run.puzzle.phrase,
+      phrase: puzzle?.phrase ?? run.listen?.[run.listen.length - 1]?.line ?? '',
       track: trackById(level.trackId),
       kicker: `Level ${level.n} · ${level.name}`,
-      prompt: level.prompt,
-      meaning: run.puzzle.meaning,
+      prompt: puzzle?.song ? 'A Hindi film song. Put the title in order, and use the hint.' : level.prompt,
+      meaning: puzzle?.meaning,
+      song: puzzle?.song,
       initialOrder: undefined as number[] | undefined,
       from: undefined as string | undefined,
     };
@@ -54,6 +59,7 @@ function describe(run: Run) {
     kicker: run.tryout ? 'Your puzzle' : data.from ? `${data.from}'s puzzle` : "A friend's puzzle",
     prompt: `${data.phrase.split(' ').length} words. Put the line back in order, then dance.`,
     meaning: undefined,
+    song: undefined,
     initialOrder: data.order,
     from: data.from,
   };
@@ -118,9 +124,14 @@ export default function App() {
   const startLevel = (n: number) => {
     music.stop();
     const level = levelByNumber(n);
+    setSplash(`Level ${level.n}|${level.name}`);
+    if (level.n === 3) {
+      // level 3 is a listening level: both clips, in a random order
+      setView({ name: 'play', run: { kind: 'level', level: 3, listen: listenOrder() }, stage: 'puzzle', key: newKey(), skipped: false });
+      return;
+    }
     const puzzle = pickPuzzle(level.n, lastPuzzle.current[level.n]);
     lastPuzzle.current[level.n] = puzzle.id;
-    setSplash(`Level ${level.n}|${level.name}`);
     setView({ name: 'play', run: { kind: 'level', level: level.n, puzzle }, stage: 'puzzle', key: newKey(), skipped: false });
   };
   const resumeLevel = () => startLevel(store.completed >= LEVEL_COUNT ? 1 : store.completed + 1);
@@ -172,7 +183,19 @@ export default function App() {
     return (
       <>
         {levelNo !== null && view.stage !== 'dance' && <LevelBar current={levelNo} completed={store.completed} onSelect={startLevel} />}
-        {view.stage === 'puzzle' && (
+        {view.stage === 'puzzle' && view.run.kind === 'level' && view.run.listen && (
+          <ListenScreen
+            key={view.key}
+            kicker={info.kicker}
+            challenges={view.run.listen}
+            volume={store.volume}
+            muted={store.muted}
+            onVolume={setVolume}
+            onMuted={setMuted}
+            onDone={() => toStage('invite')}
+          />
+        )}
+        {view.stage === 'puzzle' && !(view.run.kind === 'level' && view.run.listen) && (
           <PuzzleScreen
             key={view.key}
             kicker={info.kicker}
@@ -181,6 +204,7 @@ export default function App() {
             initialOrder={info.initialOrder}
             songTitle={info.track.title}
             meaning={info.meaning}
+            song={info.song}
             onSolved={() => toStage('invite')}
           />
         )}
@@ -188,6 +212,7 @@ export default function App() {
           <InviteScreen
             track={info.track}
             phrase={info.phrase}
+            songNote={info.song ? `That was ${info.song.title}. The dance uses our own original track, ${info.track.title}, because the recording of the film song is not included in this game.` : undefined}
             seated={store.seated}
             onSeated={(seated) => setStore((s) => ({ ...s, seated }))}
             onAccept={() => startDance(info.track)}

@@ -36,7 +36,10 @@ No API keys, accounts, database or backend. The game works offline once loaded.
 3. **Dance invitation:** "You cracked the song! Ready to dance to it?" Music starts only when you press **YES, LET'S DANCE**.
 4. **Dance:** a count-in, then a routine of about 35 seconds. A shadow dancer demonstrates each move with large cues synced to the beat; *your spot* is beside it. Pause, mute, restart, or skip any time. A seated, low-impact version is one switch away.
 5. **Celebrate and continue:** next level, dance again, or challenge a friend.
-6. **Three levels:** *Warm Up* (4 words, English), *Find the Beat* (5 words, Hindi), *Feel the Rhythm* (6 words, English), each with its own original song and routine. Every time a level is entered, one of its 20 lines is picked at random (never the one just played).
+6. **Three levels:** *Warm Up* and *Find the Beat* are word-order puzzles; *Feel the Rhythm* is a listening level. Every time a puzzle level is entered, one of its puzzles is picked at random (never the one just played).
+   - **Warm Up** (30 puzzles): 20 original four-word English lines, plus **10 Hindi film-song challenges** (Badtameez Dil, Kala Chashma, Gallan Goodiyaan, London Thumakda, What Jhumka?, Aankh Marey, Chaiyya Chaiyya, Kajra Re, Jai Jai Shivshankar, Dilliwaali Girlfriend). Each one scrambles the song **title** and shows a hint (year and film).
+   - **Find the Beat** (25 puzzles): 20 original Hindi lines, plus **5 film-song title puzzles** with hints (Pehla Nasha, Do Dil Mil Rahe Hain, Tujhe Dekha To Ye Jaana Sanam, Kuch Kuch Hota Hai, Pardesi Pardesi Jaana Nahi). Repeated words are separate tiles and the order is checked by position.
+   - **Feel the Rhythm:** two **listening challenges**. Press Play, hear a short clip with a line in it, and choose the line you heard from three options. Pause and replay are available. There is nothing to rearrange. (Its 20 earlier word-order puzzles are still in `src/data/puzzles.ts` but are no longer used by this level.)
 7. **Make a puzzle:** write a line, review the scramble, pick one of the three songs, and share a link by copy, native share, WhatsApp, Telegram or Email. A friend who opens it plays that exact puzzle, with the same shuffle and song.
 
 The in-game **How to play** is the Rule Book (also in [`docs/RULE_BOOK.md`](docs/RULE_BOOK.md)). It opens from every screen, and during a dance it pauses the routine.
@@ -66,6 +69,21 @@ This builds the game and pushes `dist/` to the `gh-pages` branch of `origin`. Th
 - **Popular songs and music services were deliberately not used.** A song being on YouTube or a streaming service does not mean it is free to reuse. Streaming embeds generally cannot be synchronised to a game clock, and many licences forbid it. No API is called and no key is needed.
 - **To add a properly licensed track later:** put the file in `public/audio/`, record its licence (author, licence name, URL) in `docs/ASSIGNMENT_DOCUMENTATION.md`, and add a small player that exposes `songTime()` like `lib/audio.ts` does, so the dancer can stay on the beat. Suitable sources are tracks under Creative Commons licences that allow your use (check attribution and "no derivatives" terms), or music you commission or make yourself. Always read the licence text for the specific track.
 - **Fonts:** Bricolage Grotesque and Figtree, bundled locally through the `@fontsource-variable` packages (SIL Open Font License 1.1). Graphics, the dancer and the logo are original SVG and CSS.
+
+## Level 3 listening clips: what is real and what is a placeholder
+
+**No licensed recording is configured, so the two clips are placeholders.** Each plays one of the game's own original songs, generated in the browser, with an original line spoken over it by the browser's built-in voice. The line choices were written for this project. The game says "Demo clip" on screen while one plays.
+
+- The spoken voice depends on the device (the test computer had 8). If a device has none, the game says so and offers **Show the words**, so the level can always be finished.
+- No popular Hindi recording, and no lyric from any film song, is used anywhere in the game. The film-song puzzles in Levels 1 and 2 contain only the song **title** and a short fact (year and film). The dance always uses the game's own original music; the invitation says so after a film-song puzzle.
+
+**To use a real, properly licensed recording** (you need the rights holder's permission or a licence that covers your use, for both the audio and any lyric text you show):
+1. Copy the audio file into `public/audio/`, for example `public/audio/level3-clip-1.mp3`.
+2. Open `src/data/listen.ts` and set that challenge's `src`, for example `src: 'audio/level3-clip-1.mp3'`.
+3. Replace its `line` and `options` with text you are allowed to use.
+4. Record the licence in `docs/ASSIGNMENT_DOCUMENTATION.md`, then run `npm run check`.
+
+If the file cannot be loaded, the game falls back to the demo clip and says so. This file-playback path is written but has **not** been tested with a real file, because none is configured.
 
 ## Controls
 
@@ -105,7 +123,8 @@ docs/                assignment documents
 
 - The dancer is a simple front-facing 2D figure with nine moves; it cannot show every movement precisely, so a written cue is always shown too. The dance is not checked in any way: nothing tracks the player.
 - The songs are simple synthesised tracks and will not sound like produced music. Their sound was not evaluated by listeners, and automated tests cannot hear audio.
-- The Hindi lines and cues have not been reviewed by a native speaker.
+- The Hindi lines and cues have not been reviewed by a native speaker. The film and year hints on the song puzzles come from general knowledge (the Find the Beat hints are as supplied by the project owner); please check them.
+- Level 3's clips are placeholders (see above). The in-game Rule Book still describes every level as rearranging words and has not been updated for the listening level.
 - Only one real browser engine (desktop Chrome) and an emulated phone viewport have been tested. Real phones, Safari, Firefox and screen readers have not.
 - The content filter for custom puzzles is a small word list, not moderation.
 - A level in progress is not saved on refresh; finished levels, sound and seated settings are.

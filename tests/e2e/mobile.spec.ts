@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { currentPuzzle, norm, solveToInvite, tileTexts } from './helpers';
+import { currentPuzzle, installRandomControl, norm, setRandom, solveToInvite, tileTexts } from './helpers';
 
 test.use({ viewport: { width: 390, height: 780 }, hasTouch: true, isMobile: true });
 
@@ -32,11 +32,14 @@ async function touchDrag(page: Page, from: { x: number; y: number }, to: { x: nu
 }
 
 test('mobile: every screen fits, touch targets are large, and tiles drag with a finger', async ({ page }) => {
+  await installRandomControl(page);
   await page.goto('./');
   await noHorizontalScroll(page, 'title');
   await touchTargetsOk(page, 'title');
+  await setRandom(page, 0); // a four-word puzzle, so the drag test has room to drag
   await page.getByTestId('title-stage').tap();
   await expect(page.getByTestId('tile-0')).toBeVisible();
+  await setRandom(page, null);
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
   await noHorizontalScroll(page, 'puzzle');
   await touchTargetsOk(page, 'puzzle');
@@ -96,8 +99,8 @@ test('mobile: make-a-puzzle screen and rule book fit the screen', async ({ page 
 test('mobile: seated dance fits and the stage is cropped for small screens', async ({ page }) => {
   await page.goto('./');
   await page.getByTestId('title-stage').tap();
-  await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
   await page.getByTestId('tile-0').waitFor();
+  await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
   await page.evaluate(() => localStorage.setItem('rhythmrush.v2', JSON.stringify({ completed: 0, volume: 0.7, muted: false, seated: true })));
   await page.reload();
   await page.getByTestId('title-stage').tap();

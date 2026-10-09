@@ -30,11 +30,31 @@ export async function noAudio(page: Page) {
   });
 }
 
-/** Start from the title screen and get past the level splash. */
+/**
+ * Lets a test steer Math.random (null = real randomness). Level puzzles are picked at random, so a test that needs a
+ * particular kind of puzzle pins the choice instead of hoping for it.
+ */
+export async function installRandomControl(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __r: number | null };
+    w.__r = null;
+    const real = Math.random;
+    Math.random = () => (w.__r !== null ? w.__r : real());
+  });
+}
+export const setRandom = (page: Page, r: number | null) => page.evaluate((v) => ((window as unknown as { __r: number | null }).__r = v), r);
+
+/**
+ * Start from the title screen and get past the level splash.
+ * Pinned to the first Level 1 puzzle ("Sway with the sunrise", four words) so tests that rely on a normal-size puzzle are stable.
+ */
 export async function startGame(page: Page) {
+  await installRandomControl(page);
   await page.goto('./');
+  await setRandom(page, 0);
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
+  await setRandom(page, null);
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
 }
 

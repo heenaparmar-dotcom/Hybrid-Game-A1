@@ -178,7 +178,8 @@ test('full Level 1: puzzle, dance with synced cues and a moving dancer, pause, c
   const l2 = await currentPuzzle(page);
   expect(l2.level).toBe(2);
   await solveByTaps(page, l2.phrase);
-  await expect(page.getByTestId('song-unlocked')).toContainText(l2.meaning!);
+  // an original Hindi line shows its meaning; a film-song puzzle shows the song title
+  await expect(page.getByTestId('song-unlocked')).toContainText(l2.song ? l2.song.title : l2.meaning!);
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
 
   // progress is saved: after a refresh the title offers to continue at level 2... then 3
