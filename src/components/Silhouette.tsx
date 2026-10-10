@@ -81,13 +81,13 @@ interface Props {
  * An original shadow figure with a natural outline, drawn from a posed skeleton.
  * Flat colour on a transparent background: no image, no outline stroke, no fill behind it.
  */
-export function HumanFigure({ fig: f, baggy = false, seated = false, className = '' }: Props) {
+export function HumanFigure({ fig: f, baggy = true, seated = false, className = '' }: Props) {
   // torso: hips, waist, ribcage and shoulders as a smooth outline around the spine
   const up = unit(sub(f.spineTop, f.pelvis));
   const v: Pt = [-up[1], up[0]];
   const at = (t: number): Pt => lerpPt(f.pelvis, f.spineTop, t);
   const samples: [number, number][] = [
-    [0.0, 13.5], [0.2, 15], [0.45, 10.5], [0.72, 13], [0.92, 14.5], [1.0, 15.5 * f.twist],
+    [0.0, 14.5], [0.2, 16], [0.45, 11.5], [0.72, 14.5], [0.92, 16.5], [1.0, 17.5 * f.twist],
   ];
   const leftSide = samples.map(([t, w]) => sub(at(t), mul(v, w)));
   const rightSide = samples.map(([t, w]) => add(at(t), mul(v, w)));
@@ -100,7 +100,7 @@ export function HumanFigure({ fig: f, baggy = false, seated = false, className =
   ]);
 
   const leg = baggy
-    ? { thigh: [11.5, 12.2, 8.6], shin: [8.6, 9.2, 9.4, 8.8] }
+    ? { thigh: [12.5, 13.4, 9.4], shin: [9.4, 10.2, 8.6, 6.4] } // loose Zumba trousers that narrow at the ankle
     : { thigh: [10.5, 10.8, 6.6], shin: [6.4, 7.8, 5, 3.8] };
 
   const limbs = [
@@ -113,10 +113,10 @@ export function HumanFigure({ fig: f, baggy = false, seated = false, className =
     tube([f.la, lerpPt(f.la, f.ltoe, 0.55), f.ltoe], [4.4, 3.8, 2.6]),
     tube([f.ra, lerpPt(f.ra, f.rtoe, 0.55), f.rtoe], [4.4, 3.8, 2.6]),
     // arms
-    tube(along(f.ls, f.le, [0, 0.35, 1]), [5.6, 5.2, 4.2]),
-    tube(along(f.le, f.lw, [0, 0.3, 1]), [4.2, 4.3, 3.1]),
-    tube(along(f.rs, f.re, [0, 0.35, 1]), [5.6, 5.2, 4.2]),
-    tube(along(f.re, f.rw, [0, 0.3, 1]), [4.2, 4.3, 3.1]),
+    tube(along(f.ls, f.le, [0, 0.35, 1]), [6.6, 6.0, 4.6]),
+    tube(along(f.le, f.lw, [0, 0.3, 1]), [4.6, 4.8, 3.3]),
+    tube(along(f.rs, f.re, [0, 0.35, 1]), [6.6, 6.0, 4.6]),
+    tube(along(f.re, f.rw, [0, 0.3, 1]), [4.6, 4.8, 3.3]),
     // neck
     tube([f.spineTop, f.neckTop, f.head], [4.6, 3.9, 3.9]),
   ];
