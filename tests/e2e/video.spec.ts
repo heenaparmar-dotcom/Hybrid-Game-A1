@@ -231,3 +231,25 @@ test('with the recording present, the dance plays it as audio only: no video pla
   await expect.poll(() => page.evaluate(() => document.querySelector('audio') === null)).toBe(true); // an Audio object, not a page element
   await expect(page.getByTestId('cue')).toHaveText('Step right, hips sway', { timeout: 12_000 });
 });
+
+test('a recording shorter than the dance repeats, so the dance still lasts about 30 seconds and finishes', async ({ page }) => {
+  test.setTimeout(90_000);
+  const badtameez = PUZZLES.find((p) => p.id === 'l1-s01')!;
+  expect(badtameez.audio?.src).toBe('audio/badtameez-dil.mp3'); // a short clip, about 14 seconds
+  await installRandomControl(page);
+  await page.goto('./');
+  await setRandom(page, 0); // Warm Up's first song in the list
+  await page.getByTestId('title-stage').click();
+  await page.getByTestId('tile-0').waitFor();
+  await setRandom(page, null);
+  await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
+  await solveByTaps(page, badtameez.phrase);
+  await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
+  const started = Date.now();
+  await page.getByTestId('accept-dance').click();
+  await expect(page.getByTestId('audio-credit')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: 'Dance complete!' })).toBeVisible({ timeout: 50_000 });
+  const elapsed = (Date.now() - started) / 1000;
+  expect(elapsed).toBeGreaterThan(27);
+  expect(elapsed).toBeLessThan(38);
+});

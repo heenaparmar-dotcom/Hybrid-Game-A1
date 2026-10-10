@@ -4,5 +4,6 @@
  * Only add recordings you have the right to publish: they are served to everyone who opens the game.
  */
 export const SONG_AUDIO: Record<string, string> = {
+  'l1-s01': 'badtameez-dil.mp3', // Badtameez Dil
   'l1-s02': 'kala-chashma.mp3', // Kala Chashma
 };

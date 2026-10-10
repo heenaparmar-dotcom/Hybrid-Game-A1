@@ -38,6 +38,8 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
   // the video player is only created when there is no usable audio file
   const [useVideo, setUseVideo] = useState(!audioFile);
   const fileRef = useRef<HTMLAudioElement | null>(null);
+  // a recording shorter than the dance repeats; this counts the seconds already played in earlier rounds
+  const fileClock = useRef({ rounds: 0, last: 0, length: 0 });
   const [videoState, setVideoState] = useState<'loading' | 'playing' | 'paused' | 'failed' | 'ended'>(video ? 'loading' : 'ended');
   const playerRef = useRef<YtPlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,6 +64,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     let settled = false;
     const el = new Audio(`${import.meta.env.BASE_URL}${audioFile.src}`);
     el.preload = 'auto';
+    el.loop = true;
     fileRef.current = el;
     const fallBack = () => {
       if (!alive || settled) return;
@@ -220,7 +223,13 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     const tick = () => {
       let seconds: number;
       if (mode === 'file') {
-        seconds = Math.max(0, (fileRef.current?.currentTime ?? 0) - (audioFile?.start ?? 0));
+        const el = fileRef.current;
+        const c = fileClock.current;
+        const t = el?.currentTime ?? 0;
+        if (el && Number.isFinite(el.duration)) c.length = el.duration;
+        if (t < c.last - 0.5 && c.length > 0) c.rounds += 1; // the recording started over
+        c.last = t;
+        seconds = Math.max(0, c.rounds * c.length + t - (audioFile?.start ?? 0));
       } else if (mode === 'video') {
         // the video's own clock keeps the dancer, the cues and the countdown in time with the song
         seconds = Math.max(0, (playerRef.current?.getCurrentTime() ?? 0) - (video?.start ?? 0));
