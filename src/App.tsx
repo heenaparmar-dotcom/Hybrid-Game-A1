@@ -47,11 +47,13 @@ function describe(run: Run) {
       track: trackById(puzzle?.trackId ?? level.trackId),
       kicker: `Level ${level.n} · ${level.name}`,
       prompt: puzzle?.song ? (level.n === 1 ? 'A Hindi film song. Put the title in order. Need help? Tap Hint.' : 'A Hindi film song. Put the title in order, and use the hint.') : level.prompt,
-      timeLimit: puzzle?.song ? puzzleSeconds() : undefined,
+      // a long lyric line gets three times as long as a short title
+      timeLimit: puzzle?.song ? (puzzle.phrase.split(/\s+/).length > 4 ? puzzleSeconds() * 3 : puzzleSeconds()) : undefined,
       hintMode: (level.n === 1 ? 'button' : 'visible') as 'button' | 'visible',
       meaning: puzzle?.meaning,
       song: puzzle?.song,
       video: puzzle?.video,
+      audio: puzzle?.audio,
       initialOrder: undefined as number[] | undefined,
       from: undefined as string | undefined,
     };
@@ -65,6 +67,7 @@ function describe(run: Run) {
     meaning: undefined,
     song: undefined,
     video: undefined as Puzzle['video'],
+    audio: undefined as Puzzle['audio'],
     timeLimit: undefined as number | undefined,
     hintMode: 'visible' as 'button' | 'visible',
     initialOrder: data.order,
@@ -152,9 +155,9 @@ export default function App() {
   const toStage = (stage: Stage, skipped = false, timedOut = false) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped, timedOut } : v));
 
   /** Called from a click, so the audio context is allowed to start. */
-  const startDance = (track: Track, video?: Puzzle['video']) => {
+  const startDance = (track: Track, video?: Puzzle['video'], audio?: Puzzle['audio']) => {
     // a song with an official video plays through YouTube's player instead of the game's own music
-    if (!video) void music.start(track.id);
+    if (!video && !audio) void music.start(track.id);
     else music.stop();
     setView((v) => (v.name === 'play' ? { ...v, stage: 'dance', key: newKey(), skipped: false } : v));
   };
@@ -227,14 +230,16 @@ export default function App() {
             timedOut={view.timedOut}
             songNote={
               info.song
-                ? info.video
+                ? info.audio
+                  ? `That was ${info.song.title}. The dance plays the song's recording, with no video. If the file cannot load, the official video or the game's own music is used.`
+                  : info.video
                   ? `That was ${info.song.title}. The dance plays the official video through YouTube (${info.video.credit}), so it needs internet. If it cannot play, the game's own music is used.`
                   : `That was ${info.song.title}. The dance uses our own original track, ${info.track.title}, because the recording of the film song is not included in this game.`
                 : undefined
             }
             seated={store.seated}
             onSeated={(seated) => setStore((s) => ({ ...s, seated }))}
-            onAccept={() => startDance(info.track, info.video)}
+            onAccept={() => startDance(info.track, info.video, info.audio)}
             onSkip={() => finishRun(true)}
           />
         )}
@@ -250,10 +255,11 @@ export default function App() {
             onVolume={setVolume}
             onMuted={setMuted}
             video={info.video}
+            audioFile={info.audio}
             songTitle={info.song?.title}
             onFinish={() => finishRun(false)}
             onSkip={() => { music.stop(); finishRun(true); }}
-            onRestart={() => startDance(info.track, info.video)}
+            onRestart={() => startDance(info.track, info.video, info.audio)}
           />
         )}
         {view.stage === 'celebrate' && (
@@ -264,7 +270,7 @@ export default function App() {
             skipped={view.skipped}
             hasNext={hasNext}
             onNext={() => startLevel((levelNo ?? 0) + 1)}
-            onAgain={() => startDance(info.track, info.video)}
+            onAgain={() => startDance(info.track, info.video, info.audio)}
             onMake={() => { music.stop(); setView({ name: 'create' }); }}
             onLevels={() => (view.run.kind === 'level' ? startLevel(1) : resumeLevel())}
             onBackToCreate={() => setView({ name: 'create' })}

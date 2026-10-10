@@ -1,3 +1,4 @@
+import { LYRIC_LINES } from './lyricLines';
 /**
  * ORIGINAL SONG LINES written for this project. None of them is a lyric from an existing song.
  * To add a puzzle, append an entry to the right level: the id must be unique, the words in a line should be distinct,
@@ -29,9 +30,11 @@ export interface Puzzle {
    * `start` is the second of the video where the 30-second dance begins; `credit` is shown to the player.
    */
   video?: { id: string; start?: number; credit: string };
+  /** A recorded audio file of the song (in public/audio). Played instead of the video; if it cannot load, the video is used. */
+  audio?: { src: string; start?: number; credit: string };
 }
 
-export const PUZZLES: readonly Puzzle[] = [
+const BASE_PUZZLES: readonly Puzzle[] = [
   // Level 1: four English words
   { id: 'l1-01', level: 1, phrase: 'Sway with the sunrise' },
   { id: 'l1-02', level: 1, phrase: 'Drums wake the morning' },
@@ -56,7 +59,7 @@ export const PUZZLES: readonly Puzzle[] = [
 
   // Level 1: Hindi film songs. The words to arrange are the song title.
   { id: 'l1-s01', level: 1, trackId: 'hookstep', phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
-  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' } },
+  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' }, audio: { src: 'audio/kala-chashma.mp3', start: 0, credit: 'Kala Chashma, Baar Baar Dekho' } },
   { id: 'l1-s03', level: 1, trackId: 'sunrise', phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
   { id: 'l1-s04', level: 1, trackId: 'hookstep', phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
   { id: 'l1-s05', level: 1, trackId: 'nacho', phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
@@ -118,6 +121,9 @@ export const PUZZLES: readonly Puzzle[] = [
   { id: 'l3-19', level: 3, phrase: 'Brave little feet start the party' },
   { id: 'l3-20', level: 3, phrase: 'Together we turn minutes into music' },
 ];
+
+/** A song puzzle can use a line you supply (see lyricLines.ts) instead of the title; the title is revealed once it is solved. */
+export const PUZZLES: readonly Puzzle[] = BASE_PUZZLES.map((p) => (LYRIC_LINES[p.id] ? { ...p, phrase: LYRIC_LINES[p.id].replace(/\s*\/\s*/g, ' ').trim() } : p));
 
 export function puzzlesForLevel(level: number): Puzzle[] {
   return PUZZLES.filter((p) => p.level === level);

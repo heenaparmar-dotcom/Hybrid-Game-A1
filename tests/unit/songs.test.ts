@@ -1,3 +1,4 @@
+import { LYRIC_LINES } from '../../src/data/lyricLines';
 import { describe, expect, it } from 'vitest';
 import { LISTEN_CHALLENGES, listenOrder, shuffledOptions } from '../../src/data/listen';
 import { PUZZLES, pickPuzzle, playablePuzzles, puzzlesForLevel } from '../../src/data/puzzles';
@@ -26,6 +27,7 @@ describe('Level 1 (Warm Up): the 10 requested Hindi songs', () => {
   it('every song carries a hint, and the scrambled words are the title (no lyrics)', () => {
     for (const p of songs(1)) {
       expect(p.song!.hint.length).toBeGreaterThan(5);
+      if (LYRIC_LINES[p.id]) continue; // a line the owner supplied in lyricLines.ts replaces the title on purpose
       const title = p.song!.title.toLowerCase().replace(/[^a-z ]/g, '');
       const phrase = p.phrase.toLowerCase().replace(/[^a-z ]/g, '');
       // the phrase is the title (one entry adds the film name, because two identical words cannot be shuffled)

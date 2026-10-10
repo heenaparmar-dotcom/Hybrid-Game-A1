@@ -84,7 +84,9 @@ async function fakeYouTube(page: Page, mode: 'works' | 'error' | 'never-plays') 
 const yt = (page: Page) => page.evaluate(() => (window as unknown as { __yt: YtLog }).__yt);
 
 /** Pin Kala Chashma, solve it, and press the dance button. */
-async function danceKala(page: Page) {
+async function danceKala(page: Page, opts: { blockAudioFile?: boolean } = { blockAudioFile: true }) {
+  // the recording is tried first; most tests here are about the video, so they block the file to reach it
+  if (opts.blockAudioFile) await page.route('**/audio/kala-chashma.mp3', (route) => route.abort());
   await installRandomControl(page);
   await page.goto('./');
   await setRandom(page, KALA_PIN);
@@ -108,7 +110,7 @@ test('the song that was solved is the song that plays: the dance uses that video
   await trackAudio(page);
   await fakeYouTube(page, 'works');
   await danceKala(page);
-  await expect(page.getByTestId('song-note')).toContainText('YouTube');
+  await expect(page.getByTestId('song-note')).toContainText('official video');
   expect(await audioCreated(page)).toBe(0); // the invitation did not start any sound
 
   await page.getByTestId('accept-dance').click();
@@ -214,4 +216,18 @@ test('REAL YouTube (nothing faked): the official player loads for the solved son
   const src = await page.locator('iframe').first().getAttribute('src').catch(() => null);
   console.log(`REAL YOUTUBE: ${outcome}, state=${state}, iframe src=${src}`);
   if (state === 'playing') expect(src).toContain('k4yXQkG2s1E');
+});
+
+test('with the recording present, the dance plays it as audio only: no video player, no game synth', async ({ page }) => {
+  test.setTimeout(60_000);
+  await trackAudio(page);
+  await fakeYouTube(page, 'works');
+  await danceKala(page, { blockAudioFile: false });
+  await page.getByTestId('accept-dance').click();
+  await expect(page.getByTestId('audio-credit')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId('video-wrap')).toHaveCount(0);
+  expect((await yt(page)).created).toBe(0);
+  expect(await audioCreated(page)).toBe(0);
+  await expect.poll(() => page.evaluate(() => document.querySelector('audio') === null)).toBe(true); // an Audio object, not a page element
+  await expect(page.getByTestId('cue')).toHaveText('Step right, hips sway', { timeout: 12_000 });
 });

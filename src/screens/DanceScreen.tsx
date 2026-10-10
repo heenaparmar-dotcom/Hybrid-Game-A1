@@ -23,6 +23,8 @@ interface Props {
   onRestart: () => void;
   /** An official YouTube video of the song to dance to. If it cannot play, the game's own music is used instead. */
   video?: { id: string; start?: number; credit: string };
+  /** A recording of the song to play with no video. Tried first; the video (or the game's music) is the fallback. */
+  audioFile?: { src: string; start?: number; credit: string };
   /** Title of the song, for the credit line under the video. */
   songTitle?: string;
 }
@@ -31,8 +33,11 @@ interface Props {
  * The hook-step challenge. The routine is driven by the music clock (or by a silent clock if sound is unavailable),
  * so the cues and the dancer stay on the beat. Nothing watches the player: they simply dance along.
  */
-export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, songTitle }: Props) {
-  const [mode, setMode] = useState<'pending' | 'audio' | 'silent' | 'video'>('pending');
+export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, audioFile, songTitle }: Props) {
+  const [mode, setMode] = useState<'pending' | 'audio' | 'silent' | 'video' | 'file'>('pending');
+  // the video player is only created when there is no usable audio file
+  const [useVideo, setUseVideo] = useState(!audioFile);
+  const fileRef = useRef<HTMLAudioElement | null>(null);
   const [videoState, setVideoState] = useState<'loading' | 'playing' | 'paused' | 'failed' | 'ended'>(video ? 'loading' : 'ended');
   const playerRef = useRef<YtPlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,9 +55,50 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
   });
   const total = routineBeats(track);
 
+  // A recording of the song: play it as audio only. If it cannot load or start, fall back to the video, then the game's music.
+  useEffect(() => {
+    if (!audioFile) return;
+    let alive = true;
+    let settled = false;
+    const el = new Audio(`${import.meta.env.BASE_URL}${audioFile.src}`);
+    el.preload = 'auto';
+    fileRef.current = el;
+    const fallBack = () => {
+      if (!alive || settled) return;
+      settled = true;
+      el.pause();
+      fileRef.current = null;
+      if (video) setUseVideo(true);
+      else
+        void music.start(track.id).then((s) => {
+          if (alive) setMode(s === 'playing' ? 'audio' : 'silent');
+        });
+    };
+    const watchdog = window.setTimeout(() => {
+      if (modeRef.current === 'pending') fallBack();
+    }, 9000);
+    el.addEventListener('error', fallBack);
+    el.addEventListener('playing', () => {
+      if (!alive || settled) return;
+      settled = true;
+      window.clearTimeout(watchdog);
+      setMode('file');
+    });
+    el.currentTime = audioFile.start ?? 0;
+    el.play().catch(fallBack);
+    return () => {
+      alive = false;
+      window.clearTimeout(watchdog);
+      el.pause();
+      fileRef.current = null;
+    };
+    // the audio file is fixed for the life of this screen
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // A song with an official video: play it through YouTube's own player. If it cannot play, use the game's own music.
   useEffect(() => {
-    if (!video) return;
+    if (!video || !useVideo) return;
     let alive = true;
     let failed = false;
     const fail = () => {
@@ -112,11 +158,11 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     };
     // the video and track are fixed for the life of this screen
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [useVideo]);
 
   // The music was started by the button press on the previous screen. Find out whether it is really playing.
   useEffect(() => {
-    if (video) return;
+    if (video || audioFile) return;
     let alive = true;
     void music.ready().then((s) => {
       if (alive) setMode(s === 'playing' ? 'audio' : 'silent');
@@ -144,6 +190,20 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     else p.unMute();
   }, [mode, volume, muted]);
 
+  // Pause or resume the recording together with the dance, and keep its volume in step with the controls.
+  useEffect(() => {
+    const el = fileRef.current;
+    if (mode !== 'file' || !el || done) return;
+    if (paused) el.pause();
+    else void el.play().catch(() => undefined);
+  }, [paused, mode, done]);
+  useEffect(() => {
+    const el = fileRef.current;
+    if (mode !== 'file' || !el) return;
+    el.volume = Math.min(1, Math.max(0, volume));
+    el.muted = muted;
+  }, [mode, volume, muted]);
+
   // Pause or resume the sound together with the dance.
   useEffect(() => {
     if (mode !== 'audio' || done) return;
@@ -159,7 +219,9 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     if (mode === 'silent' && !paused) s.last = performance.now();
     const tick = () => {
       let seconds: number;
-      if (mode === 'video') {
+      if (mode === 'file') {
+        seconds = Math.max(0, (fileRef.current?.currentTime ?? 0) - (audioFile?.start ?? 0));
+      } else if (mode === 'video') {
         // the video's own clock keeps the dancer, the cues and the countdown in time with the song
         seconds = Math.max(0, (playerRef.current?.getCurrentTime() ?? 0) - (video?.start ?? 0));
       } else if (mode === 'audio') {
@@ -180,6 +242,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         } catch {
           /* already gone */
         }
+        fileRef.current?.pause();
         music.fadeOut(1);
         window.setTimeout(() => finishRef.current(), 900);
         return;
@@ -194,7 +257,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         s.last = null;
       }
     };
-  }, [mode, paused, done, track.bpm, total, video?.start]);
+  }, [mode, paused, done, track.bpm, total, video?.start, audioFile?.start]);
 
   const st = useMemo(() => stateAt(track, beat, seated), [track, beat, seated]);
   const fig = useMemo(() => stageFigure(poseAtBeat(track, beat, seated), beat, { seated, energy: track.energy }), [track, beat, seated]);
@@ -261,13 +324,16 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         </div>
       </div>
 
-      {video && videoState !== 'failed' && (
+      {video && useVideo && videoState !== 'failed' && (
         <div className="video-wrap" data-testid="video-wrap" data-video-state={videoState}>
           <div ref={containerRef} className="video-box" />
           <p className="fine center-text">Playing "{songTitle ?? 'the song'}" ({video.credit}) through YouTube. The song belongs to its owners.</p>
         </div>
       )}
-      {video && videoState === 'failed' && (
+      {audioFile && mode === 'file' && (
+        <p className="fine center-text" data-testid="audio-credit">Playing "{songTitle ?? 'the song'}" ({audioFile.credit}). The song belongs to its owners.</p>
+      )}
+      {video && useVideo && videoState === 'failed' && (
         <p className="notice" role="status" data-testid="video-fallback">The video could not be played here (no internet, or YouTube blocked it), so the dance uses the game's own music instead.</p>
       )}
       <AudioNotice status={mode === 'silent' ? (status === 'blocked' ? 'blocked' : 'unavailable') : 'idle'} />
