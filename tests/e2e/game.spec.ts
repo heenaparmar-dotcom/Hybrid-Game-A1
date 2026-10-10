@@ -25,19 +25,19 @@ test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submi
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
 });
 
-test('title art: three original black silhouettes, no image and no white background', async ({ page }) => {
+test('title art: three original dancers drawn as vector shapes, no image and no white background', async ({ page }) => {
   await page.goto('./');
   const art = page.locator('.title-art');
-  await expect(art.locator('.sil')).toHaveCount(3);
+  await expect(art.locator('.sil:not(.trail)')).toHaveCount(3); // the faint trail copies are not extra dancers
   await expect(art.locator('image, img, foreignObject')).toHaveCount(0); // only vector shapes, no pasted picture
   await expect(page.locator('.title-stage img, .title-stage picture, .title-stage canvas')).toHaveCount(0);
   const info = await art.evaluate((svg) => {
-    const dancers = Array.from(svg.querySelectorAll('.sil'));
+    const dancers = Array.from(svg.querySelectorAll('.sil:not(.trail)'));
     const fills = dancers.map((d) => getComputedStyle(d.querySelector('ellipse')!).fill);
     return { bg: getComputedStyle(svg).backgroundColor, fills };
   });
   expect(info.bg).toBe('rgba(0, 0, 0, 0)'); // transparent: the game background shows through
-  for (const f of info.fills) expect(f).toBe('rgb(8, 1, 15)'); // near-black, not white
+  for (const f of info.fills) expect(f).toBe('rgb(8, 1, 15)'); // the hair: near-black, never a white box
   // the figures do not cover the title or the start prompt
   const title = (await page.locator('.wordmark-big').boundingBox())!;
   const prompt = (await page.locator('.start-prompt').boundingBox())!;

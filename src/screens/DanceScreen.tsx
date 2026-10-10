@@ -282,6 +282,11 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
   }, [mode, paused, done, track.bpm, total, video?.start, audioFile?.start, keeper]);
 
   const st = useMemo(() => stateAt(track, beat, seated), [track, beat, seated]);
+  /** Faint echoes of the last moment, so fast moves leave a trail. */
+  const trail = useMemo(
+    () => [0.35, 0.7].map((back) => stageFigure(poseAtBeat(track, beat - back, seated), beat - back, { seated, energy: track.energy })),
+    [track, beat, seated],
+  );
   const fig = useMemo(() => stageFigure(poseAtBeat(track, beat, seated), beat, { seated, energy: track.energy }), [track, beat, seated]);
   const pulse = Math.max(0, 1 - (((beat % 1) + 1) % 1) * 2);
   const countdown = st.phase === 'countin' ? st.countNumber : null;
@@ -310,7 +315,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
       </header>
 
       <div className="stage-wrap">
-        <Stage players={players} fig={fig} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
+        <Stage players={players} fig={fig} trail={trail} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
         {countdown !== null && <div className="count-big" aria-hidden="true" key={countdown}>{countdown}</div>}
         {go && !paused && <div className="count-big go" aria-hidden="true">GO!</div>}
         {done && <div className="count-big go" aria-hidden="true" data-testid="dance-done-flash">Nice!</div>}

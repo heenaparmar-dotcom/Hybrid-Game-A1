@@ -2,6 +2,14 @@ import type { Pt } from '../data/silhouettes';
 import { GROUND, type Figure } from '../lib/human';
 
 const COLOR = '#08010f';
+/** The neon street-dance look: hair, skin, and a bright green outfit. All original colours and shapes. */
+const HAIR = COLOR;
+const SKIN = '#d99a78';
+const SKIN_SHADE = '#b87656';
+const NEON = '#b6ff2b';
+const NEON_DEEP = '#6fd400';
+const NEON_LIGHT = '#e9ffb0';
+const EDGE = 'rgba(8, 1, 15, 0.35)';
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const add = (a: Pt, b: Pt): Pt => [a[0] + b[0], a[1] + b[1]];
 const sub = (a: Pt, b: Pt): Pt => [a[0] - b[0], a[1] - b[1]];
@@ -74,6 +82,8 @@ interface Props {
   baggy?: boolean;
   /** Draw a chair under the figure (the seated version of the dance). */
   seated?: boolean;
+  /** 'neon' is the coloured street-dance character; 'shadow' is the flat black silhouette. */
+  look?: 'neon' | 'shadow';
   className?: string;
 }
 
@@ -81,7 +91,7 @@ interface Props {
  * An original shadow figure with a natural outline, drawn from a posed skeleton.
  * Flat colour on a transparent background: no image, no outline stroke, no fill behind it.
  */
-export function HumanFigure({ fig: f, baggy = true, seated = false, className = '' }: Props) {
+export function HumanFigure({ fig: f, baggy = true, seated = false, look = 'neon', className = '' }: Props) {
   // torso: hips, waist, ribcage and shoulders as a smooth outline around the spine
   const up = unit(sub(f.spineTop, f.pelvis));
   const v: Pt = [-up[1], up[0]];
@@ -125,6 +135,96 @@ export function HumanFigure({ fig: f, baggy = true, seated = false, className = 
   const handAngle = (wrist: Pt, hand: Pt) => (-Math.atan2(hand[0] - wrist[0], hand[1] - wrist[1]) * 180) / Math.PI;
   const lc: Pt = [(f.lw[0] + f.lhand[0]) / 2, (f.lw[1] + f.lhand[1]) / 2];
   const rc: Pt = [(f.rw[0] + f.rhand[0]) / 2, (f.rw[1] + f.rhand[1]) / 2];
+
+  if (look === 'neon') {
+    const widthAt = (t: number) => {
+      for (let i = 0; i < samples.length - 1; i++) {
+        const [t0, w0] = samples[i];
+        const [t1, w1] = samples[i + 1];
+        if (t <= t1) return w0 + ((w1 - w0) * (t - t0)) / (t1 - t0 || 1);
+      }
+      return samples[samples.length - 1][1];
+    };
+    /** A band of the torso between two heights along the spine, a little wider than the body if asked. */
+    const band = (t0: number, t1: number, extra = 0) => {
+      const ts = [t0, ...samples.map((s) => s[0]).filter((t) => t > t0 && t < t1), t1];
+      const L = ts.map((t) => sub(at(t), mul(v, widthAt(t) + extra)));
+      const R = ts.map((t) => add(at(t), mul(v, widthAt(t) + extra)));
+      return smoothClosed([...R, ...L.reverse()]);
+    };
+    const hx = f.head[0];
+    const hy = f.head[1];
+    const sleeve = (a: Pt, b: Pt, c: Pt) => [tube(along(a, b, [0, 0.35, 1]), [7.4, 6.8, 5.6]), tube(along(b, c, [0, 0.3, 1]), [5.6, 5.8, 4.6])];
+    const legsPants = [
+      tube(along(f.hl, f.lk, [0, 0.3, 1]), leg.thigh),
+      tube(along(f.lk, f.la, [0, 0.28, 0.72, 1]), leg.shin),
+      tube(along(f.hr, f.rk, [0, 0.3, 1]), leg.thigh),
+      tube(along(f.rk, f.ra, [0, 0.28, 0.72, 1]), leg.shin),
+    ];
+    return (
+      <g className={`sil sil-neon ${className}`} stroke={EDGE} strokeWidth={0.7} strokeLinejoin="round">
+        {seated && (
+          <g className="chair" fill={COLOR} stroke="none">
+            <rect x={r1(f.pelvis[0] - 42)} y={r1(f.pelvis[1] - 86)} width={84} height={92} rx={14} />
+            <rect x={r1(f.pelvis[0] - 52)} y={r1(f.pelvis[1] + 2)} width={104} height={13} rx={6.5} />
+            <rect x={r1(f.pelvis[0] - 44)} y={r1(f.pelvis[1] + 15)} width={8} height={r1(Math.max(10, GROUND - (f.pelvis[1] + 15)))} rx={4} />
+            <rect x={r1(f.pelvis[0] + 36)} y={r1(f.pelvis[1] + 15)} width={8} height={r1(Math.max(10, GROUND - (f.pelvis[1] + 15)))} rx={4} />
+          </g>
+        )}
+        {/* long dark hair, streaming behind */}
+        <g fill={HAIR} stroke="none">
+          <ellipse cx={r1(hairData.mass[0])} cy={r1(hairData.mass[1])} rx={12.5} ry={13.5} />
+          {hairData.ribbons.map((d, i) => (
+            <path key={i} d={d} />
+          ))}
+        </g>
+        {/* joggers and sneakers */}
+        <g fill={NEON}>
+          {legsPants.map((d, i) => (
+            <path key={i} d={d} />
+          ))}
+        </g>
+        <g fill={NEON_DEEP}>
+          <path d={tube(along(f.lk, f.la, [0.55, 0.8, 1]), [8.2, 7, 6.4])} />
+          <path d={tube(along(f.rk, f.ra, [0.55, 0.8, 1]), [8.2, 7, 6.4])} />
+        </g>
+        <g fill={NEON_LIGHT}>
+          <path d={tube([f.la, lerpPt(f.la, f.ltoe, 0.55), f.ltoe], [5.4, 4.8, 3.4])} />
+          <path d={tube([f.ra, lerpPt(f.ra, f.rtoe, 0.55), f.rtoe], [5.4, 4.8, 3.4])} />
+        </g>
+        {/* the body: bare midriff, crop top, and the waistband of the joggers */}
+        <path d={torso} fill={SKIN} />
+        <path d={band(0, 0.22, 0.6)} fill={NEON} />
+        <path d={band(0.58, 1.0)} fill={NEON_LIGHT} />
+        <path d={tube([f.spineTop, f.neckTop, f.head], [4.6, 3.9, 3.9])} fill={SKIN_SHADE} />
+        {/* sheer cropped jacket: sleeves with cuffs, and a loose body over the top */}
+        <g fill={NEON} fillOpacity={0.82}>
+          {sleeve(f.ls, f.le, f.lw).map((d, i) => (
+            <path key={`l${i}`} d={d} />
+          ))}
+          {sleeve(f.rs, f.re, f.rw).map((d, i) => (
+            <path key={`r${i}`} d={d} />
+          ))}
+        </g>
+        <path d={band(0.46, 1.04, 4)} fill={NEON} fillOpacity={0.45} />
+        <g fill={NEON_DEEP}>
+          <path d={tube(along(f.le, f.lw, [0.78, 1]), [5.4, 5.2])} />
+          <path d={tube(along(f.re, f.rw, [0.78, 1]), [5.4, 5.2])} />
+        </g>
+        {/* hands, head, face and cap */}
+        <g fill={SKIN}>
+          <ellipse cx={r1(lc[0])} cy={r1(lc[1])} rx={3.7} ry={6} transform={`rotate(${r1(handAngle(f.lw, f.lhand))} ${r1(lc[0])} ${r1(lc[1])})`} />
+          <ellipse cx={r1(rc[0])} cy={r1(rc[1])} rx={3.7} ry={6} transform={`rotate(${r1(handAngle(f.rw, f.rhand))} ${r1(rc[0])} ${r1(rc[1])})`} />
+        </g>
+        <g transform={`rotate(${r1(f.headTilt)} ${r1(hx)} ${r1(hy)})`}>
+          <ellipse cx={r1(hx)} cy={r1(hy)} rx={9.4} ry={11.8} fill={SKIN} />
+          <path d={`M ${r1(hx - 5.6)} ${r1(hy + 1.2)} q 2.2 1.8 4.4 0 M ${r1(hx + 1.2)} ${r1(hy + 1.2)} q 2.2 1.8 4.4 0 M ${r1(hx - 2)} ${r1(hy + 6.4)} q 2 1 4 0`} fill="none" stroke={COLOR} strokeWidth={0.9} strokeLinecap="round" />
+          <path d={`M ${r1(hx - 10.4)} ${r1(hy - 2)} C ${r1(hx - 10.4)} ${r1(hy - 16.5)} ${r1(hx + 10.4)} ${r1(hy - 16.5)} ${r1(hx + 10.4)} ${r1(hy - 2)} Z`} fill={NEON} />
+          <rect x={r1(hx - 12.5)} y={r1(hy - 4)} width={25} height={4.4} rx={2.2} fill={NEON_LIGHT} />
+        </g>
+      </g>
+    );
+  }
 
   return (
     <g className={`sil ${className}`} fill={COLOR}>

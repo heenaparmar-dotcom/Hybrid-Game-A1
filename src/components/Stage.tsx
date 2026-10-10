@@ -10,6 +10,8 @@ interface Props {
   label: string;
   /** Beat pulse 0..1 that makes the floor ring breathe in time. */
   pulse: number;
+  /** Fainter copies of the dancer a moment ago, drawn behind as a motion trail. */
+  trail?: Figure[];
   /** Two players: the dancer stands in the middle with a spot on each side. */
   players?: 1 | 2;
 }
@@ -29,7 +31,7 @@ function useNarrow(): boolean {
  * Stage: the shadow dancer on the left and "your spot" on the right, so the player dances alongside a partner.
  * Your spot shows a soft copy of the same moves to match; it is a guide, not tracking.
  */
-export function Stage({ fig, seated, label, pulse, players = 1 }: Props) {
+export function Stage({ fig, seated, label, pulse, trail = [], players = 1 }: Props) {
   const FLOOR = 292;
   // On phones, crop the empty edges so the dancers are bigger.
   const two = players === 2;
@@ -64,6 +66,9 @@ export function Stage({ fig, seated, label, pulse, players = 1 }: Props) {
 
       {/* the shadow dancer */}
       <g transform={`translate(${dancerX} ${FLOOR - GROUND + 6})`} className="dancer-wrap">
+        {trail.map((t, i) => (
+          <HumanFigure key={i} fig={t} seated={seated} className={`trail trail-${i + 1}`} />
+        ))}
         <HumanFigure fig={fig} seated={seated} />
       </g>
 

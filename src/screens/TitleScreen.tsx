@@ -58,6 +58,10 @@ export function TitleScreen({ completed, players, onPlayers, allSongs, onAllSong
           {SIL_DANCERS.map((d, i) => (
             <g key={i} transform={`translate(${d.x} ${FLOOR_Y - GROUND * d.scale}) scale(${d.scale})`}>
               <g className="title-dancer" style={{ animationDelay: `${d.delay}s` }}>
+                {!reduce &&
+                  [0.3, 0.6].map((back, k) => (
+                    <HumanFigure key={k} fig={figureAt(FRAMES[i], beat - back, d.phase, d.hop)} baggy={d.baggy} className={`trail trail-${k + 1}`} />
+                  ))}
                 <HumanFigure fig={figureAt(FRAMES[i], reduce ? 0 : beat, d.phase, reduce ? 0 : d.hop)} baggy={d.baggy} />
               </g>
             </g>
