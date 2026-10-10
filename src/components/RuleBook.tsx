@@ -13,7 +13,7 @@ export function RuleBook() {
           <li><strong>Solve the song.</strong> In Warm Up and Find the Beat, the words of a Hindi film-song title are scrambled into tiles. Drag them into order within {PUZZLE_SECONDS} seconds. The game notices when you are right, so there is no button to press.</li>
           <li><strong>Unlock the dance.</strong> When you crack the song (or time runs out and the answer is shown), you are invited to dance. Nothing plays until you say yes.</li>
           <li><strong>Move for {DANCE_SECONDS} seconds.</strong> A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.</li>
-          <li><strong>Listen.</strong> In Feel the Rhythm you hear a short clip and pick the line you heard.</li>
+          <li><strong>Listen.</strong> In Feel the Rhythm you hear a short instrumental clip and pick which song it was.</li>
           <li><strong>Challenge a friend.</strong> Write your own puzzle and send a link so a friend can take a movement break too.</li>
         </ol>
       </section>
@@ -44,7 +44,7 @@ export function RuleBook() {
           <li><strong>Time's up:</strong> if the timer reaches zero, the correct order is shown and you can continue to the dance.</li>
           <li><strong>Hint:</strong> in Warm Up, the small Hint button shows the film and year of the song. The timer keeps running. In Find the Beat the hint is always shown.</li>
           <li><strong>The dance:</strong> it starts only when you press the dance button, and the music starts at the same moment. It lasts {DANCE_SECONDS} seconds, with a countdown. You can pause, mute or skip at any time.</li>
-          <li><strong>Feel the Rhythm:</strong> press Play to hear a clip, choose the line you heard from three options, and replay or pause as you like. A wrong choice never ends the level. When you are right, move on to the next clip.</li>
+          <li><strong>Feel the Rhythm:</strong> press Play to hear a clip, choose the song you heard from three titles, and replay or pause as you like. A wrong choice never ends the level. When you are right, move on to the next clip.</li>
           <li><strong>Moving on:</strong> when a dance ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.</li>
           <li><strong>Your own puzzles:</strong> a line of {PHRASE_LIMITS.minWords} to {PHRASE_LIMITS.maxWords} words, up to {PHRASE_LIMITS.maxChars} characters. Use your own words or words you have permission to use. They have no timer.</li>
         </ul>
@@ -62,7 +62,7 @@ export function RuleBook() {
         <ul>
           <li><strong>Puzzle:</strong> {PUZZLE_SECONDS} seconds in Warm Up and Find the Beat.</li>
           <li><strong>Dance:</strong> {DANCE_SECONDS} seconds, including a short count-in.</li>
-          <li><strong>Listening level:</strong> no timer. Each clip is about 9 seconds long.</li>
+          <li><strong>Listening level:</strong> no timer. Each clip is a short instrumental cover, so it can be longer than the old demo clips.</li>
           <li><strong>One level:</strong> about a minute to a minute and a half. <strong>All {LEVELS.length} levels:</strong> about 4 to 5 minutes. These are planned times, not measured results.</li>
         </ul>
       </section>

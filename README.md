@@ -39,7 +39,7 @@ No API keys, accounts, database or backend. The game works offline once loaded.
 6. **Three levels:** *Warm Up* and *Find the Beat* are word-order puzzles; *Feel the Rhythm* is a listening level. Every time a puzzle level is entered, one of its puzzles is picked at random (never the one just played).
    - **Warm Up:** a timed puzzle (30 seconds for a lyric line, 10 for a short title). The words of a line from one of **8 songs** are scrambled (Badtameez Dil, Kala Chashma, Gallan Goodiyaan, Sapphire, Jhoome Jo Pathaan, Swag Se Swagat, Jamaican (Bam Bam), Let's Nacho). The first Warm Up puzzle of a visit is always Kala Chashma. A small **Hint** button shows the film and year without stopping the timer. If time runs out, the correct order is shown and the dance is still offered.
    - **Find the Beat:** the same 10-second timer, with **5 specified film-song title puzzles** and their hints always visible (Pehla Nasha, Do Dil Mil Rahe Hain, Tujhe Dekha To Ye Jaana Sanam, Kuch Kuch Hota Hai, Pardesi Pardesi Jaana Nahi). Repeated words are separate tiles and the order is checked by position. The 20 original English and Hindi lines from earlier versions are still in `src/data/puzzles.ts` but these two levels now draw only from the song puzzles.
-   - **Feel the Rhythm:** two **listening challenges**. Press Play, hear a short clip with a line in it, and choose the line you heard from three options. Pause and replay are available. There is nothing to rearrange. (Its 20 earlier word-order puzzles are still in `src/data/puzzles.ts` but are no longer used by this level.)
+   - **Feel the Rhythm:** three **instrumental listening clips**. Press Play, hear a piano or flute version of a song, and choose which song it was from three titles. A clue (the instrument) is available if you cannot listen.
 7. **Make a puzzle:** write a line, review the scramble, pick one of the three songs, and share a link by copy, native share, WhatsApp, Telegram or Email. A friend who opens it plays that exact puzzle, with the same shuffle and song.
 
 The in-game **How to play** is the Rule Book (also in [`docs/RULE_BOOK.md`](docs/RULE_BOOK.md)). It opens from every screen, and during a dance it pauses the routine.
@@ -71,20 +71,14 @@ This builds the game and pushes `dist/` to the `gh-pages` branch of `origin`. Th
 - **To add a properly licensed track later:** put the file in `public/audio/`, record its licence (author, licence name, URL) in `docs/ASSIGNMENT_DOCUMENTATION.md`, and add a small player that exposes `songTime()` like `lib/audio.ts` does, so the dancer can stay on the beat. Suitable sources are tracks under Creative Commons licences that allow your use (check attribution and "no derivatives" terms), or music you commission or make yourself. Always read the licence text for the specific track.
 - **Fonts:** Bricolage Grotesque and Figtree, bundled locally through the `@fontsource-variable` packages (SIL Open Font License 1.1). Graphics, the dancer and the logo are original SVG and CSS.
 
-## Level 3 listening clips: what is real and what is a placeholder
+## Level 3 listening clips
 
-**No licensed recording is configured, so the two clips are placeholders.** Each plays one of the game's own original songs, generated in the browser, with an original line spoken over it by the browser's built-in voice. The line choices were written for this project. The game says "Demo clip" on screen while one plays.
+Feel the Rhythm has **three instrumental clips**: a piano version of Pehla Nasha, a flute version of Dekha Hazaro Dafa and a piano or keyboard version of Lag Ja Gale. The player hears a clip and answers **"Which song did you hear?"** from the three song titles. The files are in `public/audio/` (`listen-*.mp3`) and are set up in `src/data/listen.ts`.
 
-- The spoken voice depends on the device (the test computer had 8). If a device has none, the game says so and offers **Show the words**, so the level can always be finished.
-- No popular Hindi recording, and no lyric from any film song, is used anywhere in the game. The film-song puzzles in Levels 1 and 2 contain only the song **title** and a short fact (year and film). The dance always uses the game's own original music; the invitation says so after a film-song puzzle.
-
-**To use a real, properly licensed recording** (you need the rights holder's permission or a licence that covers your use, for both the audio and any lyric text you show):
-1. Copy the audio file into `public/audio/`, for example `public/audio/level3-clip-1.mp3`.
-2. Open `src/data/listen.ts` and set that challenge's `src`, for example `src: 'audio/level3-clip-1.mp3'`.
-3. Replace its `line` and `options` with text you are allowed to use.
-4. Record the licence in `docs/ASSIGNMENT_DOCUMENTATION.md`, then run `npm run check`.
-
-If the file cannot be loaded, the game falls back to the demo clip and says so. This file-playback path is written but has **not** been tested with a real file, because none is configured.
+- **These clips were supplied by the project owner, not created by the code. They are third-party recordings, and the team is responsible for having the right to use and publish them.**
+- A player who cannot listen can show a **clue** (the instrument, never the answer), so the level can always be finished.
+- If a file cannot load, the game says so and plays its own demo clip (generated music with a computer voice) instead.
+- To change a clip: copy the audio into `public/audio/`, then edit that challenge's `src`, `line` (the correct song title), `options` and `clue` in `src/data/listen.ts`, and run `npm run check`.
 
 ## Controls
 
@@ -125,7 +119,7 @@ docs/                assignment documents
 - The dancer is a simple front-facing 2D figure with nine moves; it cannot show every movement precisely, so a written cue is always shown too. The dance is not checked in any way: nothing tracks the player.
 - The songs are simple synthesised tracks and will not sound like produced music. Their sound was not evaluated by listeners, and automated tests cannot hear audio.
 - The Hindi lines and cues have not been reviewed by a native speaker. The film and year hints on the song puzzles come from general knowledge (the Find the Beat hints are as supplied by the project owner); please check them.
-- Level 3's clips are placeholders (see above). The in-game Rule Book still describes every level as rearranging words and has not been updated for the listening level.
+- Level 3's instrumental clips are supplied by the owner (see above). The in-game Rule Book still describes every level as rearranging words and has not been updated for the listening level.
 - Only one real browser engine (desktop Chrome) and an emulated phone viewport have been tested. Real phones, Safari, Firefox and screen readers have not.
 - The content filter for custom puzzles is a small word list, not moderation.
 - A level in progress is not saved on refresh; finished levels, sound and seated settings are.

@@ -27,7 +27,7 @@ describe('docs/RULE_BOOK.md matches the game', () => {
     expect(rules).toContain('correct order is shown');
     expect(rules).toContain('small Hint button');
     expect(rules).toContain('**Feel the Rhythm:**');
-    expect(rules).toContain('three options');
+    expect(rules).toContain('three titles');
   });
   it('states the real level count, phrase limits and emoji count', () => {
     expect(rules).toContain(`Finish all ${LEVELS.length} levels`);

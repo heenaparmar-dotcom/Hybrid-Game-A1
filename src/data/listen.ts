@@ -3,7 +3,7 @@ import type { TrackId } from './tracks';
 /**
  * Level 3 "Feel the Rhythm" listening challenges.
  *
- * The player hears a short clip, then picks the line they heard from three choices.
+ * The player hears an instrumental clip (a piano or flute cover) and picks which song it was from three song titles.
  *
  * PLACEHOLDER AUDIO. No licensed recording is configured, so each clip is original music generated in the browser
  * with an original line spoken over it by the browser's built-in voice. All lines below were written for this project.
@@ -19,8 +19,10 @@ export interface ListenChallenge {
   id: string;
   /** Short name shown to the player. */
   title: string;
-  /** The original line the clip contains (the correct answer). */
+  /** The correct answer: the title of the song in the clip (or, for a demo clip, the line it contains). */
   line: string;
+  /** A non-spoiler clue for a player who cannot listen, such as the instrument. */
+  clue?: string;
   /** Exactly three choices, including `line`. They are shuffled each time. */
   options: [string, string, string];
   /** Authorised recording to play instead of the placeholder. Leave empty until you have one. */
@@ -29,20 +31,35 @@ export interface ListenChallenge {
   placeholder: { track: TrackId; seconds: number; voiceAt: number; lang: string };
 }
 
+const SONGS: [string, string, string] = ['Pehla Nasha', 'Dekha Hazaro Dafa', 'Lag Ja Gale'];
+
 export const LISTEN_CHALLENGES: readonly ListenChallenge[] = [
   {
     id: 'l3-listen-1',
     title: 'Clip 1',
-    line: 'Feel the drums inside your chest',
-    options: ['Feel the drums inside your chest', 'Feel the waves inside your chest', 'Feel the dawn inside your chest'],
+    line: 'Pehla Nasha',
+    options: SONGS,
+    clue: 'Played on a piano.',
+    src: 'audio/listen-pehla-nasha.mp3',
     placeholder: { track: 'sunrise', seconds: 9, voiceAt: 2.2, lang: 'en-US' },
   },
   {
     id: 'l3-listen-2',
     title: 'Clip 2',
-    line: 'Turn the lights down low and sway',
-    options: ['Turn the lights down low and sway', 'Turn the music up and play', 'Turn the lights up high and stay'],
+    line: 'Dekha Hazaro Dafa',
+    options: SONGS,
+    clue: 'Played on a flute.',
+    src: 'audio/listen-dekha-hazaro-dafa.mp3',
     placeholder: { track: 'hookstep', seconds: 9, voiceAt: 2.2, lang: 'en-US' },
+  },
+  {
+    id: 'l3-listen-3',
+    title: 'Clip 3',
+    line: 'Lag Ja Gale',
+    options: SONGS,
+    clue: 'Played on a piano or keyboard.',
+    src: 'audio/listen-lag-ja-gale.mp3',
+    placeholder: { track: 'nacho', seconds: 9, voiceAt: 2.2, lang: 'en-US' },
   },
 ];
 

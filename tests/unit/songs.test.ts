@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { LYRIC_LINES } from '../../src/data/lyricLines';
 import { describe, expect, it } from 'vitest';
 import { LISTEN_CHALLENGES, listenOrder, shuffledOptions } from '../../src/data/listen';
@@ -141,23 +142,25 @@ describe('selection includes the songs and never repeats the last puzzle', () =>
 });
 
 describe('Level 3 (Feel the Rhythm): listening challenges', () => {
-  it('has exactly two different challenges with different clips and different answers', () => {
-    expect(LISTEN_CHALLENGES).toHaveLength(2);
-    const [a, b] = LISTEN_CHALLENGES;
-    expect(a.id).not.toBe(b.id);
-    expect(a.line).not.toBe(b.line);
-    expect(a.placeholder.track).not.toBe(b.placeholder.track); // different music
+  it('has three different instrumental clips, each with a different answer', () => {
+    expect(LISTEN_CHALLENGES).toHaveLength(3);
+    expect(new Set(LISTEN_CHALLENGES.map((c) => c.id)).size).toBe(3);
+    expect(new Set(LISTEN_CHALLENGES.map((c) => c.line)).size).toBe(3);
+    expect(new Set(LISTEN_CHALLENGES.map((c) => c.src)).size).toBe(3);
   });
-  it('each has three distinct choices that include the correct line exactly once', () => {
+  it('each offers the three song titles, and the correct one is among them exactly once', () => {
     for (const c of LISTEN_CHALLENGES) {
       expect(new Set(c.options).size).toBe(3);
       expect(c.options.filter((o) => o === c.line)).toHaveLength(1);
     }
-    const [a, b] = LISTEN_CHALLENGES;
-    expect(a.options.filter((o) => b.options.includes(o))).toEqual([]); // no shared answer text
   });
-  it('is configured with placeholder audio only: no file URL is invented', () => {
-    for (const c of LISTEN_CHALLENGES) expect(c.src ?? '').toBe('');
+  it('every clip points at a file in public/audio, and offers a clue that does not give the answer away', () => {
+    for (const c of LISTEN_CHALLENGES) {
+      expect(c.src).toMatch(/^audio\/listen-[a-z-]+\.mp3$/);
+      expect(existsSync(`public/${c.src}`), c.src).toBe(true);
+      expect(c.clue, c.id).toBeTruthy();
+      expect(c.clue!.toLowerCase()).not.toContain(c.line.toLowerCase());
+    }
   });
   it('options and order are shuffled without losing or duplicating anything', () => {
     for (const c of LISTEN_CHALLENGES) {
@@ -170,12 +173,12 @@ describe('Level 3 (Feel the Rhythm): listening challenges', () => {
       expect(seen.size).toBeGreaterThan(2);
     }
     const orders = new Set<string>();
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 40; i++) {
       const o = listenOrder(seeded(i * 7919 + 13));
-      expect(o).toHaveLength(2);
-      expect(new Set(o.map((c) => c.id)).size).toBe(2);
+      expect(o).toHaveLength(3);
+      expect(new Set(o.map((c) => c.id)).size).toBe(3);
       orders.add(o.map((c) => c.id).join('|'));
     }
-    expect(orders.size).toBe(2);
+    expect(orders.size).toBeGreaterThan(2);
   });
 });

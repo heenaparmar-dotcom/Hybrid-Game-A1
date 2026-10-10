@@ -19,7 +19,7 @@ interface Props {
 const IDLE: ClipInfo = { status: 'idle', source: 'demo', fileFailed: false, voiceMissing: false, soundMissing: false };
 
 /**
- * Level 3: listen to a short clip, then choose the line you heard. No rearranging here.
+ * Level 3: listen to a short instrumental clip, then choose which song it was. No rearranging here.
  * Sound only starts when the player presses Play (browsers require a tap first).
  */
 export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMuted, onDone }: Props) {
@@ -55,11 +55,11 @@ export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMu
     if (correct || wrong.includes(option)) return;
     if (option === challenge.line) {
       setCorrect(true);
-      setFeedback(`Correct! You heard: "${challenge.line}"`);
+      setFeedback(`Correct! That was "${challenge.line}".`);
       void player.current?.pause();
     } else {
       setWrong((w) => [...w, option]);
-      setFeedback('Not quite. Play the clip again and listen for the words.');
+      setFeedback('Not quite. Play the clip again and listen for the tune.');
     }
   };
 
@@ -85,7 +85,7 @@ export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMu
     <section className="screen listen" aria-labelledby="listen-title" data-testid="listen-screen">
       <p className="kicker">{kicker} · Clip {index + 1} of {challenges.length}</p>
       <h1 id="listen-title" className="screen-title">Listen, then choose</h1>
-      <p className="sub">You will hear a short music clip with a line in it. Pick the line you heard.</p>
+      <p className="sub">You will hear a short instrumental clip. Which song did you hear?</p>
 
       <div className="row center listen-controls">
         <button type="button" className="btn btn-primary" onClick={play} data-testid="clip-play">
@@ -104,15 +104,15 @@ export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMu
         <p className="fine" data-testid="clip-source">Demo clip: original music with a computer voice. A licensed recording can be added (see the README).</p>
       )}
       {info.fileFailed && <p className="notice" role="status" data-testid="clip-file-failed">The recording could not be loaded, so the demo clip is playing instead.</p>}
-      {info.soundMissing && <p className="notice" role="status" data-testid="clip-sound-missing">Your browser blocked or does not have sound. You can show the words below and still play on.</p>}
-      {info.voiceMissing && <p className="notice" role="status" data-testid="clip-voice-missing">This device has no voice to speak the line. Show the words below to play on.</p>}
+      {info.soundMissing && <p className="notice" role="status" data-testid="clip-sound-missing">Your browser blocked or does not have sound. You can show a clue below and still play on.</p>}
+      {info.voiceMissing && <p className="notice" role="status" data-testid="clip-voice-missing">This device has no voice for the demo clip. Show a clue below to play on.</p>}
 
       <button type="button" className="link-btn" onClick={() => setCaptions((c) => !c)} aria-pressed={captions} data-testid="show-words">
-        {captions ? 'Hide the words' : "Can't listen? Show the words"}
+        {captions ? 'Hide the clue' : "Can't listen? Show a clue"}
       </button>
-      {captions && <p className="listen-words" data-testid="captions">"{challenge.line}"</p>}
+      {captions && <p className="listen-words" data-testid="captions">{challenge.clue ?? `"${challenge.line}"`}</p>}
 
-      <ul className="options" aria-label="Which line did you hear?">
+      <ul className="options" aria-label="Which song did you hear?">
         {options.map((o) => {
           const isWrong = wrong.includes(o);
           const isRight = correct && o === challenge.line;
@@ -136,7 +136,7 @@ export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMu
 
       <div className="listen-foot">
         <p className={`feedback ${correct ? 'is-right' : wrong.length ? 'is-wrong' : ''}`} role="status" aria-live="polite" data-testid="listen-feedback">
-          {feedback || 'Choose the line you heard.'}
+          {feedback || 'Choose the song you heard.'}
         </p>
         {correct && (
           <>
