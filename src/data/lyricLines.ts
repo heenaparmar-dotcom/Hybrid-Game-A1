@@ -6,4 +6,5 @@
  */
 export const LYRIC_LINES: Record<string, string> = {
   'l1-s02': 'KALA / CHASHMA / JACHDA / AE / GORE / MUKHDE / PE',
+  'l1-s01': 'ZID / PAKAD / KE / KHADA / HAI / KAMBAKHT / CHHODNA / JAANE / NA',
 };

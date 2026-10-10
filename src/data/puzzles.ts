@@ -1,4 +1,5 @@
 import { LYRIC_LINES } from './lyricLines';
+import { SONG_AUDIO } from './songAudio';
 /**
  * ORIGINAL SONG LINES written for this project. None of them is a lyric from an existing song.
  * To add a puzzle, append an entry to the right level: the id must be unique, the words in a line should be distinct,
@@ -59,7 +60,7 @@ const BASE_PUZZLES: readonly Puzzle[] = [
 
   // Level 1: Hindi film songs. The words to arrange are the song title.
   { id: 'l1-s01', level: 1, trackId: 'hookstep', phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
-  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' }, audio: { src: 'audio/kala-chashma.mp3', start: 0, credit: 'Kala Chashma, Baar Baar Dekho' } },
+  { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' } },
   { id: 'l1-s03', level: 1, trackId: 'sunrise', phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
   { id: 'l1-s04', level: 1, trackId: 'hookstep', phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
   { id: 'l1-s05', level: 1, trackId: 'nacho', phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
@@ -123,7 +124,15 @@ const BASE_PUZZLES: readonly Puzzle[] = [
 ];
 
 /** A song puzzle can use a line you supply (see lyricLines.ts) instead of the title; the title is revealed once it is solved. */
-export const PUZZLES: readonly Puzzle[] = BASE_PUZZLES.map((p) => (LYRIC_LINES[p.id] ? { ...p, phrase: LYRIC_LINES[p.id].replace(/\s*\/\s*/g, ' ').trim() } : p));
+export const PUZZLES: readonly Puzzle[] = BASE_PUZZLES.map((p) => {
+  const line = LYRIC_LINES[p.id];
+  const file = SONG_AUDIO[p.id];
+  return {
+    ...p,
+    ...(line ? { phrase: line.replace(/\s*\/\s*/g, ' ').trim() } : {}),
+    ...(file && p.song ? { audio: { src: `audio/${file}`, start: 0, credit: p.song.title } } : {}),
+  };
+});
 
 export function puzzlesForLevel(level: number): Puzzle[] {
   return PUZZLES.filter((p) => p.level === level);
