@@ -330,3 +330,9 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 @media (forced-colors: active) {
   .tile, .btn, .btn-hero { border: 2px solid ButtonText; }
 }
+
+/* The official video must stay visible (YouTube's rules), so it is kept as small as allowed and tucked in a corner on wide screens */
+@media (min-width: 900px) {
+  .video-wrap { position: fixed; right: 14px; bottom: 14px; z-index: 20; }
+  .video-box { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5); }
+}

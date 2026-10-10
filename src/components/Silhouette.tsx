@@ -1,5 +1,5 @@
 import type { Pt } from '../data/silhouettes';
-import type { Figure } from '../lib/human';
+import { GROUND, type Figure } from '../lib/human';
 
 const COLOR = '#08010f';
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -72,6 +72,8 @@ interface Props {
   fig: Figure;
   /** Loose, wide-leg trousers instead of fitted legs. */
   baggy?: boolean;
+  /** Draw a chair under the figure (the seated version of the dance). */
+  seated?: boolean;
   className?: string;
 }
 
@@ -79,7 +81,7 @@ interface Props {
  * An original shadow figure with a natural outline, drawn from a posed skeleton.
  * Flat colour on a transparent background: no image, no outline stroke, no fill behind it.
  */
-export function HumanFigure({ fig: f, baggy = false, className = '' }: Props) {
+export function HumanFigure({ fig: f, baggy = false, seated = false, className = '' }: Props) {
   // torso: hips, waist, ribcage and shoulders as a smooth outline around the spine
   const up = unit(sub(f.spineTop, f.pelvis));
   const v: Pt = [-up[1], up[0]];
@@ -126,6 +128,14 @@ export function HumanFigure({ fig: f, baggy = false, className = '' }: Props) {
 
   return (
     <g className={`sil ${className}`} fill={COLOR}>
+      {seated && (
+        <g className="chair">
+          <rect x={r1(f.pelvis[0] - 42)} y={r1(f.pelvis[1] - 86)} width={84} height={92} rx={14} />
+          <rect x={r1(f.pelvis[0] - 52)} y={r1(f.pelvis[1] + 2)} width={104} height={13} rx={6.5} />
+          <rect x={r1(f.pelvis[0] - 44)} y={r1(f.pelvis[1] + 15)} width={8} height={r1(Math.max(10, GROUND - (f.pelvis[1] + 15)))} rx={4} />
+          <rect x={r1(f.pelvis[0] + 36)} y={r1(f.pelvis[1] + 15)} width={8} height={r1(Math.max(10, GROUND - (f.pelvis[1] + 15)))} rx={4} />
+        </g>
+      )}
       <ellipse cx={r1(hairData.mass[0])} cy={r1(hairData.mass[1])} rx={12.5} ry={13.5} />
       {hairData.ribbons.map((d, i) => (
         <path key={i} d={d} />

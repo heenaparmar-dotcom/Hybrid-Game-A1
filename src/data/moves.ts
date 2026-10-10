@@ -51,6 +51,26 @@ export const MOVES: Record<string, Move> = {
     cues: ['Right arm up, left down', 'Switch, switch', 'Right arm up, left down', 'Switch, switch'],
     seatedCues: ['Right arm up, left down', 'Switch, switch', 'Right arm up, left down', 'Switch, switch'],
   },
+  salsa: {
+    id: 'salsa', name: 'Salsa basic',
+    cues: ['Step right, hips sway', 'Step left, hips sway', 'Step right, hips sway', 'Step left, hips sway'],
+    seatedCues: ['Sway hips right', 'Sway hips left', 'Sway hips right', 'Sway hips left'],
+  },
+  grapevine: {
+    id: 'grapevine', name: 'Grapevine',
+    cues: ['Step right, cross behind', 'Step left, cross behind', 'Step right, cross behind', 'Step left, cross behind'],
+    seatedCues: ['Swing arms right', 'Swing arms left', 'Swing arms right', 'Swing arms left'],
+  },
+  merengue: {
+    id: 'merengue', name: 'Merengue march',
+    cues: ['March and pump', 'Keep pumping', 'March and pump', 'Keep pumping'],
+    seatedCues: ['Lift knees, pump arms', 'Keep pumping', 'Lift knees, pump arms', 'Keep pumping'],
+  },
+  jump: {
+    id: 'jump', name: 'Party hop',
+    cues: ['Little hops, arms up!', 'Keep bouncing', 'Little hops, arms up!', 'Keep bouncing'],
+    seatedCues: ['Bounce, arms up!', 'Keep bouncing', 'Bounce, arms up!', 'Keep bouncing'],
+  },
   twist: {
     id: 'twist', name: 'Easy turn',
     cues: ['Turn right', 'Turn left', 'Turn right', 'Turn left'],

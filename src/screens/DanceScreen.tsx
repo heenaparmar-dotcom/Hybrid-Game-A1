@@ -4,6 +4,7 @@ import { Icon } from '../components/Icon';
 import { Stage } from '../components/Stage';
 import { COUNT_IN_BEATS, DANCE_TOTAL_SECONDS, routineBeats, type Track } from '../data/tracks';
 import { music } from '../lib/audio';
+import { stageFigure } from '../lib/human';
 import { poseAtBeat, stateAt } from '../lib/routine';
 import { createVideoPlayer, YT_STATE, type YtPlayer } from '../lib/youtube';
 
@@ -196,7 +197,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
   }, [mode, paused, done, track.bpm, total, video?.start]);
 
   const st = useMemo(() => stateAt(track, beat, seated), [track, beat, seated]);
-  const pose = useMemo(() => poseAtBeat(track, beat, seated), [track, beat, seated]);
+  const fig = useMemo(() => stageFigure(poseAtBeat(track, beat, seated), beat, { seated, energy: track.energy }), [track, beat, seated]);
   const pulse = Math.max(0, 1 - (((beat % 1) + 1) % 1) * 2);
   const countdown = st.phase === 'countin' ? st.countNumber : null;
   // seconds left of the 30-second dance (the count-in is part of it)
@@ -224,7 +225,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
       </header>
 
       <div className="stage-wrap">
-        <Stage pose={pose} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
+        <Stage fig={fig} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
         {countdown !== null && <div className="count-big" aria-hidden="true" key={countdown}>{countdown}</div>}
         {go && !paused && <div className="count-big go" aria-hidden="true">GO!</div>}
         {done && <div className="count-big go" aria-hidden="true" data-testid="dance-done-flash">Nice!</div>}

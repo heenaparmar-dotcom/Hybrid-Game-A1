@@ -92,7 +92,7 @@ export async function createVideoPlayer(container: HTMLElement, options: VideoOp
   return new Promise<YtPlayer>((resolve, reject) => {
     try {
       const player = new YT.Player(host, {
-        width: 356,
+        width: 240,
         height: 200,
         videoId: options.id,
         host: 'https://www.youtube-nocookie.com',

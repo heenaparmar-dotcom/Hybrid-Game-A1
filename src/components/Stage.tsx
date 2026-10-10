@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Pose } from '../lib/dancer';
-import { DancerFigure } from './Dancer';
+import { GROUND, type Figure } from '../lib/human';
+import { HumanFigure } from './Silhouette';
 
 interface Props {
-  pose: Pose;
+  /** The posed dancer for this moment. */
+  fig: Figure;
   seated: boolean;
   /** Short description of the move for screen readers. */
   label: string;
@@ -11,10 +12,6 @@ interface Props {
   pulse: number;
 }
 
-/**
- * Stage: the shadow dancer on the left and "your spot" on the right, so the player dances alongside a partner.
- * Your spot shows a soft copy of the pose to match; it is a guide, not tracking.
- */
 function useNarrow(): boolean {
   const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 600px)').matches);
   useEffect(() => {
@@ -26,7 +23,11 @@ function useNarrow(): boolean {
   return narrow;
 }
 
-export function Stage({ pose, seated, label, pulse }: Props) {
+/**
+ * Stage: the shadow dancer on the left and "your spot" on the right, so the player dances alongside a partner.
+ * Your spot shows a soft copy of the same moves to match; it is a guide, not tracking.
+ */
+export function Stage({ fig, seated, label, pulse }: Props) {
   const FLOOR = 292;
   // On phones, crop the empty edges so the dancers are bigger.
   const viewBox = useNarrow() ? '95 0 590 360' : '0 0 760 360';
@@ -48,18 +49,18 @@ export function Stage({ pose, seated, label, pulse }: Props) {
       <polygon points="540,0 450,300 640,300" fill="url(#beam)" opacity="0.6" />
 
       {/* floor glow, breathing with the beat */}
-      <ellipse cx="245" cy={FLOOR} rx={150 + pulse * 10} ry={26 + pulse * 3} fill="url(#floor)" />
+      <ellipse cx="245" cy={FLOOR} rx={150 + pulse * 18} ry={26 + pulse * 5} fill="url(#floor)" />
       <ellipse cx="545" cy={FLOOR} rx={130} ry={22} fill="none" stroke="#c9f35a" strokeWidth="2.5" strokeDasharray="7 7" opacity="0.8" />
       <ellipse cx="245" cy={FLOOR + 2} rx={64} ry={9} fill="#14061f" opacity="0.55" />
 
       {/* the shadow dancer */}
-      <g transform={`translate(245 ${FLOOR - 118})`} className="dancer-wrap">
-        <DancerFigure pose={pose} seated={seated} />
+      <g transform={`translate(245 ${FLOOR - GROUND + 6})`} className="dancer-wrap">
+        <HumanFigure fig={fig} seated={seated} />
       </g>
 
       {/* your spot */}
-      <g transform={`translate(545 ${FLOOR - 118})`} className="you-wrap" aria-hidden="true">
-        <DancerFigure pose={pose} seated={seated} className="ghost" />
+      <g transform={`translate(545 ${FLOOR - GROUND + 6})`} className="you-wrap" aria-hidden="true">
+        <HumanFigure fig={fig} seated={seated} className="ghost" />
       </g>
       <g aria-hidden="true">
         <text x="545" y={FLOOR + 36} textAnchor="middle" className="stage-label">YOUR SPOT</text>

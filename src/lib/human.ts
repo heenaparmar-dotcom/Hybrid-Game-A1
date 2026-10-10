@@ -1,4 +1,5 @@
 import type { Pt, SilPose } from '../data/silhouettes';
+import type { Pose } from './dancer';
 
 /**
  * A small articulated human figure for the title screen.
@@ -156,6 +157,14 @@ export interface BuildOptions {
   laggedHair?: number;
   /** A light hop (SVG units): the whole figure lifts off the floor between beats and lands on each beat. */
   hop?: number;
+  /** How lively the beat-driven secondary motion is (1 = normal). Livelier songs use a higher number. */
+  energy?: number;
+  /** Thigh length factor. A seated dancer's thighs point towards the viewer, so they look shorter. */
+  thighScale?: number;
+  /** Seated: the lower body stays put on the chair (no knee flex). */
+  seated?: boolean;
+  /** Move the whole figure (SVG units) after it has been placed on the floor. */
+  offset?: Pt;
 }
 
 /** Forward kinematics: joint angles and fixed bone lengths in, joint positions out. The lowest foot is placed on the ground. */
@@ -164,14 +173,16 @@ export function buildFigure(p: HumanPose, o: BuildOptions): Figure {
   // secondary motion: the weight shifts and the knees give a little on every beat; the shoulders turn against the hips
   const sway = Math.sin(Math.PI * (t / 2 + o.phase));
   const bounce = Math.abs(Math.cos(Math.PI * (t + o.phase))); // 1 on the beat, 0 half a beat later
-  const flex = (1 - bounce) * 9;
+  const e = o.energy ?? 1;
+  const flex = o.seated ? 0 : (1 - bounce) * 9 * e;
+  const ts = o.thighScale ?? 1;
   const thigh: [number, number] = [p.thigh[0] + (p.thigh[0] < 0 ? -flex : flex), p.thigh[1] + (p.thigh[1] < 0 ? -flex : flex)];
   const shin: [number, number] = [p.shin[0] + (p.thigh[0] < 0 ? flex * 0.6 : -flex * 0.6), p.shin[1] + (p.thigh[1] < 0 ? flex * 0.6 : -flex * 0.6)];
-  const lean = p.lean + sway * 3;
-  const shoulderTilt = p.shoulderTilt - sway * 3.5;
-  const hipTilt = p.hipTilt + sway * 3;
+  const lean = p.lean + sway * 3 * e;
+  const shoulderTilt = p.shoulderTilt - sway * 3.5 * e;
+  const hipTilt = p.hipTilt + sway * 3 * e;
 
-  const pelvis: Pt = [sway * 4.5, 0];
+  const pelvis: Pt = [sway * 4.5 * e, 0];
   const up: Pt = [Math.sin(rad(lean)), -Math.cos(rad(lean))];
   const spineTop: Pt = [pelvis[0] + up[0] * BONES.spine, pelvis[1] + up[1] * BONES.spine];
   const sAng = rad(lean + shoulderTilt);
@@ -189,8 +200,8 @@ export function buildFigure(p: HumanPose, o: BuildOptions): Figure {
   const rw = fromDown(re, p.fore[1], BONES.fore);
   const lhand = fromDown(lw, p.fore[0], 7);
   const rhand = fromDown(rw, p.fore[1], 7);
-  const lk = fromDown(hl, thigh[0], BONES.thigh);
-  const rk = fromDown(hr, thigh[1], BONES.thigh);
+  const lk = fromDown(hl, thigh[0], BONES.thigh * ts);
+  const rk = fromDown(hr, thigh[1], BONES.thigh * ts);
   const la = fromDown(lk, shin[0], BONES.shin);
   const ra = fromDown(rk, shin[1], BONES.shin);
 
@@ -208,8 +219,11 @@ export function buildFigure(p: HumanPose, o: BuildOptions): Figure {
   const lowest = Math.max(la[1] + 6, ra[1] + 6, ltoe[1] + 2, rtoe[1] + 2);
   const hopLift = (o.hop ?? 0) * Math.abs(Math.sin(Math.PI * (t + o.phase)));
   const shift = GROUND - lowest - hopLift;
+  const dx = o.offset?.[0] ?? 0;
+  const dy = o.offset?.[1] ?? 0;
   all.forEach((pt) => {
-    pt[1] += shift;
+    pt[0] += dx;
+    pt[1] += shift + dy;
   });
 
   return {
@@ -231,3 +245,37 @@ export function figureAt(frames: HumanPose[], beat: number, phase: number, hop =
 }
 
 export const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+/**
+ * Turn the dance routine's move poses (the angles the cues describe) into the natural human figure used on the stage.
+ * `energy` is the song's liveliness: it scales the on-the-beat bounce, hip sway and arm swing for a party feel.
+ */
+export function stageFigure(pose: Pose, beat: number, opts: { seated: boolean; energy: number }): Figure {
+  const { seated, energy } = opts;
+  const bendDown = Math.max(0, pose.y) * 1.2; // the old "sink down" becomes a deeper knee bend
+  const thighOut = (t: number, lift: number) => t + 6 + 38 * lift + bendDown;
+  const shinOut = (t: number, lift: number) => t * 0.4 - 28 * lift - bendDown * 0.5;
+  const human: HumanPose = {
+    lean: pose.lean,
+    shoulderTilt: -pose.lean * 0.4,
+    hipTilt: pose.lean * 0.2,
+    twist: pose.twist,
+    headTilt: pose.head,
+    upper: [-pose.sL, pose.sR],
+    fore: [-(pose.sL + pose.eL), pose.sR + pose.eR],
+    thigh: seated ? [-(17 + (pose.tL - 5) * 0.4), 17 + (pose.tR - 5) * 0.4] : [-thighOut(pose.tL, pose.liftL), thighOut(pose.tR, pose.liftR)],
+    shin: seated ? [-(3 + (pose.tL - 5) * 0.3), 3 + (pose.tR - 5) * 0.3] : [-shinOut(pose.tL, pose.liftL), shinOut(pose.tR, pose.liftR)],
+    hair: 100,
+    hairLen: 40,
+  };
+  return buildFigure(human, {
+    beat,
+    phase: 0,
+    energy: seated ? energy * 0.5 : energy,
+    seated,
+    thighScale: seated ? 0.55 : 1,
+    offset: [pose.x * 0.9, Math.min(0, pose.y)],
+    // hair falls and swings against the way the body is moving
+    laggedHair: 100 + pose.lean * 2 - pose.x * 0.4 + 14 * Math.sin(beat * 2.4),
+  });
+}

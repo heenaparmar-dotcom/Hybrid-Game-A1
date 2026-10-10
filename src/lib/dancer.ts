@@ -90,6 +90,45 @@ const MOVE_POSES: Record<string, MoveFn> = {
       liftR: 0.3 * Math.max(0, p), liftL: 0.3 * Math.max(0, -p),
     };
   },
+  // ---- Zumba-inspired party moves: bigger, bouncier, driven by the beat ----
+  // salsa basic: weight shifts side to side, hips sway, hands swing at the waist
+  salsa: (b) => {
+    const c = ((b % 4) + 4) % 4;
+    return {
+      x: 14 * sin(b, 4), lean: -6 * sin(b, 4) + 2.5 * sin(b, 1), y: bounce(b, 3), head: 4 * sin(b, 4),
+      tR: 6 + 20 * pulse(c, 0, 1), liftR: 0.25 * pulse(c, 0, 1),
+      tL: 6 + 20 * pulse(c, 2, 3), liftL: 0.25 * pulse(c, 2, 3),
+      sL: 46 + 10 * Math.cos(TAU * b), eL: -72, sR: 46 - 10 * Math.cos(TAU * b), eR: -72,
+    };
+  },
+  // grapevine: a wide step out, the other foot crosses behind, then back the other way, arms swinging against the feet
+  grapevine: (b) => {
+    const c = ((b % 4) + 4) % 4;
+    return {
+      x: 26 * sin(b, 4), lean: -4 * sin(b, 4), y: bounce(b, 3), head: 5 * sin(b, 4),
+      tR: 6 + 26 * pulse(c, 0, 1) - 16 * pulse(c, 3, 4), tL: 6 - 16 * pulse(c, 1, 2) + 26 * pulse(c, 2, 3),
+      liftR: 0.3 * pulse(c, 0, 1), liftL: 0.3 * pulse(c, 2, 3),
+      sL: 42 + 24 * sin(b, 2), sR: 42 - 24 * sin(b, 2), eL: -30, eR: -30,
+    };
+  },
+  // merengue march: knees up on every beat, hips swaying, bent arms pumping
+  merengue: (b) => {
+    const p = ((b % 2) + 2) % 2;
+    const r = pulse(p, 0, 1);
+    const l = pulse(p, 1, 2);
+    return {
+      liftR: r * 0.9, liftL: l * 0.9, y: -3 * Math.max(r, l), x: 7 * sin(b, 2), lean: 3 * (r - l), head: 3 * (r - l),
+      sL: 38 + 26 * l, sR: 38 + 26 * r, eL: -95 + 20 * l, eR: -95 + 20 * r,
+    };
+  },
+  // party hop: a little bounce on every beat with the arms thrown up
+  jump: (b) => {
+    const p = Math.abs(Math.sin(Math.PI * b));
+    return {
+      y: -11 * p, sL: 24 + 140 * p, sR: 24 + 140 * p, eL: 14 - 24 * p, eR: 14 - 24 * p,
+      liftL: 0.55 * p, liftR: 0.55 * p, tL: 12, tR: 12, head: -3 * p,
+    };
+  },
   twist: (b) => ({
     twist: 0.65 + 0.35 * Math.abs(Math.cos((Math.PI * b) / 2)), x: 10 * sin(b, 4), lean: -4 * sin(b, 4), y: bounce(b, 2),
     sL: 40 + 25 * sin(b, 4), sR: 40 - 25 * sin(b, 4), eL: 35, eR: 35, head: 5 * sin(b, 4),

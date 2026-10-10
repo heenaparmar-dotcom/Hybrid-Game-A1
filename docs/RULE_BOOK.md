@@ -10,7 +10,7 @@ This is the same Rule Book that opens inside the game from **How to play**. A ne
 
 1. **Solve the song.** In Warm Up and Find the Beat, the words of a Hindi film-song title are scrambled into tiles. Drag them into order within 10 seconds. The game notices when you are right, so there is no button to press.
 2. **Unlock the dance.** When you crack the song (or time runs out and the answer is shown), you are invited to dance. Nothing plays until you say yes.
-3. **Move for 30 seconds.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated.
+3. **Move for 30 seconds.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated. Livelier songs get Zumba-style steps (salsa, grapevine, merengue, party hops).
 4. **Listen.** In Feel the Rhythm you hear a short clip and pick the line you heard.
 5. **Challenge a friend.** Write your own puzzle and send a link so a friend can take a movement break too.
 

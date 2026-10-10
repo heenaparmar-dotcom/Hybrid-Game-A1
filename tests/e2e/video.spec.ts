@@ -162,7 +162,7 @@ test('if the video cannot play (error), the game says so and dances to its own m
   await expect(page.getByTestId('video-fallback')).toBeVisible({ timeout: 10_000 });
   await expect(page.getByTestId('video-wrap')).toHaveCount(0);
   await expect.poll(() => audioCreated(page), { timeout: 5000 }).toBeGreaterThanOrEqual(1); // the game music took over
-  await expect(page.getByTestId('cue')).toHaveText('Step right', { timeout: 12_000 }); // and the dance carries on (Nacho Aaj starts with a step)
+  await expect(page.getByTestId('cue')).toHaveText('Step right, hips sway', { timeout: 12_000 }); // and the dance carries on (Nacho Aaj starts with a salsa step)
 });
 
 test('if the video never starts, the game does not hang: after a few seconds it falls back', async ({ page }) => {

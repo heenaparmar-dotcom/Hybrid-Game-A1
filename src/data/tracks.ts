@@ -13,6 +13,8 @@ export interface Track {
   style: string;
   blurb: string;
   bpm: number;
+  /** How lively the dancers are (1 = normal): scales their beat-driven bounce, sway and swing. */
+  energy: number;
   /** Move ids, in order. The whole sequence is danced `repeats` times. */
   moves: string[];
   repeats: number;
@@ -34,6 +36,7 @@ export const TRACKS: readonly Track[] = [
     style: 'Warm pop groove',
     blurb: 'Easy sways and big reaches. A gentle first dance.',
     bpm: 112,
+    energy: 0.85,
     moves: ['sway', 'reach', 'step'],
     repeats: 2,
   },
@@ -43,9 +46,10 @@ export const TRACKS: readonly Track[] = [
     title: 'Nacho Aaj',
     language: 'Hindi',
     style: 'Dhol-inspired groove',
-    blurb: 'Bhangra-style lifts and a hands-on-hips sway.',
+    blurb: 'Salsa steps, bhangra arm lifts, a grapevine and a bouncy finish.',
     bpm: 96,
-    moves: ['step', 'bhangra', 'hips', 'clap', 'reach'],
+    energy: 1.2,
+    moves: ['salsa', 'bhangra', 'grapevine', 'merengue', 'jump'],
     repeats: 1,
   },
   {
@@ -54,9 +58,10 @@ export const TRACKS: readonly Track[] = [
     title: 'Hook-Step Party',
     language: 'English',
     style: 'Latin-pop, Zumba-inspired',
-    blurb: 'Marching, turning and waving. The liveliest of the three.',
+    blurb: 'Merengue marching, turns, waves and party hops. The liveliest of the three.',
     bpm: 128,
-    moves: ['march', 'twist', 'wave', 'bhangra', 'reach', 'sway', 'step'],
+    energy: 1.35,
+    moves: ['merengue', 'twist', 'wave', 'jump', 'grapevine', 'salsa', 'reach'],
     repeats: 1,
   },
 ];
