@@ -252,10 +252,25 @@ export const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
  */
 export function stageFigure(pose: Pose, beat: number, opts: { seated: boolean; energy: number }): Figure {
   const { seated, energy } = opts;
+  const human = stageHumanPose(pose, seated);
+  return buildFigure(human, {
+    beat,
+    phase: 0,
+    energy: seated ? energy * 0.5 : energy,
+    seated,
+    thighScale: seated ? 0.55 : 1,
+    offset: [pose.x * 0.9, Math.min(0, pose.y)],
+    // hair falls and swings against the way the body is moving
+    laggedHair: 100 + pose.lean * 2 - pose.x * 0.4 + 14 * Math.sin(beat * 2.4),
+  });
+}
+
+/** The joint angles the stage dancer shows for a routine pose. The camera scoring compares the player's body with these. */
+export function stageHumanPose(pose: Pose, seated: boolean): HumanPose {
   const bendDown = Math.max(0, pose.y) * 1.2; // the old "sink down" becomes a deeper knee bend
   const thighOut = (t: number, lift: number) => t + 11 + 38 * lift + bendDown; // a wide Zumba stance
   const shinOut = (t: number, lift: number) => t * 0.4 - 28 * lift - bendDown * 0.5;
-  const human: HumanPose = {
+  return {
     lean: pose.lean,
     shoulderTilt: -pose.lean * 0.4,
     hipTilt: pose.lean * 0.2,
@@ -268,14 +283,4 @@ export function stageFigure(pose: Pose, beat: number, opts: { seated: boolean; e
     hair: 100,
     hairLen: 40,
   };
-  return buildFigure(human, {
-    beat,
-    phase: 0,
-    energy: seated ? energy * 0.5 : energy,
-    seated,
-    thighScale: seated ? 0.55 : 1,
-    offset: [pose.x * 0.9, Math.min(0, pose.y)],
-    // hair falls and swings against the way the body is moving
-    laggedHair: 100 + pose.lean * 2 - pose.x * 0.4 + 14 * Math.sin(beat * 2.4),
-  });
 }

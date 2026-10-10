@@ -107,7 +107,7 @@ export function RuleBook() {
           <li>Move gently. Stop if you feel pain or dizziness. You can always pause or skip.</li>
           <li><strong>Seated version:</strong> choose it before the dance. The dancer sits on a chair and the cues use the upper body.</li>
           <li>Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation. In the listening level you can show the words if you cannot listen.</li>
-          <li>The game needs no camera, microphone or location, and it does not watch you move. You decide how it went.</li>
+          <li>The game never needs a microphone or your location. The camera is optional and used only in Find the Beat if you switch it on: it traces your arms and legs on your own device to give you points, nothing is recorded, saved or sent anywhere, and it turns off when the dance ends. Without it, the game does not watch you move and you decide how it went.</li>
         </ul>
         <p><strong>Wellness note:</strong> this is a game that encourages enjoyable movement, music and time with friends. It is not a medical treatment.</p>
       </section>

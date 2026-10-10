@@ -33,53 +33,42 @@ test('Warm Up: all 8 Hindi songs appear as challenges with their hint, shuffled 
   ]);
 });
 
-test('Find the Beat: the 5 specified puzzles show the exact fragments and hints; repeated words are separate tiles', async ({ page }) => {
-  test.setTimeout(240_000);
+test('Find the Beat: all 11 Hook-Step songs show their title words shuffled with the hint; repeated words are separate tiles', async ({ page }) => {
+  test.setTimeout(300_000);
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = { 2: (await currentPuzzle(page)).id }; // already shown by the title screen
-  const spec = [
-    { fragments: ['PEHLA', 'NASHA'], hint: '1992 · Jo Jeeta Wohi Sikandar' },
-    { fragments: ['DO', 'DIL', 'MIL', 'RAHE', 'HAIN'], hint: '1998 · Pardes' },
-    { fragments: ['TUJHE', 'DEKHA', 'TOH', 'YE', 'JAANA', 'SANAM'], hint: '1995 · Dilwale Dulhania Le Jayenge' },
-    { fragments: ['KUCH', 'KUCH', 'HOTA', 'HAI'], hint: '1998 · Kuch Kuch Hota Hai' },
-    { fragments: ['PARDESI', 'PARDESI', 'JAANA', 'NAHI'], hint: '1996 · Raja Hindustani' },
-  ];
-  expect(songs(2)).toHaveLength(5);
-  const items = songs(2).map((s, i) => ({ song: s, spec: spec[i] }));
-  items.sort((a, b) => Number(a.song.id === last[2]) - Number(b.song.id === last[2]));
-  for (const { song, spec: itemSpec } of items) {
+  expect(songs(2)).toHaveLength(11);
+  const items = [...songs(2)].sort((a, b) => Number(a.id === last[2]) - Number(b.id === last[2]));
+  const seen: string[] = [];
+  for (const song of items) {
     const shown = await enterPinned(page, 2, name(2), song, last);
     const tiles = (await tileTexts(page)).map((t) => t.trim());
-    expect([...tiles].sort()).toEqual([...itemSpec.fragments].sort()); // exactly the supplied fragments (TOH, capitals, repeats)
-    expect(tiles.join(' ')).not.toBe(itemSpec.fragments.join(' '));
-    await expect(page.getByTestId('puzzle-hint')).toContainText(itemSpec.hint);
+    expect(tiles.map(norm).sort()).toEqual(shown.phrase.split(' ').map(norm).sort());
+    expect(tiles.join(' ')).not.toBe(shown.phrase); // shuffled, never handed over solved
+    await expect(page.getByTestId('puzzle-hint')).toContainText(song.song!.hint); // Find the Beat keeps its hint on screen
 
-    const repeated = itemSpec.fragments.find((f, k) => itemSpec.fragments.indexOf(f) !== k);
-    if (repeated) {
-      // two separate, draggable tiles for the same word
-      expect(tiles.filter((t) => t === repeated)).toHaveLength(2);
-      // the right words in the wrong places must not count as solved (the check is by position, not by set)
-      const wrong = [itemSpec.fragments[0], itemSpec.fragments[2], itemSpec.fragments[1], itemSpec.fragments[3]];
-      await solveByTaps(page, wrong.join(' '));
+    if (song.id === 'l2-s03') {
+      // "Tauba Tauba Bad Newz": two separate tiles for Tauba; the right words in the wrong places are not accepted
+      expect(tiles.filter((t) => norm(t) === 'tauba')).toHaveLength(2);
+      await solveByTaps(page, 'Tauba Bad Tauba Newz');
       await expect(page.getByTestId('song-unlocked')).toHaveCount(0);
-      await expect(page.getByTestId('puzzle-hint')).toContainText(itemSpec.hint); // hint still showing
     }
     await solveByTaps(page, shown.phrase);
     await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
-    // the answer key: tiles now read in the specified sequence
-    expect((await tileTexts(page)).map((t) => t.trim())).toEqual(itemSpec.fragments);
     await expect(page.getByTestId('song-title')).toContainText(shown.song!.title);
+    seen.push(shown.song!.title);
   }
+  expect(seen.sort()).toEqual(songs(2).map((p) => p.song!.title).sort());
 });
 
 test('after a film-song puzzle the invitation says which music the dance really uses', async ({ page }) => {
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = { 2: (await currentPuzzle(page)).id }; // already shown by the title screen
-  const target = songs(2)[0]; // Pehla Nasha
+  const target = songs(2)[0]; // Aankh Marey
   const shown = await enterPinned(page, 2, name(2), target, last);
   await solveByTaps(page, shown.phrase);
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
-  await expect(page.getByTestId('song-note')).toContainText('Pehla Nasha');
+  await expect(page.getByTestId('song-note')).toContainText('Aankh Marey');
   await expect(page.getByTestId('song-note')).toContainText('original track');
   const p = await currentPuzzle(page).catch(() => null);
   expect(p).toBeNull(); // we are on the invitation now, not the puzzle

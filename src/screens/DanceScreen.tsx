@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AudioControls, AudioNotice, useMusicStatus } from '../components/AudioControls';
 import { Icon } from '../components/Icon';
+import { CameraCoach } from '../components/CameraCoach';
 import { Stage } from '../components/Stage';
 import { COUNT_IN_BEATS, DANCE_TOTAL_SECONDS, routineBeats, type Track } from '../data/tracks';
 import { music } from '../lib/audio';
 import { stageFigure } from '../lib/human';
+import { ScoreKeeper, type CameraResult } from '../lib/poseScore';
 import { poseAtBeat, stateAt } from '../lib/routine';
 import { createVideoPlayer, YT_STATE, type YtPlayer } from '../lib/youtube';
 
@@ -18,7 +20,8 @@ interface Props {
   muted: boolean;
   onVolume: (v: number) => void;
   onMuted: (m: boolean) => void;
-  onFinish: () => void;
+  /** Called when the dance ends. With the camera on, it carries the player's points. */
+  onFinish: (score?: CameraResult) => void;
   onSkip: () => void;
   onRestart: () => void;
   /** An official YouTube video of the song to dance to. If it cannot play, the game's own music is used instead. */
@@ -29,13 +32,15 @@ interface Props {
   songTitle?: string;
   /** Two players dance side by side on the stage. */
   players?: 1 | 2;
+  /** The player chose to have the camera trace their moves and give points. */
+  camera?: boolean;
 }
 
 /**
  * The hook-step challenge. The routine is driven by the music clock (or by a silent clock if sound is unavailable),
  * so the cues and the dancer stay on the beat. Nothing watches the player: they simply dance along.
  */
-export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, audioFile, songTitle, players = 1 }: Props) {
+export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, audioFile, songTitle, players = 1, camera = false }: Props) {
   const [mode, setMode] = useState<'pending' | 'audio' | 'silent' | 'video' | 'file'>('pending');
   // the video player is only created when there is no usable audio file
   const [useVideo, setUseVideo] = useState(!audioFile);
@@ -58,6 +63,11 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
     finishRef.current = onFinish;
   });
   const total = routineBeats(track);
+  const beatRef = useRef(-COUNT_IN_BEATS);
+  const keeper = useMemo(() => new ScoreKeeper(track, seated), [track, seated]);
+  const cameraRef = useRef(camera);
+  /** True once the camera really started: without it there are no points to show. */
+  const cameraWorked = useRef(false);
 
   // A recording of the song: play it as audio only. If it cannot load or start, fall back to the video, then the game's music.
   useEffect(() => {
@@ -244,6 +254,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         seconds = s.elapsed / 1000;
       }
       const b = (seconds * track.bpm) / 60 - COUNT_IN_BEATS;
+      beatRef.current = b;
       setBeat(b);
       if (b >= total) {
         setDone(true);
@@ -255,7 +266,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         }
         fileRef.current?.pause();
         music.fadeOut(1);
-        window.setTimeout(() => finishRef.current(), 900);
+        window.setTimeout(() => finishRef.current(cameraRef.current && cameraWorked.current ? keeper.result() : undefined), 900);
         return;
       }
       raf = requestAnimationFrame(tick);
@@ -268,7 +279,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         s.last = null;
       }
     };
-  }, [mode, paused, done, track.bpm, total, video?.start, audioFile?.start]);
+  }, [mode, paused, done, track.bpm, total, video?.start, audioFile?.start, keeper]);
 
   const st = useMemo(() => stateAt(track, beat, seated), [track, beat, seated]);
   const fig = useMemo(() => stageFigure(poseAtBeat(track, beat, seated), beat, { seated, energy: track.energy }), [track, beat, seated]);
@@ -340,6 +351,9 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
           <div ref={containerRef} className="video-box" />
           <p className="fine center-text">Playing "{songTitle ?? 'the song'}" ({video.credit}) through YouTube. The song belongs to its owners.</p>
         </div>
+      )}
+      {camera && (
+        <CameraCoach track={track} keeper={keeper} getBeat={() => beatRef.current} running={!paused && !done && mode !== 'pending'} onStatus={(st) => { if (st === 'on') cameraWorked.current = true; }} />
       )}
       {audioFile && mode === 'file' && (
         <p className="fine center-text" data-testid="audio-credit">Playing "{songTitle ?? 'the song'}"{audioFile.credit !== songTitle ? ` (${audioFile.credit})` : ''}. The song belongs to its owners.</p>

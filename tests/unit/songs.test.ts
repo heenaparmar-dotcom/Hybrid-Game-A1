@@ -41,28 +41,24 @@ describe('Level 1 (Warm Up): the 8 Hindi songs', () => {
   });
 });
 
-describe('Level 2 (Find the Beat): the 5 specified puzzles', () => {
-  const spec: { title: string; hint: string; fragments: string[] }[] = [
-    { title: 'Pehla Nasha', hint: '1992 · Jo Jeeta Wohi Sikandar', fragments: ['PEHLA', 'NASHA'] },
-    { title: 'Do Dil Mil Rahe Hain', hint: '1998 · Pardes', fragments: ['DO', 'DIL', 'MIL', 'RAHE', 'HAIN'] },
-    { title: 'Tujhe Dekha To Ye Jaana Sanam', hint: '1995 · Dilwale Dulhania Le Jayenge', fragments: ['TUJHE', 'DEKHA', 'TOH', 'YE', 'JAANA', 'SANAM'] },
-    { title: 'Kuch Kuch Hota Hai', hint: '1998 · Kuch Kuch Hota Hai', fragments: ['KUCH', 'KUCH', 'HOTA', 'HAI'] },
-    { title: 'Pardesi Pardesi Jaana Nahi', hint: '1996 · Raja Hindustani', fragments: ['PARDESI', 'PARDESI', 'JAANA', 'NAHI'] },
+describe('Level 2 (Find the Beat): the 11 Hook-Step songs', () => {
+  const titles = [
+    'Aankh Marey', 'Dola Re Dola', 'Tauba Tauba', 'Jhoome Jo Pathaan', 'Kaho Na Pyaar Hai', 'Caller Tune',
+    'Kajra Re', 'Jai Jai Shivshankar', 'Om Shanti Om', 'Desi Girl', 'Dhana Dhin Dha',
   ];
-  it('has all five, with the exact title, hint and fragment sequence supplied', () => {
-    expect(songs(2)).toHaveLength(5);
-    spec.forEach((s, i) => {
-      const p = songs(2)[i];
-      expect(p.song).toEqual({ title: s.title, hint: s.hint });
-      expect(tokenise(p.phrase).map((t) => t.text)).toEqual(s.fragments); // the answer key sequence, TOH included
-    });
+  it('has all eleven songs, in order, each with a hint', () => {
+    expect(songs(2).map((p) => p.song!.title)).toEqual(titles);
+    for (const p of songs(2)) expect(p.song!.hint.length, p.id).toBeGreaterThan(5);
   });
-  it('keeps the original Level 2 puzzles too: 20 originals + 5 songs', () => {
+  it('every song is danced to the Hook-Step routine', () => {
+    for (const p of songs(2)) expect(p.trackId, p.id).toBe('hookstep');
+  });
+  it('keeps the original Level 2 puzzles too: 20 originals + 11 songs', () => {
     expect(puzzlesForLevel(2).filter((p) => !p.song)).toHaveLength(20);
-    expect(puzzlesForLevel(2)).toHaveLength(25);
+    expect(puzzlesForLevel(2)).toHaveLength(31);
   });
   it('repeated words stay separate tiles and the order check compares positions, not a set', () => {
-    for (const title of ['KUCH KUCH HOTA HAI', 'PARDESI PARDESI JAANA NAHI']) {
+    for (const title of ['Tauba Tauba Bad Newz']) {
       const solution = tokenise(title);
       const dup = solution[0].norm;
       expect(solution.filter((t) => t.norm === dup)).toHaveLength(2); // two separate tiles
@@ -102,9 +98,9 @@ describe('Level 2 (Find the Beat): the 5 specified puzzles', () => {
 });
 
 describe('Warm Up and Find the Beat are played with the Hindi film-song puzzles only', () => {
-  it('Warm Up draws from exactly the 8 songs and Find the Beat from exactly the 5 specified puzzles', () => {
+  it('Warm Up draws from exactly the 8 songs and Find the Beat from exactly the 11 songs', () => {
     expect(playablePuzzles(1)).toHaveLength(8);
-    expect(playablePuzzles(2)).toHaveLength(5);
+    expect(playablePuzzles(2)).toHaveLength(11);
     for (const p of [...playablePuzzles(1), ...playablePuzzles(2)]) expect(p.song, p.id).toBeDefined();
   });
   it('every random pick for levels 1 and 2 is a song, and the original lines are never picked there', () => {
@@ -135,8 +131,8 @@ describe('selection includes the songs and never repeats the last puzzle', () =>
       for (const p of songs(level)) expect(seen.has(p.id), p.id).toBe(true);
     }
   });
-  it('the whole pool is 28 + 25 + 20 = 73 puzzle entries; level 3 keeps its 20 word-order puzzles in data', () => {
-    expect(PUZZLES).toHaveLength(73);
+  it('the whole pool is 28 + 31 + 20 = 79 puzzle entries; level 3 keeps its 20 word-order puzzles in data', () => {
+    expect(PUZZLES).toHaveLength(79);
     expect(puzzlesForLevel(3)).toHaveLength(20);
   });
 });

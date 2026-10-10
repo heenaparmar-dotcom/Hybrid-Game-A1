@@ -12,10 +12,12 @@ interface Props {
   onSeated: (v: boolean) => void;
   onAccept: () => void;
   onSkip: () => void;
+  /** Offered in Find the Beat for one player: let the camera trace the moves and give points. */
+  camera?: { on: boolean; onChange: (on: boolean) => void };
 }
 
 /** The dance invitation. Music starts only when the player presses the big button. */
-export function InviteScreen({ track, phrase, songNote, timedOut, seated, onSeated, onAccept, onSkip }: Props) {
+export function InviteScreen({ track, phrase, songNote, timedOut, seated, onSeated, onAccept, onSkip, camera }: Props) {
   return (
     <section className="screen invite" aria-labelledby="invite-title">
       <p className="kicker">{timedOut ? 'Time ran out' : 'Song unlocked'}</p>
@@ -37,6 +39,19 @@ export function InviteScreen({ track, phrase, songNote, timedOut, seated, onSeat
         <span className="switch-track" aria-hidden="true" />
         <span className="switch-label"><Icon name="seat" size={18} /> Seated, low-impact version</span>
       </label>
+
+      {camera && (
+        <div className="camera-offer">
+          <label className="switch">
+            <input type="checkbox" checked={camera.on} onChange={(e) => camera.onChange(e.target.checked)} data-testid="camera-toggle" />
+            <span className="switch-track" aria-hidden="true" />
+            <span className="switch-label"><Icon name="check" size={18} /> Score my moves with the camera (optional)</span>
+          </label>
+          <p className="fine" data-testid="camera-privacy">
+            The camera traces your arms and legs on this device and gives you points for copying the dancer. Nothing is recorded, saved or sent anywhere, and the camera turns off when the dance ends. Stand back so your whole body is in view. You can dance without it.
+          </p>
+        </div>
+      )}
 
       <button type="button" className="link-btn" onClick={onSkip} data-testid="skip-dance">Not now, skip the dance</button>
     </section>

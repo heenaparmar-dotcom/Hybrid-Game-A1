@@ -10,7 +10,7 @@ This is the same Rule Book that opens inside the game from **How to play**. A ne
 
 1. **Solve the song.** In Warm Up and Find the Beat, the words of a Hindi film-song title are scrambled into tiles. Drag them into order within 10 seconds. The game notices when you are right, so there is no button to press.
 2. **Unlock the dance.** When you crack the song (or time runs out and the answer is shown), you are invited to dance. Nothing plays until you say yes.
-3. **Move for 30 seconds.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated. Livelier songs get Zumba-style steps (salsa, grapevine, merengue, party hops).
+3. **Move for 30 seconds.** A shadow dancer shows a short routine. Copy it like a mirror, standing or seated. In Find the Beat you can switch on the camera to get points for how closely you copy the dancer. Livelier songs get Zumba-style steps (salsa, grapevine, merengue, party hops).
 4. **Listen.** In Feel the Rhythm you hear a short instrumental clip and pick which song it was.
 5. **Challenge a friend.** Write your own puzzle and send a link so a friend can take a movement break too.
 
@@ -85,7 +85,7 @@ The game never sends anything for you. You choose who gets it and press send. A 
 - Move gently. Stop if you feel pain or dizziness. You can always pause or skip.
 - **Seated version:** choose it before the dance. The dancer sits on a chair and the cues use the upper body.
 - Puzzles work with mouse, touch and keyboard. The dance is shown with words as well as the animation. In the listening level you can show a clue (such as the instrument) if you cannot listen.
-- The game needs no camera, microphone or location, and it does not watch you move. You decide how it went.
+- The game never needs a microphone or your location. The camera is optional and used only in Find the Beat if you switch it on: it traces your arms and legs on your own device to give you points, nothing is recorded, saved or sent anywhere, and it turns off when the dance ends. Without it, the game does not watch you move and you decide how it went.
 
 > **Wellness note:** this is a game that encourages enjoyable movement, music and time with friends. It is not a medical treatment.
 

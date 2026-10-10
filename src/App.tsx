@@ -10,6 +10,7 @@ import { pickPuzzle, playablePuzzles, type Puzzle } from './data/puzzles';
 import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
 import { CHALLENGE_PARAM, parseChallengeInput, type ChallengeData } from './lib/challenge';
+import type { CameraResult } from './lib/poseScore';
 import { loadStore, saveStore, type Store } from './lib/storage';
 import { puzzleSeconds } from './lib/timing';
 import { prefersReducedMotion } from './lib/useBeat';
@@ -35,7 +36,7 @@ interface TwoPlayer {
 }
 type View =
   | { name: 'title' }
-  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean; timedOut?: boolean; two?: TwoPlayer }
+  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean; timedOut?: boolean; two?: TwoPlayer; score?: CameraResult }
   | { name: 'create' }
   | { name: 'challenge' };
 
@@ -90,6 +91,8 @@ export default function App() {
   const [view, setView] = useState<View>(() => (readIncoming().kind === 'none' ? { name: 'title' } : { name: 'challenge' }));
   const [rulesOpen, setRulesOpen] = useState(false);
   const [splash, setSplash] = useState<string | null>(null);
+  /** Camera points are opt-in each time and never remembered. */
+  const [cameraOn, setCameraOn] = useState(false);
   const keyCounter = useRef(0);
   /** The puzzle last shown for each level, so entering a level again gives a different one. */
   const lastPuzzle = useRef<Record<number, string>>({});
@@ -165,7 +168,7 @@ export default function App() {
     setView({ name: 'play', run: { kind: 'challenge', data, tryout }, stage: 'puzzle', key: newKey(), skipped: false });
   };
 
-  const toStage = (stage: Stage, skipped = false, timedOut = false) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped, timedOut } : v));
+  const toStage = (stage: Stage, skipped = false, timedOut = false, score?: CameraResult) => setView((v) => (v.name === 'play' ? { ...v, stage, skipped, timedOut, score } : v));
 
   /** Called from a click, so the audio context is allowed to start. */
   const startDance = (track: Track, video?: Puzzle['video'], audio?: Puzzle['audio']) => {
@@ -212,13 +215,13 @@ export default function App() {
     setView({ ...view, run: { ...view.run, puzzle }, stage: 'puzzle', key: newKey(), two: { turn: 2, first: view.two.first } });
   };
 
-  const finishRun = (skipped: boolean) => {
+  const finishRun = (skipped: boolean, score?: CameraResult) => {
     if (view.name !== 'play') return;
     if (view.run.kind === 'level') {
       const n = view.run.level;
       setStore((s) => ({ ...s, completed: Math.max(s.completed, n) }));
     }
-    toStage('celebrate', skipped);
+    toStage('celebrate', skipped, false, score);
   };
 
   const body = () => {
@@ -298,6 +301,7 @@ export default function App() {
             }
             seated={store.seated}
             onSeated={(seated) => setStore((s) => ({ ...s, seated }))}
+            camera={levelNo === 2 && !two ? { on: cameraOn, onChange: setCameraOn } : undefined}
             onAccept={() => startDance(info.track, info.video, info.audio)}
             onSkip={() => finishRun(true)}
           />
@@ -308,6 +312,7 @@ export default function App() {
             track={info.track}
             kicker={kicker}
             players={two ? 2 : 1}
+            camera={cameraOn && levelNo === 2 && !two}
             seated={store.seated}
             externalPause={rulesOpen}
             volume={store.volume}
@@ -317,7 +322,7 @@ export default function App() {
             video={info.video}
             audioFile={info.audio}
             songTitle={info.song?.title}
-            onFinish={() => finishRun(false)}
+            onFinish={(score) => finishRun(false, score)}
             onSkip={() => { music.stop(); finishRun(true); }}
             onRestart={() => startDance(info.track, info.video, info.audio)}
           />
@@ -328,6 +333,7 @@ export default function App() {
             level={levelNo !== null ? { n: levelNo, name: levelByNumber(levelNo).name, total: LEVEL_COUNT } : undefined}
             from={info.from}
             skipped={view.skipped}
+            score={view.score}
             hasNext={hasNext}
             onNext={() => startLevel((levelNo ?? 0) + 1)}
             onAgain={() => startDance(info.track, info.video, info.audio)}

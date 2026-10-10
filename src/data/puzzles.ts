@@ -90,12 +90,19 @@ const BASE_PUZZLES: readonly Puzzle[] = [
   { id: 'l2-19', level: 2, phrase: 'Tez dhun par khoob nacho', meaning: 'Dance a lot to the fast tune' },
   { id: 'l2-20', level: 2, phrase: 'Geet gungunao aur saath jhoomo', meaning: 'Hum a song and sway along' },
 
-  // Level 2: Hindi film songs. The words to arrange are the song title, exactly as supplied (capitals, TOH and repeated words kept).
-  { id: 'l2-s01', level: 2, phrase: 'PEHLA NASHA', song: { title: 'Pehla Nasha', hint: '1992 · Jo Jeeta Wohi Sikandar' } },
-  { id: 'l2-s02', level: 2, phrase: 'DO DIL MIL RAHE HAIN', song: { title: 'Do Dil Mil Rahe Hain', hint: '1998 · Pardes' } },
-  { id: 'l2-s03', level: 2, phrase: 'TUJHE DEKHA TOH YE JAANA SANAM', song: { title: 'Tujhe Dekha To Ye Jaana Sanam', hint: '1995 · Dilwale Dulhania Le Jayenge' } },
-  { id: 'l2-s04', level: 2, phrase: 'KUCH KUCH HOTA HAI', song: { title: 'Kuch Kuch Hota Hai', hint: '1998 · Kuch Kuch Hota Hai' } },
-  { id: 'l2-s05', level: 2, phrase: 'PARDESI PARDESI JAANA NAHI', song: { title: 'Pardesi Pardesi Jaana Nahi', hint: '1996 · Raja Hindustani' } },
+  // Level 2: Hindi film songs. The words to arrange are the song title, the 11 songs you chose, all danced to the Hook-Step routine.
+  { id: 'l2-s01', level: 2, trackId: 'hookstep', phrase: 'Aankh Marey', song: { title: 'Aankh Marey', hint: '2018 · Simmba' } },
+  { id: 'l2-s02', level: 2, trackId: 'hookstep', phrase: 'Dola Re Dola', song: { title: 'Dola Re Dola', hint: '2002 · Devdas' } },
+  // Two identical words cannot be shuffled, so this one adds the film name to the fragments.
+  { id: 'l2-s03', level: 2, trackId: 'hookstep', phrase: 'Tauba Tauba Bad Newz', song: { title: 'Tauba Tauba', hint: '2024 · Bad Newz' } },
+  { id: 'l2-s04', level: 2, trackId: 'hookstep', phrase: 'Jhoome Jo Pathaan', song: { title: 'Jhoome Jo Pathaan', hint: '2023 · Pathaan' } },
+  { id: 'l2-s05', level: 2, trackId: 'hookstep', phrase: 'Kaho Na Pyaar Hai', song: { title: 'Kaho Na Pyaar Hai', hint: '2000 · Kaho Naa… Pyaar Hai' } },
+  { id: 'l2-s06', level: 2, trackId: 'hookstep', phrase: 'Caller Tune', song: { title: 'Caller Tune', hint: 'A two-word title' } },
+  { id: 'l2-s07', level: 2, trackId: 'hookstep', phrase: 'Kajra Re', song: { title: 'Kajra Re', hint: '2005 · Bunty Aur Babli' } },
+  { id: 'l2-s08', level: 2, trackId: 'hookstep', phrase: 'Jai Jai Shivshankar', song: { title: 'Jai Jai Shivshankar', hint: '2019 · War' } },
+  { id: 'l2-s09', level: 2, trackId: 'hookstep', phrase: 'Om Shanti Om', song: { title: 'Om Shanti Om', hint: '2007 · Om Shanti Om' } },
+  { id: 'l2-s10', level: 2, trackId: 'hookstep', phrase: 'Desi Girl', song: { title: 'Desi Girl', hint: '2008 · Dostana' } },
+  { id: 'l2-s11', level: 2, trackId: 'hookstep', phrase: 'Dhana Dhin Dha', song: { title: 'Dhana Dhin Dha', hint: 'A three-word title' } },
 
   // Level 3: six English words
   { id: 'l3-01', level: 3, phrase: 'Let the rhythm carry us forward' },

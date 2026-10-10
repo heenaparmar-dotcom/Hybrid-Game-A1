@@ -25,7 +25,8 @@ test('entering a level again gives a different puzzle each time, with a fresh sh
       await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
     }
     expect(new Set(seen.map((p) => p.id)).size, `level ${level} variety`).toBeGreaterThanOrEqual(3);
-    expect(orders.size).toBeGreaterThanOrEqual(5);
+    // Warm Up lines have many words; Find the Beat titles are short (two words have only one other order), so fewer different orders are possible
+    expect(orders.size).toBeGreaterThanOrEqual(level === 1 ? 5 : 3);
   }
 });
 
@@ -38,7 +39,7 @@ test('"Shuffle again" keeps the same puzzle but re-mixes the tiles', async ({ pa
   expect((await tileTexts(page)).join(' ')).not.toBe(p.phrase);
 });
 
-test('every puzzle played in Levels 1 and 2 (all 13 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
+test('every puzzle played in Levels 1 and 2 (all 19 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
   test.setTimeout(600_000);
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = {};
@@ -59,7 +60,7 @@ test('every puzzle played in Levels 1 and 2 (all 13 Hindi film-song puzzles) can
     }
   }
   expect(solved.size).toBe(playablePuzzles(1).length + playablePuzzles(2).length);
-  expect(solved.size).toBe(13);
+  expect(solved.size).toBe(19);
 });
 
 test('a solved level 2 puzzle still leads to the dance invitation, and the next level is the listening level', async ({ page }) => {
@@ -68,7 +69,7 @@ test('a solved level 2 puzzle still leads to the dance invitation, and the next 
   await solveByTaps(page, p.phrase);
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
   await expect(page.getByRole('heading', { name: 'You cracked the song!' })).toBeVisible();
-  await expect(page.getByText('Nacho Aaj', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('Hook-Step Party', { exact: false }).first()).toBeVisible();
   await page.getByTestId('skip-dance').click();
   await page.getByTestId('next-level').click();
   await expect(page.getByTestId('listen-screen')).toBeVisible();
