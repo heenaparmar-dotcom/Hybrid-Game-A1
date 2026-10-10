@@ -6,4 +6,5 @@
 export const SONG_AUDIO: Record<string, string> = {
   'l1-s01': 'badtameez-dil.mp3', // Badtameez Dil
   'l1-s02': 'kala-chashma.mp3', // Kala Chashma
+  'l1-s03': 'gallan-goodiyaan.mp3', // Gallan Goodiyaan
 };
