@@ -7,4 +7,9 @@ export const SONG_AUDIO: Record<string, string> = {
   'l1-s01': 'badtameez-dil.mp3', // Badtameez Dil
   'l1-s02': 'kala-chashma.mp3', // Kala Chashma
   'l1-s03': 'gallan-goodiyaan.mp3', // Gallan Goodiyaan
+  'l1-s04': 'sapphire.mp3', // Sapphire
+  'l1-s05': 'jhoome-jo-pathaan.mp3', // Jhoome Jo Pathaan
+  'l1-s06': 'swag-se-swagat.mp3', // Swag Se Swagat
+  'l1-s07': 'jamaican-bam-bam.mp3', // Jamaican (Bam Bam)
+  'l1-s08': 'lets-nacho.mp3', // Let's Nacho
 };

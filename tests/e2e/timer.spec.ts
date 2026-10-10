@@ -1,30 +1,33 @@
 import { expect, test, type Page } from '@playwright/test';
+import { LYRIC_LINES } from '../../src/data/lyricLines';
 import { PUZZLES } from '../../src/data/puzzles';
-import { PIN_FOUR_TILES, audioCreated, installRandomControl, setRandom, solveByTaps, tileTexts, trackAudio } from './helpers';
+import { PIN_SUNRISE_SONG, audioCreated, installRandomControl, setRandom, solveByTaps, tileTexts, trackAudio } from './helpers';
 import { openWithProgress } from './support';
 
 // These tests use the REAL 10-second timer (no override), so they take real time.
 test.use({ trace: 'off' });
 
-const pinned = PUZZLES.find((p) => p.id === 'l1-s07')!; // "Dil Se Chaiyya Chaiyya"
+const pinned = PUZZLES.find((p) => p.id === 'l1-s03')!; // "Gallan Goodiyaan"
+// a long lyric line gets three times as long as a short title
+const SECONDS = LYRIC_LINES[pinned.id] ? 30 : 10;
 const num = async (page: Page) => Number(await page.getByTestId('puzzle-timer-num').innerText());
 
-/** Open Warm Up with the real timer, on the pinned four-tile song, and wait until the level splash has gone. */
+/** Open Warm Up with the real timer, on the pinned song, and wait until the level splash has gone. */
 async function startWarmUp(page: Page) {
   await installRandomControl(page, { realTimer: true });
   await page.goto('./');
-  await setRandom(page, PIN_FOUR_TILES);
+  await setRandom(page, PIN_SUNRISE_SONG);
   await page.getByTestId('title-stage').click();
   await page.getByTestId('tile-0').waitFor();
   await setRandom(page, null);
 }
 
-test('Warm Up shows a 10-second countdown: it waits for the splash, then counts down second by second', async ({ page }) => {
+test('Warm Up shows a countdown: it waits for the splash, then counts down second by second', async ({ page }) => {
   await startWarmUp(page);
   await expect(page.getByTestId('puzzle-timer')).toBeVisible();
   // frozen at 10 while the level splash covers the puzzle
   await expect(page.getByTestId('splash')).toBeVisible();
-  expect(await num(page)).toBe(10);
+  expect(await num(page)).toBe(SECONDS);
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
 
   const seen: number[] = [];
@@ -34,7 +37,7 @@ test('Warm Up shows a 10-second countdown: it waits for the splash, then counts 
     if (seen[seen.length - 1] !== n) seen.push(n);
     await page.waitForTimeout(120);
   }
-  expect(seen[0]).toBeGreaterThanOrEqual(9);
+  expect(seen[0]).toBeGreaterThanOrEqual(SECONDS - 1);
   expect(seen.length).toBeGreaterThanOrEqual(4); // it really counted down
   for (let i = 1; i < seen.length; i++) expect(seen[i - 1] - seen[i], `jumped from ${seen[i - 1]} to ${seen[i]}`).toBe(1); // exactly one per second
 });
@@ -47,21 +50,21 @@ test('the Hint button reveals the film and year without stopping the timer, and 
   await page.getByTestId('puzzle-hint-button').click();
   await expect(page.getByTestId('puzzle-hint')).toContainText(pinned.song!.hint);
   const hint = await page.getByTestId('puzzle-hint').innerText();
-  expect(hint.toLowerCase()).not.toContain('dil se chaiyya'); // the hint is a clue, not the answer
+  expect(hint.toLowerCase()).not.toContain(pinned.song!.title.toLowerCase()); // the hint is a clue, not the answer
   await page.waitForTimeout(1300);
   expect(await num(page)).toBeLessThan(before); // the timer kept running while the hint was open
   await expect(page.getByTestId('puzzle-timeout')).toHaveCount(0);
 });
 
 test('timeout: the correct order is revealed, a clear message appears, and the dance is offered (not started)', async ({ page }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   await trackAudio(page);
   await startWarmUp(page);
-  await expect(page.getByTestId('puzzle-timeout')).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId('puzzle-timeout')).toBeVisible({ timeout: (SECONDS + 10) * 1000 });
   await expect(page.getByTestId('puzzle-timeout')).toContainText("Time's up!");
   await expect(page.getByTestId('puzzle-timeout')).toContainText("Here's the correct order.");
   expect((await tileTexts(page)).map((t) => t.trim())).toEqual(pinned.phrase.split(' ')); // the answer, in order
-  await expect(page.getByTestId('song-title')).toContainText('Chaiyya Chaiyya');
+  await expect(page.getByTestId('song-title')).toContainText(pinned.song!.title);
   await expect(page.getByRole('button', { name: /submit|check|verify/i })).toHaveCount(0);
   expect(await num(page)).toBe(0);
 
@@ -102,9 +105,9 @@ test('a correct answer stops the timer at once; there is exactly one transition 
 test('Shuffle again restarts the puzzle and the timer', async ({ page }) => {
   await startWarmUp(page);
   await expect(page.getByTestId('splash')).toHaveCount(0, { timeout: 5000 });
-  await expect.poll(() => num(page), { timeout: 8000 }).toBeLessThanOrEqual(7);
+  await expect.poll(() => num(page), { timeout: 8000 }).toBeLessThanOrEqual(SECONDS - 3);
   await page.getByTestId('shuffle-again').click();
-  await expect.poll(() => num(page), { timeout: 2000 }).toBeGreaterThanOrEqual(9);
+  await expect.poll(() => num(page), { timeout: 2000 }).toBeGreaterThanOrEqual(SECONDS - 1);
 });
 
 test('leaving mid-countdown leaves no timer behind: nothing fires afterwards and nothing crashes', async ({ page }) => {

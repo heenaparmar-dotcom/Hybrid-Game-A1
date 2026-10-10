@@ -10,19 +10,19 @@ const seeded = (seed: number) => () => {
 };
 const songs = (level: number) => puzzlesForLevel(level).filter((p) => p.song);
 
-describe('Level 1 (Warm Up): the 10 requested Hindi songs', () => {
+describe('Level 1 (Warm Up): the 8 Hindi songs', () => {
   const expected = [
-    'Badtameez Dil', 'Kala Chashma', 'Gallan Goodiyaan', 'London Thumakda', 'What Jhumka?',
-    'Aankh Marey', 'Chaiyya Chaiyya', 'Kajra Re', 'Jai Jai Shivshankar', 'Dilliwaali Girlfriend',
+    'Badtameez Dil', 'Kala Chashma', 'Gallan Goodiyaan', 'Sapphire', 'Jhoome Jo Pathaan',
+    'Swag Se Swagat', 'Jamaican (Bam Bam)', "Let's Nacho",
   ];
   it('contains every requested song, in the selection pool, as its own challenge', () => {
     expect(songs(1).map((p) => p.song!.title)).toEqual(expected);
-    expect(new Set(songs(1).map((p) => p.id)).size).toBe(10);
+    expect(new Set(songs(1).map((p) => p.id)).size).toBe(8);
     for (const p of songs(1)) expect(puzzlesForLevel(1)).toContain(p);
   });
-  it('keeps the original Level 1 puzzles too (nothing was deleted): 20 originals + 10 songs', () => {
+  it('keeps the original Level 1 puzzles too (nothing was deleted): 20 originals + 8 songs', () => {
     expect(puzzlesForLevel(1).filter((p) => !p.song)).toHaveLength(20);
-    expect(puzzlesForLevel(1)).toHaveLength(30);
+    expect(puzzlesForLevel(1)).toHaveLength(28);
   });
   it('every song carries a hint, and the scrambled words are the title (no lyrics)', () => {
     for (const p of songs(1)) {
@@ -101,8 +101,8 @@ describe('Level 2 (Find the Beat): the 5 specified puzzles', () => {
 });
 
 describe('Warm Up and Find the Beat are played with the Hindi film-song puzzles only', () => {
-  it('Warm Up draws from exactly the 10 songs and Find the Beat from exactly the 5 specified puzzles', () => {
-    expect(playablePuzzles(1)).toHaveLength(10);
+  it('Warm Up draws from exactly the 8 songs and Find the Beat from exactly the 5 specified puzzles', () => {
+    expect(playablePuzzles(1)).toHaveLength(8);
     expect(playablePuzzles(2)).toHaveLength(5);
     for (const p of [...playablePuzzles(1), ...playablePuzzles(2)]) expect(p.song, p.id).toBeDefined();
   });
@@ -134,8 +134,8 @@ describe('selection includes the songs and never repeats the last puzzle', () =>
       for (const p of songs(level)) expect(seen.has(p.id), p.id).toBe(true);
     }
   });
-  it('the whole pool is 30 + 25 + 20 = 75 puzzle entries; level 3 keeps its 20 word-order puzzles in data', () => {
-    expect(PUZZLES).toHaveLength(75);
+  it('the whole pool is 28 + 25 + 20 = 73 puzzle entries; level 3 keeps its 20 word-order puzzles in data', () => {
+    expect(PUZZLES).toHaveLength(73);
     expect(puzzlesForLevel(3)).toHaveLength(20);
   });
 });

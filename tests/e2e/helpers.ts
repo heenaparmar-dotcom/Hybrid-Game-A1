@@ -47,16 +47,16 @@ export async function installRandomControl(page: Page, opts: { realTimer?: boole
 export const setRandom = (page: Page, r: number | null) => page.evaluate((v) => ((window as unknown as { __r: number | null }).__r = v), r);
 
 /**
- * Random number that makes Warm Up pick its 7th song, "Dil Se Chaiyya Chaiyya": the only four-tile song puzzle, which uses the
+ * Random number that makes Warm Up pick its 3rd song, "Gallan Goodiyaan": a song puzzle with plenty of tiles, which uses the
  * "Sunrise Sway" dance. Tests that drag tiles or need a normal-size puzzle pin it so they are stable.
  */
-export const PIN_FOUR_TILES = 0.65;
+export const PIN_SUNRISE_SONG = 0.3125;
 
-/** Start from the title screen and get past the level splash (pinned to the four-tile song puzzle). */
+/** Start from the title screen and get past the level splash (pinned to the Gallan Goodiyaan puzzle). */
 export async function startGame(page: Page) {
   await installRandomControl(page);
   await page.goto('./');
-  await setRandom(page, PIN_FOUR_TILES);
+  await setRandom(page, PIN_SUNRISE_SONG);
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
   await setRandom(page, null);

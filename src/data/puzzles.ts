@@ -62,14 +62,11 @@ const BASE_PUZZLES: readonly Puzzle[] = [
   { id: 'l1-s01', level: 1, trackId: 'hookstep', phrase: 'Badtameez Dil', song: { title: 'Badtameez Dil', hint: '2013 · Yeh Jawaani Hai Deewani' } },
   { id: 'l1-s02', level: 1, trackId: 'nacho', phrase: 'Kala Chashma', song: { title: 'Kala Chashma', hint: '2016 · Baar Baar Dekho' }, video: { id: 'k4yXQkG2s1E', start: 0, credit: 'Zee Music Company' } },
   { id: 'l1-s03', level: 1, trackId: 'sunrise', phrase: 'Gallan Goodiyaan', song: { title: 'Gallan Goodiyaan', hint: '2015 · Dil Dhadakne Do' } },
-  { id: 'l1-s04', level: 1, trackId: 'hookstep', phrase: 'London Thumakda', song: { title: 'London Thumakda', hint: '2014 · Queen' } },
-  { id: 'l1-s05', level: 1, trackId: 'nacho', phrase: 'What Jhumka?', song: { title: 'What Jhumka?', hint: '2023 · Rocky Aur Rani Kii Prem Kahaani' } },
-  { id: 'l1-s06', level: 1, trackId: 'hookstep', phrase: 'Aankh Marey', song: { title: 'Aankh Marey', hint: '2018 · Simmba' } },
-  // Two identical words cannot be shuffled, so this one adds the film name to the fragments: Dil Se, Chaiyya, Chaiyya.
-  { id: 'l1-s07', level: 1, trackId: 'sunrise', phrase: 'Dil Se Chaiyya Chaiyya', song: { title: 'Chaiyya Chaiyya', hint: '1998 · Famously filmed on top of a moving train' } },
-  { id: 'l1-s08', level: 1, trackId: 'nacho', phrase: 'Kajra Re', song: { title: 'Kajra Re', hint: '2005 · Bunty Aur Babli' } },
-  { id: 'l1-s09', level: 1, trackId: 'nacho', phrase: 'Jai Jai Shivshankar', song: { title: 'Jai Jai Shivshankar', hint: '2019 · War' } },
-  { id: 'l1-s10', level: 1, trackId: 'hookstep', phrase: 'Dilliwaali Girlfriend', song: { title: 'Dilliwaali Girlfriend', hint: '2013 · Yeh Jawaani Hai Deewani' } },
+  { id: 'l1-s04', level: 1, trackId: 'nacho', phrase: 'Sapphire', song: { title: 'Sapphire', hint: 'Ed Sheeran' } },
+  { id: 'l1-s05', level: 1, trackId: 'hookstep', phrase: 'Jhoome Jo Pathaan', song: { title: 'Jhoome Jo Pathaan', hint: '2023 · Pathaan' } },
+  { id: 'l1-s06', level: 1, trackId: 'hookstep', phrase: 'Swag Se Swagat', song: { title: 'Swag Se Swagat', hint: '2017 · Tiger Zinda Hai' } },
+  { id: 'l1-s07', level: 1, trackId: 'nacho', phrase: 'Jamaican Bam Bam', song: { title: 'Jamaican (Bam Bam)', hint: 'Hugel x SOLTO' } },
+  { id: 'l1-s08', level: 1, trackId: 'hookstep', phrase: "Let's Nacho", song: { title: "Let's Nacho", hint: '2016 · Kapoor & Sons' } },
 
   // Level 2: five Hindi words (Roman script)
   { id: 'l2-01', level: 2, phrase: 'Aaj dil khol ke nacho', meaning: 'Today, dance with an open heart' },

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { PUZZLES } from '../../src/data/puzzles';
-import { PIN_FOUR_TILES, audioCreated, installRandomControl, setRandom, solveByTaps, trackAudio } from './helpers';
+import { PIN_SUNRISE_SONG, audioCreated, installRandomControl, setRandom, solveByTaps, trackAudio } from './helpers';
 
 test.use({ trace: 'off' });
 
@@ -184,22 +184,23 @@ test('with no connection to YouTube at all the game still works (script blocked)
   await expect(page.getByTestId('dance-timer')).toBeVisible();
 });
 
-test('a song without a video is unchanged: no player, the game music plays', async ({ page }) => {
+test('a song with a recording but no video: no YouTube player, the recording plays as audio only', async ({ page }) => {
   await trackAudio(page);
   await fakeYouTube(page, 'works');
   await installRandomControl(page);
   await page.goto('./');
-  await setRandom(page, PIN_FOUR_TILES); // Dil Se Chaiyya Chaiyya has no video
+  await setRandom(page, PIN_SUNRISE_SONG); // Gallan Goodiyaan has no video
   await page.getByTestId('title-stage').click();
   await page.getByTestId('tile-0').waitFor();
   await setRandom(page, null);
-  const p = PUZZLES.find((x) => x.id === 'l1-s07')!;
+  const p = PUZZLES.find((x) => x.id === 'l1-s03')!;
   await solveByTaps(page, p.phrase);
   await page.getByTestId('accept-dance').click();
   await expect(page.getByTestId('cue')).toBeVisible();
   await expect(page.getByTestId('video-wrap')).toHaveCount(0);
   expect((await yt(page)).created).toBe(0);
-  expect(await audioCreated(page)).toBeGreaterThanOrEqual(1);
+  await expect(page.getByTestId('audio-credit')).toBeVisible({ timeout: 10_000 });
+  expect(await audioCreated(page)).toBe(0);
 });
 
 test('REAL YouTube (nothing faked): the official player loads for the solved song', async ({ page }) => {

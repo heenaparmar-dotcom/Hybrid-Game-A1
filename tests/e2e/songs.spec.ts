@@ -7,7 +7,7 @@ import { enterPinned, openWithProgress } from './support';
 const name = (n: number) => LEVELS[n - 1].name;
 const songs = (level: number) => puzzlesForLevel(level).filter((p) => p.song);
 
-test('Warm Up: all 10 Hindi songs appear as challenges with their hint, shuffled title words, and the song title once solved', async ({ page }) => {
+test('Warm Up: all 8 Hindi songs appear as challenges with their hint, shuffled title words, and the song title once solved', async ({ page }) => {
   test.setTimeout(240_000);
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = {};
@@ -28,8 +28,8 @@ test('Warm Up: all 10 Hindi songs appear as challenges with their hint, shuffled
     await expect(page.getByTestId('song-title')).toContainText(song.title);
   }
   expect(shownTitles).toEqual([
-    'Badtameez Dil', 'Kala Chashma', 'Gallan Goodiyaan', 'London Thumakda', 'What Jhumka?',
-    'Aankh Marey', 'Chaiyya Chaiyya', 'Kajra Re', 'Jai Jai Shivshankar', 'Dilliwaali Girlfriend',
+    'Badtameez Dil', 'Kala Chashma', 'Gallan Goodiyaan',
+    'Sapphire', 'Jhoome Jo Pathaan', 'Swag Se Swagat', 'Jamaican (Bam Bam)', "Let's Nacho",
   ]);
 });
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { PIN_FOUR_TILES, audioCreated, currentPuzzle, installRandomControl, setRandom, noAudio, solveByTaps, solveCurrent, solveToInvite, startGame, tileTexts, trackAudio, norm } from './helpers';
+import { PIN_SUNRISE_SONG, audioCreated, currentPuzzle, installRandomControl, setRandom, noAudio, solveByTaps, solveCurrent, solveToInvite, startGame, tileTexts, trackAudio, norm } from './helpers';
 
 test('title screen: tap anywhere starts Level 1 with shuffled tiles and no submit button', async ({ page }) => {
   await page.goto('./');
@@ -78,13 +78,13 @@ test('correct order is detected automatically, then the dance invitation appears
   expect(await audioCreated(page)).toBe(0);
   await solveCurrent(page);
   await expect(page.getByTestId('song-unlocked')).toContainText('You got it!');
-  await expect(page.getByTestId('song-title')).toContainText('Chaiyya Chaiyya'); // the pinned Warm Up song
+  await expect(page.getByTestId('song-title')).toContainText('Gallan Goodiyaan'); // the pinned Warm Up song
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
   await expect(page.getByRole('heading', { name: 'You cracked the song!' })).toBeVisible();
   expect(await audioCreated(page)).toBe(0); // still silent: the player has not accepted yet
   await page.getByTestId('accept-dance').click();
   await expect(page.getByTestId('cue')).toBeVisible();
-  expect(await audioCreated(page)).toBeGreaterThanOrEqual(1); // music starts only now
+  await expect(page.getByTestId('audio-credit')).toBeVisible({ timeout: 10_000 }); // this song has a recording: it starts only now
 });
 
 test('tiles can be dragged with the mouse', async ({ page }) => {
@@ -245,6 +245,7 @@ test('seated version: the dancer sits on a chair and cues use the upper body', a
 
 test('audio fallback: when Web Audio is unavailable the dance still runs, silently, with a clear message', async ({ page }) => {
   await noAudio(page);
+  await page.route('**/audio/*.mp3', (route) => route.abort()); // no recording either, so the game's own music is needed
   await startGame(page);
   await solveToInvite(page);
   await page.getByTestId('accept-dance').click();
@@ -265,7 +266,7 @@ test('rule book: reachable from the title, documents all seven elements, and pau
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
 
-  await setRandom(page, PIN_FOUR_TILES); // the Sunrise Sway song, so the first cue is known
+  await setRandom(page, PIN_SUNRISE_SONG); // the Sunrise Sway song, so the first cue is known
   await page.getByTestId('title-stage').click();
   await expect(page.getByTestId('tile-0')).toBeVisible();
   await setRandom(page, null);

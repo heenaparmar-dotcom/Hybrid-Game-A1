@@ -5,6 +5,7 @@ import { Modal } from './components/Modal';
 import { RuleBook } from './components/RuleBook';
 import { LEVEL_COUNT, levelByNumber } from './data/levels';
 import { listenOrder, type ListenChallenge } from './data/listen';
+import { LYRIC_LINES } from './data/lyricLines';
 import { pickPuzzle, playablePuzzles, type Puzzle } from './data/puzzles';
 import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
@@ -47,8 +48,8 @@ function describe(run: Run) {
       track: trackById(puzzle?.trackId ?? level.trackId),
       kicker: `Level ${level.n} · ${level.name}`,
       prompt: puzzle?.song ? (level.n === 1 ? 'A Hindi film song. Put the title in order. Need help? Tap Hint.' : 'A Hindi film song. Put the title in order, and use the hint.') : level.prompt,
-      // a long lyric line gets three times as long as a short title
-      timeLimit: puzzle?.song ? (puzzle.phrase.split(/\s+/).length > 4 ? puzzleSeconds() * 3 : puzzleSeconds()) : undefined,
+      // a lyric line (see lyricLines.ts) gets three times as long as a short title
+      timeLimit: puzzle?.song ? (LYRIC_LINES[puzzle.id] ? puzzleSeconds() * 3 : puzzleSeconds()) : undefined,
       hintMode: (level.n === 1 ? 'button' : 'visible') as 'button' | 'visible',
       meaning: puzzle?.meaning,
       song: puzzle?.song,

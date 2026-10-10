@@ -38,7 +38,7 @@ test('"Shuffle again" keeps the same puzzle but re-mixes the tiles', async ({ pa
   expect((await tileTexts(page)).join(' ')).not.toBe(p.phrase);
 });
 
-test('every puzzle played in Levels 1 and 2 (all 15 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
+test('every puzzle played in Levels 1 and 2 (all 13 Hindi film-song puzzles) can be solved and shows the success state', async ({ page }) => {
   test.setTimeout(600_000);
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = {};
@@ -59,7 +59,7 @@ test('every puzzle played in Levels 1 and 2 (all 15 Hindi film-song puzzles) can
     }
   }
   expect(solved.size).toBe(playablePuzzles(1).length + playablePuzzles(2).length);
-  expect(solved.size).toBe(15);
+  expect(solved.size).toBe(13);
 });
 
 test('a solved level 2 puzzle still leads to the dance invitation, and the next level is the listening level', async ({ page }) => {
