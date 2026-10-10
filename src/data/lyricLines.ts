@@ -5,5 +5,5 @@
  * Keep it to 3 to 8 words so it fits the tile board and the 10-second timer.
  */
 export const LYRIC_LINES: Record<string, string> = {
-  'l1-s02': 'JACHDA / MUKHDE / PE / AE / GORE / CHASHMA / KALA',
+  'l1-s02': 'KALA / CHASHMA / JACHDA / AE / GORE / MUKHDE / PE',
 };
