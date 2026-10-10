@@ -167,6 +167,8 @@ describe('storage sanitising', () => {
   it('falls back to defaults on garbage', () => {
     expect(sanitiseStore(null)).toEqual(defaultStore());
     expect(sanitiseStore('x')).toEqual(defaultStore());
+    expect(sanitiseStore({ players: 2 }).players).toBe(2);
+    expect(sanitiseStore({ players: 7 }).players).toBe(1); // anything else means one player
     const s = sanitiseStore({ completed: 99, volume: 9, muted: 'yes', seated: 1 });
     expect(s.completed).toBe(3);
     expect(s.volume).toBe(1);

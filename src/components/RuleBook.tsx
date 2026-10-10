@@ -21,7 +21,7 @@ export function RuleBook() {
       <section>
         <h3>1. Players</h3>
         <p><strong>Who it is for:</strong> college students and young adults, about 18 to 24.</p>
-        <p><strong>How many:</strong> one player on one device. Friends join by opening a challenge link on their own device, so the best way to play is 2 or more friends sending each other puzzles. The game does not have accounts or live multiplayer.</p>
+        <p><strong>How many:</strong> choose <em>1 player</em> or <em>2 players</em> under TAP TO START. With two players, you share one device and take turns: in Warm Up and Find the Beat, Player 1 solves a puzzle, then Player 2 gets a different one. Whoever solves faster picks the song, and then you dance side by side. Feel the Rhythm is played together. Friends on other devices can still join through a challenge link. The game does not have accounts or live online multiplayer.</p>
       </section>
 
       <section>

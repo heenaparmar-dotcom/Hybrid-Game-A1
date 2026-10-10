@@ -27,13 +27,15 @@ interface Props {
   audioFile?: { src: string; start?: number; credit: string };
   /** Title of the song, for the credit line under the video. */
   songTitle?: string;
+  /** Two players dance side by side on the stage. */
+  players?: 1 | 2;
 }
 
 /**
  * The hook-step challenge. The routine is driven by the music clock (or by a silent clock if sound is unavailable),
  * so the cues and the dancer stay on the beat. Nothing watches the player: they simply dance along.
  */
-export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, audioFile, songTitle }: Props) {
+export function DanceScreen({ track, kicker, seated, externalPause, volume, muted, onVolume, onMuted, onFinish, onSkip, onRestart, video, audioFile, songTitle, players = 1 }: Props) {
   const [mode, setMode] = useState<'pending' | 'audio' | 'silent' | 'video' | 'file'>('pending');
   // the video player is only created when there is no usable audio file
   const [useVideo, setUseVideo] = useState(!audioFile);
@@ -297,7 +299,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
       </header>
 
       <div className="stage-wrap">
-        <Stage fig={fig} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
+        <Stage players={players} fig={fig} seated={seated} pulse={paused ? 0 : pulse} label={`Shadow dancer showing: ${st.move.name}`} />
         {countdown !== null && <div className="count-big" aria-hidden="true" key={countdown}>{countdown}</div>}
         {go && !paused && <div className="count-big go" aria-hidden="true">GO!</div>}
         {done && <div className="count-big go" aria-hidden="true" data-testid="dance-done-flash">Nice!</div>}
@@ -340,7 +342,7 @@ export function DanceScreen({ track, kicker, seated, externalPause, volume, mute
         </div>
       )}
       {audioFile && mode === 'file' && (
-        <p className="fine center-text" data-testid="audio-credit">Playing "{songTitle ?? 'the song'}" ({audioFile.credit}). The song belongs to its owners.</p>
+        <p className="fine center-text" data-testid="audio-credit">Playing "{songTitle ?? 'the song'}"{audioFile.credit !== songTitle ? ` (${audioFile.credit})` : ''}. The song belongs to its owners.</p>
       )}
       {video && useVideo && videoState === 'failed' && (
         <p className="notice" role="status" data-testid="video-fallback">The video could not be played here (no internet, or YouTube blocked it), so the dance uses the game's own music instead.</p>

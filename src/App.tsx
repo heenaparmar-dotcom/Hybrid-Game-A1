@@ -17,6 +17,7 @@ import { CelebrateScreen } from './screens/CelebrateScreen';
 import { ChallengeScreen, type Incoming } from './screens/ChallengeScreen';
 import { CreateScreen } from './screens/CreateScreen';
 import { DanceScreen } from './screens/DanceScreen';
+import { HandoverScreen } from './screens/HandoverScreen';
 import { InviteScreen } from './screens/InviteScreen';
 import { ListenScreen } from './screens/ListenScreen';
 import { PuzzleScreen } from './screens/PuzzleScreen';
@@ -24,10 +25,17 @@ import { TitleScreen } from './screens/TitleScreen';
 
 /** Levels 1 and 2 give a word-order puzzle; level 3 gives two listening clips. */
 type Run = { kind: 'level'; level: number; puzzle?: Puzzle; listen?: ListenChallenge[] } | { kind: 'challenge'; data: ChallengeData; tryout: boolean };
-type Stage = 'puzzle' | 'invite' | 'dance' | 'celebrate';
+type Stage = 'puzzle' | 'handover' | 'invite' | 'dance' | 'celebrate';
+/** Two players on one device: Player 1 solves a puzzle, then Player 2, then both dance to the faster solver's song. */
+interface TwoPlayer {
+  turn: 1 | 2;
+  first?: { puzzle: Puzzle; ms: number; timedOut: boolean };
+  /** Said on the invitation once both have played: whose song plays and why. */
+  note?: string;
+}
 type View =
   | { name: 'title' }
-  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean; timedOut?: boolean }
+  | { name: 'play'; run: Run; stage: Stage; key: number; skipped: boolean; timedOut?: boolean; two?: TwoPlayer }
   | { name: 'create' }
   | { name: 'challenge' };
 
@@ -138,6 +146,7 @@ export default function App() {
     setSplash(`Level ${level.n}|${level.name}`);
     if (level.n === 3) {
       // level 3 is a listening level: both clips, in a random order
+      // the listening level is shared: both players listen together
       setView({ name: 'play', run: { kind: 'level', level: 3, listen: listenOrder() }, stage: 'puzzle', key: newKey(), skipped: false });
       return;
     }
@@ -146,7 +155,7 @@ export default function App() {
     const featured = level.n === 1 && lastPuzzle.current[1] === undefined && typeof (window as unknown as { __r?: unknown }).__r === 'undefined';
     const puzzle = (featured ? playablePuzzles(1).find((p) => p.id === 'l1-s02') : undefined) ?? pickPuzzle(level.n, lastPuzzle.current[level.n]);
     lastPuzzle.current[level.n] = puzzle.id;
-    setView({ name: 'play', run: { kind: 'level', level: level.n, puzzle }, stage: 'puzzle', key: newKey(), skipped: false });
+    setView({ name: 'play', run: { kind: 'level', level: level.n, puzzle }, stage: 'puzzle', key: newKey(), skipped: false, two: store.players === 2 ? { turn: 1 } : undefined });
   };
   const resumeLevel = () => startLevel(store.completed >= LEVEL_COUNT ? 1 : store.completed + 1);
 
@@ -166,6 +175,43 @@ export default function App() {
     setView((v) => (v.name === 'play' ? { ...v, stage: 'dance', key: newKey(), skipped: false } : v));
   };
 
+  /** One puzzle is finished. With two players, Player 1 hands over and Player 2's result decides whose song plays. */
+  const onPuzzleDone = (timedOut: boolean, ms: number) => {
+    if (view.name !== 'play') return;
+    const { two, run } = view;
+    if (!two || run.kind !== 'level' || !run.puzzle) {
+      toStage('invite', false, timedOut);
+      return;
+    }
+    if (two.turn === 1) {
+      setView({ ...view, stage: 'handover', two: { turn: 1, first: { puzzle: run.puzzle, ms, timedOut } } });
+      return;
+    }
+    const first = two.first;
+    if (!first) {
+      toStage('invite', false, timedOut);
+      return;
+    }
+    const p2Wins = !timedOut && (first.timedOut || ms < first.ms);
+    const winner = p2Wins ? 2 : 1;
+    const note =
+      first.timedOut && timedOut
+        ? "Neither of you beat the clock, so Player 1's song plays for both of you."
+        : first.timedOut || timedOut
+          ? `Player ${winner} solved theirs, so their song plays for both of you.`
+          : `Player ${winner} solved it faster, so their song plays for both of you.`;
+    setView({ ...view, run: { ...run, puzzle: p2Wins ? run.puzzle : first.puzzle }, stage: 'invite', timedOut: first.timedOut && timedOut, skipped: false, two: { turn: 2, first, note } });
+  };
+
+  /** Player 2 is ready: give them a different puzzle from the same level. */
+  const startSecondTurn = () => {
+    if (view.name !== 'play' || view.run.kind !== 'level' || !view.two?.first) return;
+    const level = view.run.level;
+    const puzzle = pickPuzzle(level, view.two.first.puzzle.id);
+    lastPuzzle.current[level] = puzzle.id;
+    setView({ ...view, run: { ...view.run, puzzle }, stage: 'puzzle', key: newKey(), two: { turn: 2, first: view.two.first } });
+  };
+
   const finishRun = (skipped: boolean) => {
     if (view.name !== 'play') return;
     if (view.run.kind === 'level') {
@@ -177,7 +223,7 @@ export default function App() {
 
   const body = () => {
     if (view.name === 'title') {
-      return <TitleScreen completed={store.completed} onStart={resumeLevel} onStartOver={() => { setStore((s) => ({ ...s, completed: 0 })); startLevel(1); }} />;
+      return <TitleScreen completed={store.completed} players={store.players} onPlayers={(players) => setStore((s) => ({ ...s, players }))} onStart={resumeLevel} onStartOver={() => { setStore((s) => ({ ...s, completed: 0 })); startLevel(1); }} />;
     }
     if (view.name === 'create') {
       return <CreateScreen onTry={(data) => startChallenge(data, true)} onOpenLink={(data) => { setIncoming({ kind: 'ok', data }); setView({ name: 'challenge' }); }} />;
@@ -194,6 +240,8 @@ export default function App() {
     }
 
     const info = describe(view.run);
+    const two = view.name === 'play' ? view.two : undefined;
+    const kicker = two && view.stage === 'puzzle' ? `${info.kicker} · Player ${two.turn}` : two ? `${info.kicker} · 2 players` : info.kicker;
     const levelNo = view.run.kind === 'level' ? view.run.level : null;
     const hasNext = levelNo !== null && levelNo < LEVEL_COUNT;
     return (
@@ -214,7 +262,7 @@ export default function App() {
         {view.stage === 'puzzle' && !(view.run.kind === 'level' && view.run.listen) && (
           <PuzzleScreen
             key={view.key}
-            kicker={info.kicker}
+            kicker={kicker}
             prompt={info.prompt}
             phrase={info.phrase}
             initialOrder={info.initialOrder}
@@ -224,7 +272,14 @@ export default function App() {
             hintMode={info.hintMode}
             timeLimit={info.timeLimit}
             paused={splash !== null || rulesOpen}
-            onSolved={({ timedOut }) => toStage('invite', false, timedOut)}
+            onSolved={({ timedOut, ms }) => onPuzzleDone(timedOut, ms)}
+          />
+        )}
+        {view.stage === 'handover' && two?.first && (
+          <HandoverScreen
+            key={view.key}
+            result={two.first.timedOut ? 'Player 1 ran out of time on theirs.' : `Player 1 solved theirs in about ${Math.max(1, Math.round(two.first.ms / 1000))} seconds.`}
+            onReady={startSecondTurn}
           />
         )}
         {view.stage === 'invite' && (
@@ -233,13 +288,13 @@ export default function App() {
             phrase={info.phrase}
             timedOut={view.timedOut}
             songNote={
-              info.song
+              (two?.note ? `${two.note} ` : '') + (info.song
                 ? info.audio
                   ? `That was ${info.song.title}. The dance plays the song's recording, with no video. If the file cannot load, the official video or the game's own music is used.`
                   : info.video
                   ? `That was ${info.song.title}. The dance plays the official video through YouTube (${info.video.credit}), so it needs internet. If it cannot play, the game's own music is used.`
                   : `That was ${info.song.title}. The dance uses our own original track, ${info.track.title}, because the recording of the film song is not included in this game.`
-                : undefined
+                : '')
             }
             seated={store.seated}
             onSeated={(seated) => setStore((s) => ({ ...s, seated }))}
@@ -251,7 +306,8 @@ export default function App() {
           <DanceScreen
             key={view.key}
             track={info.track}
-            kicker={info.kicker}
+            kicker={kicker}
+            players={two ? 2 : 1}
             seated={store.seated}
             externalPause={rulesOpen}
             volume={store.volume}

@@ -22,7 +22,7 @@ interface Props {
   /** Freeze the countdown (for example while the level splash or the Rule Book covers the puzzle). */
   paused?: boolean;
   /** Called once: a moment after a correct answer (timedOut: false), or when the player continues after time ran out (timedOut: true). */
-  onSolved: (result: { timedOut: boolean }) => void;
+  onSolved: (result: { timedOut: boolean; ms: number }) => void;
 }
 
 const NUDGE_AFTER_MS = 14000;
@@ -96,10 +96,10 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
     const id = window.setTimeout(() => {
       if (reported.current) return;
       reported.current = true;
-      onSolvedRef.current({ timedOut: false });
+      onSolvedRef.current({ timedOut: false, ms: timeLimit ? Math.max(0, timeLimit * 1000 - remainingMs.current) : 0 });
     }, CELEBRATION_MS);
     return () => window.clearTimeout(id);
-  }, [solved]);
+  }, [solved, timeLimit]);
 
   const check = (next: Token[]) => {
     if (phaseRef.current !== 'play') return;
@@ -144,7 +144,7 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
   const goOn = () => {
     if (reported.current) return;
     reported.current = true;
-    onSolvedRef.current({ timedOut: true });
+    onSolvedRef.current({ timedOut: true, ms: (timeLimit ?? 0) * 1000 });
   };
 
   const showHint = song && (hintMode === 'visible' || hintOpen || solved || timedOut);

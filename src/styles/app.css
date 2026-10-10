@@ -336,3 +336,9 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
   .video-wrap { position: fixed; right: 14px; bottom: 14px; z-index: 20; }
   .video-box { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5); }
 }
+
+/* One player or two players, under TAP TO START */
+.players-switch { display: inline-flex; gap: 0; margin-top: 0.7rem; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; background: rgba(255, 242, 224, 0.06); }
+.players-switch button { font: 700 0.85rem var(--body); letter-spacing: 0.06em; padding: 0.5rem 1.1rem; min-height: 44px; color: var(--muted); background: transparent; border: 0; cursor: pointer; }
+.players-switch button.is-on { background: var(--cream, #fff2e0); color: #1b0b2e; }
+.players-switch button:focus-visible { outline: 3px solid var(--lime); outline-offset: -3px; }
