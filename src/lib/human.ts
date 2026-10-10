@@ -253,7 +253,7 @@ export const distance = (a: Pt, b: Pt) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 export function stageFigure(pose: Pose, beat: number, opts: { seated: boolean; energy: number }): Figure {
   const { seated, energy } = opts;
   const bendDown = Math.max(0, pose.y) * 1.2; // the old "sink down" becomes a deeper knee bend
-  const thighOut = (t: number, lift: number) => t + 6 + 38 * lift + bendDown;
+  const thighOut = (t: number, lift: number) => t + 11 + 38 * lift + bendDown; // a wide Zumba stance
   const shinOut = (t: number, lift: number) => t * 0.4 - 28 * lift - bendDown * 0.5;
   const human: HumanPose = {
     lean: pose.lean,

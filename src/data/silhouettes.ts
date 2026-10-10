@@ -42,53 +42,57 @@ export interface SilDancer {
   b: SilPose;
 }
 
+/**
+ * All three share the Zumba "power stance": feet wide apart, knees soft, one arm high and the other bent behind the head,
+ * with a ponytail that flies with the move. The poses are written by hand for this game.
+ */
 export const SIL_DANCERS: readonly SilDancer[] = [
   {
-    // left: wide power stance, one fist reaching up-left, the other arm out to the right, hair flying left
+    // left: arm bent behind the head, the other arm reaching up and out, ponytail trailing
     x: -158, y: 108, scale: 0.95, delay: 0.1, phase: 0,
     a: {
-      pelvis: [0, 0], ls: [-11, -80], rs: [27, -76], head: [14, -105], tilt: 10,
-      le: [-44, -100], lw: [-66, -129], re: [62, -66], rw: [86, -86],
-      lk: [-36, 52], la: [-54, 104], rk: [40, 48], ra: [62, 100],
-      hair: 200, hairLen: 54,
+      pelvis: [0, 0], ls: [-12, -80], rs: [26, -78], head: [10, -106], tilt: 6,
+      le: [-46, -104], lw: [-14, -124], re: [52, -108], rw: [62, -148],
+      lk: [-44, 50], la: [-72, 104], rk: [44, 50], ra: [72, 104],
+      hair: 200, hairLen: 52,
     },
     b: {
-      pelvis: [0, 2], ls: [-12, -80], rs: [25, -78], head: [11, -105], tilt: 4,
-      le: [-47, -90], lw: [-72, -112], re: [60, -72], rw: [84, -96],
-      lk: [-32, 54], la: [-46, 106], rk: [37, 50], ra: [54, 103],
-      hair: 188, hairLen: 56,
+      pelvis: [4, 3], ls: [-12, -80], rs: [26, -78], head: [14, -105], tilt: -4,
+      le: [-50, -108], lw: [-58, -148], re: [50, -100], rw: [18, -122],
+      lk: [-40, 54], la: [-62, 106], rk: [48, 48], ra: [78, 100],
+      hair: 188, hairLen: 54,
     },
   },
   {
-    // centre: deep lunge, one arm straight up, the other out, head tipped back, long hair falling
+    // centre: the same stance, mirrored and deeper, wide-leg trousers, both arms reaching high on the beat
     x: 0, y: 96, scale: 0.98, delay: 0.3, phase: 0.5, baggy: true,
     a: {
-      pelvis: [0, 14], ls: [-26, -62], rs: [10, -70], head: [-16, -91], tilt: -22,
-      le: [-62, -52], lw: [-96, -40], re: [16, -110], rw: [22, -146],
-      lk: [-58, 44], la: [-62, 98], rk: [58, 48], ra: [100, 84],
-      hair: 105, hairLen: 62,
+      pelvis: [0, 12], ls: [-24, -70], rs: [14, -72], head: [-6, -98], tilt: -8,
+      le: [-52, -98], lw: [-64, -140], re: [38, -100], rw: [8, -120],
+      lk: [-52, 46], la: [-78, 100], rk: [52, 46], ra: [78, 100],
+      hair: 110, hairLen: 58,
     },
     b: {
-      pelvis: [0, 10], ls: [-24, -64], rs: [12, -70], head: [-12, -92], tilt: -14,
-      le: [-60, -56], lw: [-92, -52], re: [20, -108], rw: [28, -144],
-      lk: [-54, 42], la: [-60, 98], rk: [54, 46], ra: [94, 88],
-      hair: 96, hairLen: 64,
+      pelvis: [0, 6], ls: [-24, -72], rs: [14, -74], head: [-6, -100], tilt: -2,
+      le: [-48, -110], lw: [-58, -150], re: [42, -112], rw: [52, -150],
+      lk: [-48, 48], la: [-70, 102], rk: [48, 48], ra: [70, 102],
+      hair: 100, hairLen: 60,
     },
   },
   {
-    // right: lightly airborne, one knee bent and lifted, one arm up-right and the other swinging low, hair flicked up
+    // right: lightly airborne with one knee bent, one arm high and the other swinging low, ponytail flicked up
     x: 160, y: 104, scale: 0.95, delay: 0.5, phase: 1, hop: 7,
     a: {
-      pelvis: [0, 8], ls: [-20, -72], rs: [18, -80], head: [8, -104], tilt: -10,
-      le: [-56, -54], lw: [-72, -22], re: [42, -112], rw: [62, -142],
-      lk: [-22, 56], la: [-26, 110], rk: [46, 40], ra: [34, 88],
-      hair: 228, hairLen: 62,
+      pelvis: [0, 6], ls: [-20, -74], rs: [18, -80], head: [8, -104], tilt: -10,
+      le: [-52, -58], lw: [-74, -30], re: [48, -112], rw: [56, -150],
+      lk: [-40, 54], la: [-60, 108], rk: [50, 44], ra: [66, 96],
+      hair: 228, hairLen: 60,
     },
     b: {
-      pelvis: [0, 8], ls: [-20, -72], rs: [17, -80], head: [7, -104], tilt: -4,
-      le: [-52, -62], lw: [-80, -44], re: [34, -114], rw: [48, -148],
-      lk: [-20, 58], la: [-22, 112], rk: [40, 46], ra: [28, 96],
-      hair: 216, hairLen: 64,
+      pelvis: [0, 6], ls: [-20, -74], rs: [18, -80], head: [7, -104], tilt: -4,
+      le: [-48, -96], lw: [-20, -122], re: [44, -100], rw: [70, -126],
+      lk: [-36, 56], la: [-54, 110], rk: [46, 48], ra: [62, 100],
+      hair: 214, hairLen: 62,
     },
   },
 ];

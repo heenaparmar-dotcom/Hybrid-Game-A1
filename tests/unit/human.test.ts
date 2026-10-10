@@ -91,9 +91,10 @@ describe('title dancers move like a person', () => {
   });
 
   it('retargeting keeps the shape of the hand-authored poses (arms up stay up, legs stay apart)', () => {
-    const lunge = toHumanPose(SIL_DANCERS[1].a);
-    expect(Math.abs(lunge.upper[1])).toBeGreaterThan(160); // right arm straight up
-    expect(lunge.thigh[0]).toBeLessThan(-40); // left leg out to the left
-    expect(lunge.thigh[1]).toBeGreaterThan(40); // right leg out to the right
+    const lunge = toHumanPose(SIL_DANCERS[1].b);
+    expect(Math.abs(lunge.upper[0])).toBeGreaterThan(130); // both arms reaching up
+    expect(Math.abs(lunge.upper[1])).toBeGreaterThan(130);
+    expect(lunge.thigh[0]).toBeLessThan(-35); // left leg out to the left
+    expect(lunge.thigh[1]).toBeGreaterThan(35); // right leg out to the right
   });
 });
