@@ -5,7 +5,7 @@ import { Modal } from './components/Modal';
 import { RuleBook } from './components/RuleBook';
 import { LEVEL_COUNT, levelByNumber } from './data/levels';
 import { listenOrder, type ListenChallenge } from './data/listen';
-import { pickPuzzle, type Puzzle } from './data/puzzles';
+import { pickPuzzle, playablePuzzles, type Puzzle } from './data/puzzles';
 import { trackById, type Track } from './data/tracks';
 import { music } from './lib/audio';
 import { CHALLENGE_PARAM, parseChallengeInput, type ChallengeData } from './lib/challenge';
@@ -140,7 +140,10 @@ export default function App() {
       setView({ name: 'play', run: { kind: 'level', level: 3, listen: listenOrder() }, stage: 'puzzle', key: newKey(), skipped: false });
       return;
     }
-    const puzzle = pickPuzzle(level.n, lastPuzzle.current[level.n]);
+    // The first Warm Up puzzle of a visit is always Kala Chashma (the song with the full recording). Tests steer Math.random through
+    // window.__r, so they keep their own picks.
+    const featured = level.n === 1 && lastPuzzle.current[1] === undefined && typeof (window as unknown as { __r?: unknown }).__r === 'undefined';
+    const puzzle = (featured ? playablePuzzles(1).find((p) => p.id === 'l1-s02') : undefined) ?? pickPuzzle(level.n, lastPuzzle.current[level.n]);
     lastPuzzle.current[level.n] = puzzle.id;
     setView({ name: 'play', run: { kind: 'level', level: level.n, puzzle }, stage: 'puzzle', key: newKey(), skipped: false });
   };
