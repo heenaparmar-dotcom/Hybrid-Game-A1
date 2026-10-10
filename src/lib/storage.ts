@@ -11,9 +11,11 @@ export interface Store {
   seated: boolean;
   /** One player, or two players taking turns on the same device. */
   players: 1 | 2;
+  /** One player: play every song of a level in turn (Warm Up 8, Find the Beat 11) instead of one song per level. */
+  allSongs: boolean;
 }
 
-export const defaultStore = (): Store => ({ completed: 0, volume: 0.7, muted: false, seated: false, players: 1 });
+export const defaultStore = (): Store => ({ completed: 0, volume: 0.7, muted: false, seated: false, players: 1, allSongs: false });
 
 /** Defensive parse: anything unexpected falls back to defaults. */
 export function sanitiseStore(raw: unknown): Store {
@@ -28,6 +30,7 @@ export function sanitiseStore(raw: unknown): Store {
     muted: typeof r.muted === 'boolean' ? r.muted : d.muted,
     seated: typeof r.seated === 'boolean' ? r.seated : d.seated,
     players: r.players === 2 ? 2 : 1,
+    allSongs: typeof r.allSongs === 'boolean' ? r.allSongs : d.allSongs,
   };
 }
 

@@ -281,9 +281,9 @@ test('rule book: reachable from the title, documents all seven elements, and pau
   await expect.poll(async () => page.locator('.dancer-wrap').innerHTML()).not.toBe(frozen);
 });
 
-test('level bar: finished levels can be replayed, later ones are locked', async ({ page }) => {
+test('level bar: every level is open from the start, and finished levels can be replayed', async ({ page }) => {
   await startGame(page);
-  await expect(page.getByTestId('level-3')).toBeDisabled();
+  await expect(page.getByTestId('level-3')).toBeEnabled(); // nothing is locked
   await solveToInvite(page);
   await page.getByTestId('skip-dance').click();
   await expect(page.getByTestId('level-2')).toBeEnabled();

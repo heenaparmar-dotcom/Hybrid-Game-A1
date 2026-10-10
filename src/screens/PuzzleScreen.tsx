@@ -21,6 +21,10 @@ interface Props {
   timeLimit?: number;
   /** Freeze the countdown (for example while the level splash or the Rule Book covers the puzzle). */
   paused?: boolean;
+  /** Skip this song (only offered when a level plays all its songs in turn). */
+  onSkipSong?: () => void;
+  /** Skip the whole level. */
+  onSkipLevel?: () => void;
   /** Called once: a moment after a correct answer (timedOut: false), or when the player continues after time ran out (timedOut: true). */
   onSolved: (result: { timedOut: boolean; ms: number }) => void;
 }
@@ -35,7 +39,7 @@ type Phase = 'play' | 'solved' | 'timeout';
  * The order is checked automatically after every change. There is no submit button.
  * With a time limit there is exactly one active countdown; it stops on success, on timeout and on unmount.
  */
-export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, meaning, song, hintMode = 'visible', timeLimit, paused = false, onSolved }: Props) {
+export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, meaning, song, hintMode = 'visible', timeLimit, paused = false, onSolved, onSkipSong, onSkipLevel }: Props) {
   const solution = useMemo(() => tokenise(phrase), [phrase]);
   const [order, setOrder] = useState<Token[]>(() => (initialOrder ? applyOrder(solution, initialOrder) : scramble(solution)));
   const [locked, setLocked] = useState(0);
@@ -212,6 +216,12 @@ export function PuzzleScreen({ kicker, prompt, phrase, initialOrder, songTitle, 
           </>
         )}
       </div>
+      {(onSkipSong || onSkipLevel) && (
+        <div className="row center skip-row">
+          {onSkipSong && <button type="button" className="link-btn" onClick={onSkipSong} data-testid="skip-song">Skip this song</button>}
+          {onSkipLevel && <button type="button" className="link-btn" onClick={onSkipLevel} data-testid="skip-level">Skip this level</button>}
+        </div>
+      )}
       <p className="sr-only" role="status" aria-live="polite" data-testid="puzzle-live">{live}</p>
     </section>
   );

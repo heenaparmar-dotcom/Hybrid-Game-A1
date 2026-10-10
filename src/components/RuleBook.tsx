@@ -45,6 +45,9 @@ export function RuleBook() {
           <li><strong>Hint:</strong> in Warm Up, the small Hint button shows the film and year of the song. The timer keeps running. In Find the Beat the hint is always shown.</li>
           <li><strong>The dance:</strong> it starts only when you press the dance button, and the music starts at the same moment. It lasts {DANCE_SECONDS} seconds, with a countdown. You can pause, mute or skip at any time.</li>
           <li><strong>Feel the Rhythm:</strong> press Play to hear a clip, choose the song you heard from three titles, and replay or pause as you like. A wrong choice never ends the level. When you are right, move on to the next clip.</li>
+          <li><strong>All songs:</strong> with one player, choose <em>All songs</em> under TAP TO START to play every song of a level in turn: 8 in Warm Up, then 11 in Find the Beat. The level counts as finished after its last song. The default is one song a level.</li>
+          <li><strong>Skipping:</strong> every level is open from the start. You can skip a song, skip a whole level, or skip a listening clip whenever you want. A skipped level counts as finished.</li>
+          <li><strong>Back:</strong> the Back button at the top left returns to the previous step on every screen. A dance cannot be resumed, so Back goes to the step before it.</li>
           <li><strong>Moving on:</strong> when a dance ends you celebrate and go to the next level. You can skip a dance if you cannot move right now.</li>
           <li><strong>Your own puzzles:</strong> a line of {PHRASE_LIMITS.minWords} to {PHRASE_LIMITS.maxWords} words, up to {PHRASE_LIMITS.maxChars} characters. Use your own words or words you have permission to use. They have no timer.</li>
         </ul>

@@ -64,11 +64,11 @@ test('Find the Beat: all 11 Hook-Step songs show their title words shuffled with
 test('after a film-song puzzle the invitation says which music the dance really uses', async ({ page }) => {
   await openWithProgress(page, 1);
   const last: Record<number, string | undefined> = { 2: (await currentPuzzle(page)).id }; // already shown by the title screen
-  const target = songs(2)[0]; // Aankh Marey
+  const target = songs(2).find((p) => p.id !== last[2])!; // any Find the Beat song other than the one already showing
   const shown = await enterPinned(page, 2, name(2), target, last);
   await solveByTaps(page, shown.phrase);
   await expect(page.getByTestId('accept-dance')).toBeVisible({ timeout: 6000 });
-  await expect(page.getByTestId('song-note')).toContainText('Aankh Marey');
+  await expect(page.getByTestId('song-note')).toContainText(target.song!.title);
   await expect(page.getByTestId('song-note')).toContainText('original track');
   const p = await currentPuzzle(page).catch(() => null);
   expect(p).toBeNull(); // we are on the invitation now, not the puzzle

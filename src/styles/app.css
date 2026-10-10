@@ -361,3 +361,7 @@ input[type='range'] { accent-color: var(--coral); width: 130px; height: 32px; }
 .score-stars { display: flex; gap: 0.35rem; justify-content: center; }
 .score-stars .star { fill: none; stroke: var(--lime); stroke-width: 1.6; stroke-linejoin: round; }
 .score-stars .star.is-on { fill: var(--lime); }
+
+/* Back button beside the wordmark, and the skip links under the puzzle and listening screens */
+.topbar-left { display: flex; align-items: center; gap: 0.7rem; }
+.skip-row { gap: 1.2rem; margin-top: 0.4rem; }

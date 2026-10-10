@@ -9,6 +9,8 @@ interface Props {
   completed: number;
   players: 1 | 2;
   onPlayers: (n: 1 | 2) => void;
+  allSongs: boolean;
+  onAllSongs: (on: boolean) => void;
   onStart: () => void;
   onStartOver: () => void;
 }
@@ -18,7 +20,7 @@ const FRAMES = SIL_DANCERS.map((d) => keyframes(toHumanPose(d.a), toHumanPose(d.
 const FLOOR_Y = 218;
 
 /** The first screen: one big gesture (tap anywhere on the screen) into the game. */
-export function TitleScreen({ completed, players, onPlayers, onStart, onStartOver }: Props) {
+export function TitleScreen({ completed, players, onPlayers, allSongs, onAllSongs, onStart, onStartOver }: Props) {
   const reduce = prefersReducedMotion();
   const beat = useBeat(96, !reduce, 30);
   const [leaving, setLeaving] = useState<{ x: number; y: number } | null>(null);
@@ -86,6 +88,12 @@ export function TitleScreen({ completed, players, onPlayers, onStart, onStartOve
           <button type="button" className={players === 1 ? 'is-on' : ''} aria-pressed={players === 1} onClick={() => onPlayers(1)} data-testid="players-1">1 player</button>
           <button type="button" className={players === 2 ? 'is-on' : ''} aria-pressed={players === 2} onClick={() => onPlayers(2)} data-testid="players-2">2 players</button>
         </div>
+        {players === 1 && (
+          <div className="players-switch" role="group" aria-label="How many songs per level" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+            <button type="button" className={!allSongs ? 'is-on' : ''} aria-pressed={!allSongs} onClick={() => onAllSongs(false)} data-testid="songs-one">One song a level</button>
+            <button type="button" className={allSongs ? 'is-on' : ''} aria-pressed={allSongs} onClick={() => onAllSongs(true)} data-testid="songs-all">All songs</button>
+          </div>
+        )}
         {completed > 0 && completed < LEVEL_COUNT && <span className="start-sub">Continue at level {next}</span>}
         {completed > 0 && (
           <button

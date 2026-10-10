@@ -14,6 +14,9 @@ interface Props {
   /** Points from the camera, when the player used it. */
   score?: CameraResult;
   hasNext: boolean;
+  /** When a level plays all its songs in turn: which song this was, and how to go on to the next one. */
+  songProgress?: { index: number; total: number };
+  onNextSong?: () => void;
   onNext: () => void;
   onAgain: () => void;
   onMake: () => void;
@@ -22,7 +25,7 @@ interface Props {
 }
 
 /** The end-of-dance celebration, then the way forward. */
-export function CelebrateScreen({ kind, level, from, skipped, score, hasNext, onNext, onAgain, onMake, onLevels, onBackToCreate }: Props) {
+export function CelebrateScreen({ kind, level, from, skipped, score, hasNext, songProgress, onNextSong, onNext, onAgain, onMake, onLevels, onBackToCreate }: Props) {
   const [mood, setMood] = useState<string | null>(null);
   const [copied, setCopied] = useState('');
   const finalLevel = kind === 'level' && level && !hasNext;
@@ -100,8 +103,11 @@ export function CelebrateScreen({ kind, level, from, skipped, score, hasNext, on
       )}
 
       <div className="row center actions">
+        {kind === 'level' && onNextSong && songProgress && (
+          <button type="button" className="btn btn-hero" onClick={onNextSong} data-testid="next-song"><Icon name="right" size={24} /> Next song ({songProgress.index + 2} of {songProgress.total})</button>
+        )}
         {kind === 'level' && hasNext && (
-          <button type="button" className="btn btn-hero" onClick={onNext} data-testid="next-level"><Icon name="right" size={24} /> Next level</button>
+          <button type="button" className={onNextSong ? 'btn' : 'btn btn-hero'} onClick={onNext} data-testid="next-level"><Icon name="right" size={onNextSong ? 20 : 24} /> {onNextSong ? 'Skip to the next level' : 'Next level'}</button>
         )}
         {kind === 'level' && !hasNext && (
           <button type="button" className="btn btn-hero" onClick={onMake} data-testid="make-for-friend"><Icon name="share" size={24} /> Make a puzzle for a friend</button>

@@ -14,6 +14,8 @@ interface Props {
   onMuted: (m: boolean) => void;
   /** Called after the last clip is answered correctly. Receives the line from the last clip. */
   onDone: (lastLine: string) => void;
+  /** Skip the whole level. */
+  onSkipLevel?: () => void;
 }
 
 const IDLE: ClipInfo = { status: 'idle', source: 'demo', fileFailed: false, voiceMissing: false, soundMissing: false };
@@ -22,7 +24,7 @@ const IDLE: ClipInfo = { status: 'idle', source: 'demo', fileFailed: false, voic
  * Level 3: listen to a short instrumental clip, then choose which song it was. No rearranging here.
  * Sound only starts when the player presses Play (browsers require a tap first).
  */
-export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMuted, onDone }: Props) {
+export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMuted, onDone, onSkipLevel }: Props) {
   const [index, setIndex] = useState(0);
   const challenge = challenges[index];
   const options = useMemo(() => shuffledOptions(challenge), [challenge]);
@@ -133,6 +135,11 @@ export function ListenScreen({ kicker, challenges, volume, muted, onVolume, onMu
           );
         })}
       </ul>
+
+      <div className="row center skip-row">
+        <button type="button" className="link-btn" onClick={next} data-testid="skip-clip">{last ? 'Skip this clip and finish' : 'Skip this clip'}</button>
+        {onSkipLevel && <button type="button" className="link-btn" onClick={onSkipLevel} data-testid="skip-level">Skip this level</button>}
+      </div>
 
       <div className="listen-foot">
         <p className={`feedback ${correct ? 'is-right' : wrong.length ? 'is-wrong' : ''}`} role="status" aria-live="polite" data-testid="listen-feedback">
